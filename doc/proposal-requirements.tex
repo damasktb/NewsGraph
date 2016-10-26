@@ -1,0 +1,36 @@
+\section{Article Acquisition}
+\begin{itemize}
+	\item The system must be able to accept any standard XML document compliant with the RSS 2.0 specification.\footnote{http://cyber.harvard.edu/rss/rss.html}
+	\item The system must be able to extract a specified number of articles from an RSS feed, in reverse chronological order.
+	\item The system must be able to download the textual content and/or raw HTML for each article.
+	\item The system must not be specific to any online news source, and therefore must be continually tested with various different feeds.
+\end{itemize}
+\section{Keyword Extraction}
+\begin{itemize}
+	\item The system must be able to tokenise articles in order to perform basic NLP.
+	\item The system must implement at least one method of keyword extraction.
+	\item The system must store a corresponding measure of relative importance for each keyword such as TF-IDF\citep{tfidf}.
+	\item The system should attempt to combine keywords it considers equivalent (e.g. \textit{UK} and \textit{United Kingdom}) to form stronger keyword matches between or within articles.
+	\item The system may use external services (e.g. Google's Knowledge Graph API\footnote{http://www.google.com/intl/es419/insidesearch/features/search/knowledge.html}) to query any extracted keywords, in order to gain further insight or help disambiguate particular entities.
+\end{itemize}
+\section{Topic Selection and Graph Formation}
+\begin{itemize}
+	\item The system must analyse the keywords extracted from all articles in a feed to choose a set of appropriate topics.
+	\item The system must use these topics and the publish dates of the articles to form a directed graph, with articles as vertices and common topic storylines as edges.
+	\item The system should choose topics which are specific to some but not all articles in the collection, so as to form a visually interesting graph.
+	\item The system may attempt to maximise the coverage of the topic selection, i.e. maximise the number of articles covered by a given set of keywords.
+	 \item The system may attempt to combine keywords to form topics if it considers them strongly correlated.
+\end{itemize}
+\section{Graph Visualisation}
+\begin{itemize}
+	\item The system must have the capability to automatically visualise graphs it generates.
+	\item The system should provide drill-down detail for nodes, e.g. by providing a hyperlink to the original article or embedding static content from each article within the visualisation itself to provide a preview.
+	\item The system should ensure the graphs generated are readable by ensuring nodes, edges and labels do not overlap with each other.
+	\item The system may allow some degree of interactive customisation which does not change the underlying structure of the graph, such as dragging nodes or changing attributes including colour.
+\end{itemize}
+\section{Storage and Persistence}
+\begin{itemize}
+	\item By default, the articles collected by each run of the system must be treated as a new corpus so keyword ranking is deterministic for any given feed.
+	\item The system must be able to store, process and visualise enough data to form a meaningful graph. The exact value of \textit{enough} has yet to be determined.
+	\item The system should support the importing/exporting of an intermediate data form, in order to reconstruct graphs it had previously created.
+\end{itemize}

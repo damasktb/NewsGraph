@@ -1,0 +1,144 @@
+\section{Milestones}
+
+The major milestones in the form of deliverables and their deadlines are outlined here to act as the starting point for the project plan. In between deliverables are distinct phases which may later be subdivided; all key activities will fit into one of these phases.
+
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+Phase 0 & Speculative reading, development and scoping. \\
+\hline
+\end{tabularx}
+\textbf{\begin{tabularx}{\textwidth}{|X|l|}
+\hline
+Project Proposal & 28th October 2016 (Week 4) \\
+\hline
+\end{tabularx}}
+
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+Phase 1 & Requirements specification, literature survey, initial proof of concept. \\
+\hline
+\end{tabularx}
+\textbf{\begin{tabularx}{\textwidth}{|X|l|}
+\hline
+Literature and Technology Survey & 25th November 2016 (Week 8) \\
+\hline
+\end{tabularx}}
+
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+Phase 2 & Iteration on initial prototype, refining system, integration of new requirements if applicable.\\
+\hline
+\end{tabularx}
+\textbf{\begin{tabularx}{\textwidth}{|X|l|}
+\hline
+Demonstration of Progress & 20th February 2017 (Week 21) \\
+\hline
+\end{tabularx}}
+
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+Phase 3 & Experimental design, and evaluation of user interaction with application.\\
+Phase 4 & Final write-up and submission. \\
+\hline
+\end{tabularx}
+\textbf{\begin{tabularx}{\textwidth}{|X|l|}
+\hline
+Dissertation & 5th May 2017 (Week 31) \\
+\hline
+\end{tabularx}}
+
+\section{Gantt Chart}
+
+Plotting the project's phases and milestones on a Gantt chart has allowed me to plan and allocate additional time at the end of each phase as a contingency buffer which can, depending on whether or not any problems are encountered, act as a period for reflection on the previous phase or be used to extend it.
+
+The four key deadlines (Proposal, Literature Survey, Demonstration of Progress, and Dissertation) are shown on the chart in red, with tasks for each respective phase listed under that phase and coloured to represent my current state of progress through each.
+
+Dotted areas represent University holidays, where I have deliberately scheduled more flexible tasks in the lead-up to exams. The period from the start of the Christmas break to the end of the Inter-Semester break which includes January exams has been blocked as one break, as I do not anticipate completing a significant volume of work during exam revision.
+
+As I begin each new phase, I will produce a more detailed plan and decompose tasks and their dependencies to ensure I organise my time effectively.
+
+\hspace{-0.5cm}\footnotesize\begin{ganttchart}[
+    y unit title=0.5cm,
+    y unit chart=0.6cm,
+    vgrid={*{27}{draw=none}, *1{red,ultra thick}, *{27}{draw=none}, *1{red,ultra thick}, *{24}{draw=none}, *{49}{dotted}, *{13}{draw=none}, *1{red,ultra thick}, *{69}{draw=none}, *2{dotted}, *2{draw=none}, *1{red,ultra thick}, *7{draw=none}, *{21}{dotted}},
+    time slot format=isodate,
+    x unit=0.6mm,
+    title/.append style={shape=rectangle, fill=black!10},
+    title height=1,
+    bar/.append style={fill=blue!90},
+    bar height=.5,
+    bar label font=\scriptsize\color{black!50},
+    group top shift=.6,
+    group height=.2,
+    group peaks height=.2,
+    bar incomplete/.append style={fill=blue!40}
+  ]{2016-10-01}{2017-05-10}
+  \gantttitlecalendar{year} \\
+  \gantttitlecalendar{month} \\
+  \ganttset{progress label text={},
+       bar incomplete/.append style={fill=blue!30},
+       group/.append style={draw=black, fill=black}} % this suppresses percentage done labels
+  \ganttgroup{Phase 0: }{2016-10-03}{2016-10-26} \\
+  	\ganttbar[progress=100, name=prop]{Proposal}{2016-10-03}{2016-10-26} \\
+  	\ganttbar[progress=100, name=scoping]{Scoping}{2016-10-10}{2016-10-20} \\
+  \ganttgroup{Phase 1: }{2016-10-29}{2016-11-22} \\
+    	\ganttbar[progress=90, name=vo]{Proof of Concept}{2016-10-20}{2016-11-10} \\
+    \ganttbar[progress=20, name=rq]{Requirements}{2016-10-28}{2016-11-8} \\
+  	\ganttbar[name=lr, progress=10]{Literature Survey}{2016-10-31}{2016-11-22} \\
+  \ganttgroup{Phase 2: }{2016-11-26}{2017-02-06} \\
+  \ganttbar[progress=0, name=dev]{Core Development}{2016-11-25}{2017-01-09} \\
+  \ganttbar[progress=0, name=devw]{Development Write-up}{2016-11-25}{2017-02-06} \\
+  \ganttbar[progress=0, name=ref]{Refining System}{2017-01-10}{2017-02-06} \\
+
+  \ganttgroup{Phase 3: }{2017-02-21}{2017-03-15} \\
+	\ganttbar[progress=0, name=ed]{Experimental Design}{2017-02-20}{2017-03-01} \\
+	\ganttbar[progress=0, name=ue]{Evaluation Write-up}{2017-02-20}{2017-03-15} \\
+	\ganttbar[progress=0, name=ue]{User Evaluation}{2017-03-01}{2017-03-08} \\
+  \ganttgroup{Phase 4: }{2017-03-18}{2017-04-23} \\
+  \ganttbar[progress=0, name=ed]{Finish Dissertation}{2017-03-10}{2017-04-23} \\
+
+\end{ganttchart}
+
+
+\section{Probabilistic Risk Assessment}
+In an attempt to mitigate the most foreseeable high-level risks to the project, I have identified each and categorised their severity and likelihood, along with a basic contingency plan.
+
+Hardware failure has not been recorded as a risk, as there will not be a physical component to the project, and both and the code and the documentation are hosted privately on GitHub and mirrored on Google Drive, with hourly physical backups.\\
+
+\begin{tabularx}{1\linewidth}{|X|l|l|X|}
+\hline
+Risk & Severity & Likelihood & Contingency \\
+\hline
+Underestimated project size and/or scope. 
+& Moderate
+& Possible
+& Use scheduled buffer to refine requirements by priority. \\
+\hline
+Wrongly assessed technical feasibility of project. 
+& Critical
+& Unlikely
+& Use external libraries or APIs to solve problems encountered which are not solvable in the given time. \\
+\hline
+Personal reasons/illness.
+& Critical
+& Possible
+& Use schedule buffer to make up time, or refine requirements if necessary. \\
+\hline
+Underestimated development or documentation time. 
+& Critical
+& Likely
+& Use schedule buffer to make up time, or refine requirements if necessary. \\
+\hline
+Software or library failure. 
+& Catastrophic
+& Possible
+& Manually download and compile older versions of the open source libraries required. \\
+\hline
+Scoped project too narrowly/Project lacks complexity. 
+& Catastrophic
+& Unlikely
+& Use Core Development (Phase 2) to iteratively expand research and create new requirements in order to broaden scope. \\
+\hline
+
+\end{tabularx}
+

@@ -1,0 +1,37 @@
+%---PROBLEM DESCRIPTION
+
+\section{Introduction}
+
+Making sense of collections of related documents is a common task when using the internet for information retrieval, and nowhere is this challenge more prevalent than in the context of reading and understanding the news.
+
+Studies have found the public most commonly use news media to make important life decisions, for entertainment and discussion, as a requirement of their jobs, or out of perceived civic obligation \citep{InformationCartography, UnderstandingTheParticipatoryNewsConsumer}. As a result of the ongoing shift towards online multimedia journalism, 
+there has been an explosion of globally accessible knowledge to support these common uses, which is expanding at an unprecedented rate as the internet grows.
+
+The rise of the internet as an ambient news platform\footnote{https://www.researchgate.net/publication/228176202} has lead to many users finding the most efficient method of reading news articles is to subscribe to various topic-specific news feeds and read what is automatically collated by their computers \citep{nReader}. Ubiquitous news media may have resulted in more complete coverage of current events, but the volume of content available online has made the process of understanding it overwhelming to readers.
+
+Broder\citep{ATaxonomyofWebSearch} found that in almost 15\% of information query searches (of which searching for news is an example), a related collection of links is the desired result of the search, as opposed to a single document. This suggests that simply reducing a collection of news articles into a single summary is approach to the information overload problem. In addition, news articles are often part of long-running stories \citep{ExploringLongRunningNewsStoriesUsingWikipedia} such as international conflicts, and therefore fit into a wider set of stories which span a common salient topic.
+
+In spite of these facts, little attention has been given to addressing the problem that understanding news articles individually is inherently reliant on understanding news articles as a collection. Existing information infrastructure has been criticised both for not supporting the cross-correlation between collections of related news articles \citep{GalaxyOfNews}, and for attempting fit complex narratives into visualisations using a single unit of analysis \citep{InformationCartography}. Research into how humans' spatio-cognitive abilities can be applied to more abstract spatial metaphors \citep{FromMetaphorToMethod} suggests that the best visualisation format for collections of this nature may be cartographic.
+
+\section{Aims and Objectives}
+This project will seek to develop a tool to solve the twofold problem outlined above; the proliferation of online news content is causing information overload for reader, and there are no general purpose tools enabling readers to explore the contextual relationships between news articles in order to understand the bigger picture.
+
+The objectives of the project are as follows:
+\begin{enumerate}
+	\item Investigate efficient methods for keyword extraction and build a generic module which can download articles from a given RSS feed and use an extract keywords which it considers significant.
+	\item Implement or adapt an existing algorithm to fit a feed of articles into a directed graph with nodes as articles and vertices as salient topic threads, or \textit{stories}. If necessary, the goal of the algorithm will be simplified by not attempting to maximise the coverage of the graph over the set of all topics.
+	\item Use existing work on information cartography such as \cite{GeneratingInformationMaps, InteractiveTopicBasedVisualTextSummarizationAndAnalysis} to design a map-based visualisation for the graphs which preserves chronology, and refine using sets of real news data.
+	\item Evaluate how readers use the system, and whether the contextual information provided helps them learn or retain more effectively than simply reading the articles individually.
+\end{enumerate}
+
+\section{Related Work}
+
+Interactive exploration of news article chronology is an active area of research, with much work dedicated to visualising timelines of events \citep{StructuredSummarizationForNewsEvents, ExploringLongRunningNewsStoriesUsingWikipedia} or using probabalistic topic modelling to extract salient themes from more general document collections \citep{DiscoveringDiverseAndSalientThreads}. Both Goyal et al.\citep{ESTHETE} and Wang et al. \citep{nReader} designed news timeline viewers based on contextual graphs connecting related stories, though the graphs themselves were not part of the final visualisations in either case, making them less applicable to the scope of this project.
+
+Relative topic significance as a determiner for the physical features of a visualisation can be found in \citep{InteractiveTopicBasedVisualTextSummarizationAndAnalysis}, where Liu et al. graph continuous keyword frequency for words extracted from 10,000 emails over the course of a year.
+
+Information cartography as a solution to information overload has been explored by Shahaf et al, who present \textit{Metro Maps} as a visualisation for data in the domains of news, science and legal documents \citep{InformationCartography, MetroMapsOfScience, GeneratingInformationMaps}. Map-based information design has also been approached from an explicitly cartographic perspective by Skupin \citep{FromMetaphorToMethod}, who makes recommendations for the use of maps within information design based on the cognitive abilities of humans to process highly dimensional data.\\
+
+
+
+

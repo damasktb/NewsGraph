@@ -7,7 +7,14 @@
 \usepackage{pdflscape}  % Provides landscape mode for end code listings
 \usepackage{multicol}   % Provides ability to split output into columns
 \usepackage{listings}   % Provides styled code listings
-
+\usepackage[left=3cm, right=2cm, top=3cm, bottom=3cm]{geometry} % Margins
+\usepackage{titlesec}
+\usepackage{lipsum}
+\usepackage{natbib}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{pgfgantt}
+  
 %%
 %% Set some page size changes from the standard article class
 %%
@@ -15,8 +22,8 @@
 \setlength{\parskip}{6pt}
 \setlength{\parindent}{0pt}
 \addtolength{\hoffset}{-0.5cm}
-\addtolength{\textwidth}{2.5cm}
-
+%\addtolength{\textwidth}{2.5cm}
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{0pt}{\huge}
 
 %%
 %% Format definitions for the style
