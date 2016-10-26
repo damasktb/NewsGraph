@@ -8,3 +8,6 @@
 *.lof
 *.lot
 *.toc
+*.pyc
+doc/.texpadtmp/*
+/doc/example/*
