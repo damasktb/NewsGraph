@@ -11,3 +11,5 @@
 *.pyc
 doc/.texpadtmp/*
 /doc/example/*
+*.DS_Store
+*.gz
