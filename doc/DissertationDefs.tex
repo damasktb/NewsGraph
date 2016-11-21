@@ -11,6 +11,7 @@
 \usepackage{titlesec}
 \usepackage{lipsum}
 \usepackage[numbers]{natbib}
+\usepackage{enumerate}
 \usepackage{tabularx}
 \usepackage{longtable}
 \usepackage{pgfgantt}
@@ -18,6 +19,18 @@
 \usepackage{amsmath, amsthm, amsfonts}
 \newtheorem{definition}{Definition}
 \usepackage{bbm}
+\usepackage{appendix}
+
+\newcommand\requirement[2]{
+  {#1} %\textbf{Priority: {#2}.}
+}
+
+\newcommand\invisiblesubsection[1]{
+  \refstepcounter{subsection}
+  \addcontentsline{toc}{subsection}{\protect\numberline{\thesubsection}#1}
+  \subsectionmark{#1}}
+\makeatother
+
   
 %%
 %% Set some page size changes from the standard article class
@@ -34,6 +47,7 @@
 %%
 %\usepackage{harvard}    % Uses harvard style referencing
 \bibliographystyle{abbrvnat} %{agsm}%{agsm} %{alpha}
+\setcitestyle{authoryear}
 %\citationstyle{dcu}
 \pagestyle{headings}
 \fussy
