@@ -1,0 +1,21 @@
+\section{Gathering}
+
+\section{Categorisation}
+The operation of the proposed system suggests a natural pipeline of four components through which data will be transformed, with each component comprising some distinct functionality which can be tested in isolation. The components are as follows;
+\begin{itemize}
+	\item Article acquisition - The process of parsing an RSS feed and downloading content from the articles within it.
+	\item Keyword extraction - The NLP component, wherein articles are tokenised and their significant keywords are extracted.
+	\item Topic selection/Graph formation - The transformation of a collection of labeled vertices (articles and their keywords) into a graph structure, by selecting keywords which best represent the entire corpus.
+	\item Graph visualisation - The generation of a visual representation of the graph structure, which the user will interact with.
+\end{itemize}
+In addition to the four components of the pipeline, the system requires an ancillary storage component, to allow processed corpora and their graphs to be imported and exported. In the specification, I chose to categorise all functional requirements according to these five components, to assist in the implementation planning and testing processes.
+
+\section{Prioritisation}
+I used the MoSCoW technique for assigning priority to requirements, since the size of the proposed system is not large enough to warrant more granularity in requirement priority. MoSCoW assigns requirements to one of four categories \citep{PrioritizationUsingMoscow};
+\begin{enumerate}
+	\item \textbf{M}ust have - Features which must be included for the project to be useful.
+	\item \textbf{S}hould have - High value but non-critical features.
+	\item \textbf{C}ould have - Features which will be moved out of scope if timescales become at risk.
+	\item \textbf{W}on't have - Features which have been requested but won't be included. 
+\end{enumerate}
+As my requirements gathering process was based on analysing the findings of other studies rather than surveying potential users, there are no requirements with a \textit{won't have} modifier. All requirements were assigned on of the other three modifiers with my aim being to fully implement all the \textit{must have} and \textit{should have} requirements in the assigned timescale. Time permitting, I will assess which of the \textit{could have} requirements would be most beneficial to the system and implement a subset of these.
