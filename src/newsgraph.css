@@ -1,0 +1,31 @@
+.header {
+ padding: 5px;
+ font-size: 2em;
+}
+
+.node circle {
+ stroke: #000;
+ stroke-width: 4px;
+}
+
+.link {
+  fill: none;
+  stroke-width: 7px;
+}
+
+.card {
+	width: 300px;
+	display: inline-block;
+	float: none;
+	margin: 5px;
+}
+
+#cards {
+	margin-top: 20px;
+	text-align: center;
+}
+
+.card-title {
+	font-size: 1.4em !important;
+	line-height: 1.2em !important;
+}

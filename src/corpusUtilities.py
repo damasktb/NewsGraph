@@ -16,12 +16,12 @@ import unicodedata
 
 from unidecode import unidecode
 
-def tokenize(doc, knowledge, ltze=True, extract_entities=False):
+def tokenize(doc, knowledge, ltze=True, extract_entities=True):
 	wnl = nltk.WordNetLemmatizer()
 	tokens = []
-	entities = set()
+	entities = []
 	# Don't transform letter case until after entity recognition, or it will fail.
-	punctuation = [i for i in xrange(sys.maxunicode) 
+	punctuation = [i for i in xrange(sys.maxunicode)
 		if unicodedata.category(unichr(i)).startswith('P')]
 
 	stopWords = set(get_stop_words("en"))
@@ -33,23 +33,27 @@ def tokenize(doc, knowledge, ltze=True, extract_entities=False):
 			prevTree = (prevTree+" "+t).strip()
 		else:
 			if prevTree:
-				entities.add(prevTree)
+				tokens.append(prevTree)
+				if prevTree not in entities:
+					# No point querying KnowledgeGraph multiple times
+					entities.append(prevTree)
 				prevTree = ""
 
 			t = chunk[0].lower()
 			if ltze: 
-				t = unicode(wnl.lemmatize(t))
-			if t not in stopWords and not unicode.isnumeric(t):
-				t = unicode.strip(t)
+				t = wnl.lemmatize(t)
+			if t not in stopWords and not t.isdigit():
+				t = string.strip(t, string.punctuation)
 				tokens.append(t)
 	
 	aliases = knowledge.aliasEntities(entities)
+	entities = [aliases.get(e, e) for e in entities]
 	if aliases:
-		entities = list(set(aliases.get(e, e) for e in entities))
+		tokens = [aliases.get(t, t) for t in tokens]
 	if extract_entities:
 		return tokens, entities
 	else:
-		return tokens.extend(entities)
+		return tokens
 
 # class LevelStatistics:
 # 	def __init__(self, word, spectra, dists, doc_words):
