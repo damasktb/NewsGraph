@@ -13,3 +13,4 @@ doc/.texpadtmp/*
 /doc/example/*
 *.DS_Store
 *.gz
+*api_key
