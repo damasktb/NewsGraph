@@ -54,7 +54,7 @@ class NewsGraphKnowledge:
 	LOG = False
 
 	def __init__(self):
-		self.api_key = open('.api_key').read()
+		self.api_key = open('keywordUtils/.api_key').read()
 		self.service_url = 'https://kgsearch.googleapis.com/v1/entities:search'
 
 	def query(self, queryText, limit=4):

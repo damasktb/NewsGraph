@@ -5,7 +5,7 @@ except:
 	import pickle
 
 
-DEFAULT = "cache.ng"
+DEFAULT = "io_ignore/cache.ng"
 
 class CacheWriter:
 

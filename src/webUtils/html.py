@@ -52,9 +52,9 @@ def buildCards(line_lookup):
 
 
 def writePage(nodes, links, line_lookup):
-	with open("newsgraph.css", "r") as css:
+	with open("webUtils/newsgraph.css", "r") as css:
 		default_css = css.read()
-	with open("newsgraph.js", "r") as js:
+	with open("webUtils/newsgraph.js", "r") as js:
 		default_js = js.read()
 		default_js = default_js.replace("NG-NODES", json.dumps(nodes))
 		default_js = default_js.replace("NG-LINKS", json.dumps(links))

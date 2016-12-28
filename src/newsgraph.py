@@ -3,11 +3,11 @@ import feedparser
 import newspaper
 from newspaper import Article as RawArticle
 
-from newsSerialiser import *
+from ioUtils.newsSerialiser import *
 
 import uuid
-from corpusUtilities import *
-from graphObjects import *
+from keywordUtils.corpusUtilities import *
+from mapEngine.graphObjects import *
 
 import itertools
 
@@ -188,7 +188,7 @@ else:
 	cln = NewsCollection(urls)
 
 if write_cache:
-	wr = CacheWriter(strftime("%Y%m%d-%H%M%S")+".ng")
+	wr = CacheWriter("io_ignore"+strftime("%Y%m%d-%H%M%S")+".ng")
 	wr.write(cln)
 
 #TF-IDF
