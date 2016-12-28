@@ -16,7 +16,9 @@ import unicodedata
 
 from unidecode import unidecode
 
-def tokenize(doc, knowledge, ltze=True, extract_entities=True):
+IGNORE = [u"Getty Images", u"Getty", u"Photograph", u"Photo", u"Facebook Twitter Pinterest"]
+
+def tokenize(doc, knowledge, ltze=True):
 	wnl = nltk.WordNetLemmatizer()
 	tokens = []
 	entities = []
@@ -25,35 +27,34 @@ def tokenize(doc, knowledge, ltze=True, extract_entities=True):
 		if unicodedata.category(unichr(i)).startswith('P')]
 
 	stopWords = set(get_stop_words("en"))
-	prevTree = ""
-	for chunk in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(doc)), binary=False):
-		if isinstance(chunk, nltk.Tree):
-			t = " ".join(ent[0] for ent in chunk.leaves())
-			#TODO This is horrific
-			prevTree = (prevTree+" "+t).strip()
-		else:
-			if prevTree:
-				tokens.append(prevTree)
-				if prevTree not in entities:
-					# No point querying KnowledgeGraph multiple times
-					entities.append(prevTree)
-				prevTree = ""
 
-			t = chunk[0].lower()
-			if ltze: 
-				t = wnl.lemmatize(t)
-			if t not in stopWords and not t.isdigit():
-				t = string.strip(t, string.punctuation)
-				tokens.append(t)
+	for sentence in preprocess(doc):
+		for chunk in nltk.ne_chunk(sentence, binary=False):
+			if isinstance(chunk, nltk.Tree):
+				t = " ".join(ent[0] for ent in chunk.leaves()).strip()
+				for phrase in IGNORE:
+					t = t.replace(phrase, "")
+				if t:
+					tokens.append(t)
+					#if t not in entities: # No point querying KnowledgeGraph multiple times
+					entities.append(t)
+			else:
+				t = chunk[0].lower()
+				if ltze: 
+					t = wnl.lemmatize(t)
+				if t not in stopWords and not t.isdigit():
+					t = string.strip(t, string.punctuation)
+					tokens.append(t)
 	
+	entities = list(set([e for e in entities if entities.count(e) > 1]))
 	aliases = knowledge.aliasEntities(entities)
 	entities = [aliases.get(e, e) for e in entities]
-	if aliases:
-		tokens = [aliases.get(t, t) for t in tokens]
-	if extract_entities:
-		return tokens, entities
-	else:
-		return tokens
+	return tokens, entities
+
+def preprocess(doc):
+	sentences = nltk.sent_tokenize(doc)
+	words = [nltk.word_tokenize(s) for s in sentences]
+	return [nltk.pos_tag(w) for w in words]
 
 # class LevelStatistics:
 # 	def __init__(self, word, spectra, dists, doc_words):

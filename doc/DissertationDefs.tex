@@ -19,6 +19,7 @@
 \usepackage{amsmath, amsthm, amsfonts}
 \newtheorem{definition}{Definition}
 \usepackage{bbm}
+\usepackage{enumitem}
 \usepackage{appendix}
 
 \newcommand\requirement[2]{
@@ -46,7 +47,7 @@
 %% Format definitions for the style
 %%
 %\usepackage{harvard}    % Uses harvard style referencing
-\bibliographystyle{abbrvnat} %{agsm}%{agsm} %{alpha}
+\bibliographystyle{agsm}%{alpha}
 \setcitestyle{authoryear}
 %\citationstyle{dcu}
 \pagestyle{headings}
@@ -138,6 +139,19 @@ from the date of submission of the dissertation.
 Signed: \includegraphics[width=3cm]{img/signature.png}
 \end{centrespaced}
 }
+
+
+\usepackage{epigraph}
+%\epigraphsize{\small}
+\setlength\epigraphwidth{13cm}
+\setlength\epigraphrule{0pt}
+
+\usepackage{etoolbox}
+
+\makeatletter
+\patchcmd{\epigraph}{\@epitext{#1}}{\itshape\@epitext{#1}}{}{}
+\makeatother
+
 
 %%
 %% END OF DEFINITIONS

@@ -32,7 +32,7 @@ def buildCards(line_lookup):
 				),
 				E.p(
 					E.a(
-						"Read more at "+ article.feed,
+						"Read more at "+ article.feed_name,
 						href=article.url
 					)
 				)
