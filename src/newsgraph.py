@@ -1,37 +1,26 @@
-import feedparser
-
-import newspaper
-from newspaper import Article as RawArticle
-
-from ioUtils.newsSerialiser import *
-
-import uuid
-from keywordUtils.corpusUtilities import *
-from mapEngine.graphObjects import *
-
-import itertools
-
-import pytz
-
 import datetime
+import feedparser
+import newspaper
+import operator
+import pytz
+import uuid
 
+from collections import Counter
+from itertools import combinations
+from math import log
+from newspaper import Article as RawArticle
+from time import strftime
 from tqdm import tqdm
 
-import collections
-import operator 
-
-from time import strftime
-
-import lxml.etree as ET
-
-
-news_graph_knowledge = NewsGraphKnowledge()
+from ioUtils.newsSerialiser import *
+from keywordUtils.corpusUtilities import *
+from mapEngine.graphObjects import *
 
 class NewsFeed:
 	def __init__(self, feed_name):
 		self.name = feed_name
-		self.F_jc = collections.Counter() # Frequency of all terms in the channel
-		self.n_jc = collections.Counter() # Number of documents in the channel which contain the term
+		self.F_jc = Counter() # Frequency of all terms in the channel
+		self.n_jc = Counter() # Number of documents in the channel which contain the term
 		self.article_count = 0
 
 	def addArticle(self, article):
@@ -59,23 +48,18 @@ class Article:
 		self.text = article.text
 		self.author = author
 		self.html = article.article_html
+		self.summary = article.summary
+		self.url = article.url
+		self.img = article.top_image
+		self.feed_name = feed
+		self.tokens, self.entities = tokenize(self.title)# +". "+ self.text)
+		self.entities = list(set(self.entities).difference(self.author, self.feed_name))
+		self.word_count = len(self.tokens)
+		self.term_frequency = {}
 		try:
 			self.publish_date = publish_date.replace(tzinfo=pytz.UTC)
 		except AttributeError as e:
 			self.publish_date = publish_date
-
-		self.summary = article.summary
-		self.url = article.url
-		self.img = article.top_image
-		self.uuid = id
-		self.feed_name = feed
-		self.tokens, self.entities = tokenize(
-			self.title +". "+ self.text,
-			news_graph_knowledge
-		)
-		self.entities = list(set(self.entities).difference(self.author, self.feed_name))
-		self.word_count = len(self.tokens)
-		self.term_frequency = {}
 
 	def termFrequency(self, term):
 		if not self.term_frequency:
@@ -94,7 +78,6 @@ class Article:
 
 
 class NewsCollection:
-	
 	def __init__(self, feed_data):
 		self.collection_by_id = {}
 		self.collection_by_feed = {}
@@ -125,7 +108,7 @@ class NewsCollection:
 		for article in self.collection_by_id.values():
 			if article.containsTerm(term):
 				n_containing += 1
-		return math.log(self.article_count/n_containing)
+		return log(self.article_count/n_containing)
 
 	def tf_idf(self, term, article_id):
 		article = self.article(article_id)
@@ -178,7 +161,7 @@ else:
 	print "Fetching RSS Feed(s)"
 	for feed in feeds:
 		feed = feedparser.parse(feed)
-		for item in feed["items"][:40]:
+		for item in feed["items"][:50]:
 			urls.append(
 				(item["link"], 
 				item["published_parsed"], #Newspaper date extraction loses timestamps, which we want
@@ -192,14 +175,14 @@ if write_cache:
 	wr.write(cln)
 
 #TF-IDF
-e_map = cln.top_article_keywords(6)
+e_map = cln.top_article_keywords(5)
 top_25 = sorted(e_map.iteritems(), key=lambda (k,a): len(a), reverse=True)[:15]
 
 #TF-PDF
 # top_25 = sorted(cln.top_corpus_keywords(5).iteritems(), key=lambda (k,a): len(a), reverse=True)
 
 subsumed = {}
-for pair1, pair2 in itertools.combinations(top_25, 2):
+for pair1, pair2 in combinations(top_25, 2):
 	kw1, articles1 = pair1[0], set(pair1[1])
 	kw2, articles2 = pair2[0], set(pair2[1])
 	unique = len(articles1.difference(articles2))/float(len(articles1))
@@ -209,9 +192,9 @@ for pair1, pair2 in itertools.combinations(top_25, 2):
 
 new_top = {}
 for (k, articles) in top_25:
-	while k in subsumed:
-		print k, " subsumed by ", subsumed[k]
-		k = subsumed[k]
+	# while k in subsumed:
+	# 	print k, " subsumed by ", subsumed[k]
+	# 	k = subsumed[k]
 	
 	arts_for_keyword = new_top.get(k, set())
 	arts_for_keyword.update(articles)

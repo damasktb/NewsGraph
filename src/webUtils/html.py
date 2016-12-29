@@ -1,9 +1,8 @@
+from json import dumps
 from lxml import etree
 from lxml.builder import E
-import json
 from time import strftime
 from xml.sax.saxutils import escape
-
 
 def CLASS(*args):
 	return {"class":' '.join(args)}
@@ -56,8 +55,8 @@ def writePage(nodes, links, line_lookup):
 		default_css = css.read()
 	with open("webUtils/newsgraph.js", "r") as js:
 		default_js = js.read()
-		default_js = default_js.replace("NG-NODES", json.dumps(nodes))
-		default_js = default_js.replace("NG-LINKS", json.dumps(links))
+		default_js = default_js.replace("NG-NODES", dumps(nodes))
+		default_js = default_js.replace("NG-LINKS", dumps(links))
 
 	page = (
 		E.html(
@@ -101,4 +100,3 @@ def writePage(nodes, links, line_lookup):
 
 	with open("ng.html", "w") as ng:
 		ng.write(etree.tostring(page, pretty_print=True).replace("NG-JS", default_js))
-	#print(etree.tostring(page, pretty_print=True))

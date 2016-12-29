@@ -1,15 +1,7 @@
 import json
 import urllib
 
-import itertools
-
 from sys import maxint
-from stop_words import get_stop_words
-from unidecode import unidecode
-
-import regex as re
-
-#Config should include schema.org types to ignore
 
 class NewsGraphResult:
 	NAME  = 0
@@ -52,9 +44,10 @@ class NewsGraphResult:
 
 class NewsGraphKnowledge:
 	LOG = False
+	default_api_key = 'keywordUtils/.api_key'
 
 	def __init__(self):
-		self.api_key = open('keywordUtils/.api_key').read()
+		self.api_key = open(NewsGraphKnowledge.default_api_key).read()
 		self.service_url = 'https://kgsearch.googleapis.com/v1/entities:search'
 
 	def query(self, queryText, limit=4):
@@ -62,6 +55,7 @@ class NewsGraphKnowledge:
 			queryText = queryText.encode('utf-8')
 		elif isinstance(queryText, str):
 			queryText.decode('utf-8')
+
 		params = {
 			'query': queryText,
 			'limit': limit,
@@ -70,7 +64,10 @@ class NewsGraphKnowledge:
 		}
 		url = self.service_url + '?' + urllib.urlencode(params)
 		response = json.loads(urllib.urlopen(url).read().decode('utf-8'))
-		return NewsGraphResult(queryText, response['itemListElement'])
+		if 'itemListElement' in response:
+			return NewsGraphResult(queryText, response['itemListElement'])
+		else:
+			return None
 
 	def aliasEntities(self, entities, certainty=2):
 		uncertain = []
@@ -104,6 +101,9 @@ class NewsGraphKnowledge:
 			# 	continue
 
 			result = self.query(queryText)
+			if result == None:
+				continue
+				
 			if result.certainty > certainty or e in popular_entities:
 				if NewsGraphKnowledge.LOG:
 					print "Certain: %s => %s (%s)" % (
@@ -138,7 +138,3 @@ class NewsGraphKnowledge:
 					mapping[queryText] = queryText
 
 		return dict((entity, alias) for entity, alias in mapping.iteritems() if entity!=alias)
-
-
-
-
