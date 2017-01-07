@@ -73,7 +73,7 @@ It should be noted that there is an overlap between the notion of spatial quanti
 
 Viewing the dimensions of overload from a news domain perspective, it is clear that (consistent with the findings of \citet{TowardsAnOptimalResolutionToInformationOverload}) information quantity is the most relevant contributing factor in respect to fatigue, along factors influencing contextual quality such as value-added and timeliness.
 
-Any proposed solutions to the news overload problem should therefore address these factors as a matter of importance.
+Any proposed solutions to the news overload problem should therefore address these factors first.
 
 \subsection{Supporting Sensemaking}
 
@@ -95,9 +95,9 @@ The most intuitive solution to the problem is an idiomatic one; a picture is wor
 
 \section{An Overview of Information Visualisation}
 
-Of course, a picture is not always worth a thousand words, particularly when the picture is unstructured and complex in its own right. However, a recognised and effective technique for bridging the gap between a set of data and a user's mental model and subsequent comprension of the data is information visualisation, or InfoVis. \citep{UnderstandingAndCharacterizingInsights, ThemeRiver}. In this section, I therefore provide a brief overview of a notable InfoVis taxonomy and use this to explore appropriate visual models for news feed visualisation.
+Of course, a picture is not always worth a thousand words, particularly when the picture is unstructured and complex in its own right. However, a recognised and effective technique for bridging the gap between a set of data and a user's mental model and subsequent comprension of the data is information visualisation, or InfoVis. \citep{UnderstandingAndCharacterizingInsights, ThemeRiver}. This section provides a brief overview of a formative InfoVis taxonomy and uses the taxonomy to categorise appropriate visual models for news feed visualisation.
 
-In his seminal paper on InfoVis, \citeauthor{TheEyesHaveIt} proposed a taxonomy for visualisations comprising seven data type abstractions, and seven tasks which are components of the visual information seeking mantra; ``Overview first, zoom and filter, then details-on-demand.'' \citep[p.1]{TheEyesHaveIt}
+In his seminal paper on information visualisation, \citeauthor{TheEyesHaveIt} proposed a taxonomy for visualisations comprising seven data type abstractions, and seven tasks which are components of the visual information seeking mantra; ``Overview first, zoom and filter, then details-on-demand.'' \citep[p.1]{TheEyesHaveIt}
 
 \citeauthor{TheEyesHaveIt}'s type abstractions are as follows:
 \begin{description}[leftmargin=11em,style=nextline]
@@ -125,9 +125,10 @@ The use of preexisting visual metaphors--specifically those with which a large n
 Examples of visual metaphors commonly used to represent collections of data include calendars, bookshelves, timelines and maps. These do not have to be visually skeuomorphic to be effective, but to avoid misinterpretation, there should be a match between the underlying structure of the metaphor and the underlying structure of the data.
 
 \subsubsection{Timelines}
+\todo{Write this}
 
 \subsubsection{Cartographs}
-
+\todo{Write this}
 
 \subsection{InfoVis for Sensemaking}
 
@@ -252,6 +253,8 @@ Significant work in the area of information visualisation--and in particular, in
 
 The the metro map was introduced in \citep{GeneratingInformationMaps} to address the fact that previous timeline-based news summarisation systems could only represent simple linear stories; ``In contrast, complex stories display a very non-linear structure: stories split into branches, side stories, dead ends, and intertwining narratives.'' \citep[p.1]{InformationCartographyPre}
 
+In this section, the formalisation of the metro map metaphor, its associated characteristics, and its limitations will be discussed.
+
 \begin{definition}{Metro Map \citep{GeneratingInformationMaps}:}
 A metro map $\mathcal{M}$ is a pair $(G, \Pi)$, where $G=(V, E)$ is a directed graph and $\Pi$ is a set of paths, or \textit{metro lines} in $G$. Each $e \in E$ must belong to at least one metro line.
 \end{definition}
@@ -322,12 +325,10 @@ The final property is the most simply defined; the connectivity of a metro map i
 \subsubsection{Corpus}
 Perhaps the biggest limitation of the system developed in \citep{GeneratingInformationMaps, InformationCartographyPre} is the nature of the corpus $\mathcal{D}$; it is a fixed dataset, meaning users can only query it for certain non-recent events with no way of specifying a different corpus themselves. 
 
-From a historical reference perspective the output provided for certain queries is interesting, but it is not possible to use the system as a replacement to a news feed aggregator or similar tool, which seems as though it would be the next logical step.
+From a historical reference perspective the output provided for certain queries is interesting, but it is not possible to use the system as a replacement to a news feed aggregator or similar tool, which seems a logical next step.
 
 \subsubsection{Transit Map Aesthetics}
-
-
-
+\todo{Write this}
 
 \section{Evaluation Methods}
 \citet{GeneratingInformationMaps} evaluated their system both for accuracy and with a user study. The accuracy evaluation tested whether the system included the most `important' (as decided by experts) documents in the map. The user study focused on the strength of the results returned by specific queries, where output was transformed into a structureless list in order for the study to be double-blind against the other methods. The evaluation was performed between-subjects, so background knowledge had to be controlled for. Output was compared with that from Google News and a TDT (Topic Detection and Tracking) method presented in \citep{SemanticLanguageModelsForTDT}. This approach to evaluation is less relevant to my proposed system, since it was actually evaluating the performance of the system in selecting documents based on a query, rather than visualising the documents on a map. In contrast, a visualisation and its usability is precisely the aspect of my process which I would ultimately need to evaluate.

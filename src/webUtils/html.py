@@ -7,13 +7,13 @@ from xml.sax.saxutils import escape
 def CLASS(*args):
 	return {"class":' '.join(args)}
 
-def buildCards(line_lookup):
+def buildCards(articles):
 	cards = []
-	for article in line_lookup:
+	for article in articles:
 		title = article.title
 		text = article.text
 		card = E.div(
-			CLASS("card", *[l.replace(" ","-") for l in line_lookup[article]]),
+			CLASS("card", *[l.replace(" ","-") for l in article.metro_lines]),
 			E.title(title),
 			E.div(
 				CLASS("card-image waves-effect waves-block waves-light"),
@@ -50,13 +50,14 @@ def buildCards(line_lookup):
 	return cards
 
 
-def writePage(nodes, links, line_lookup):
+def writePage(nodes, links, articles, metro_lines):
 	with open("webUtils/newsgraph.css", "r") as css:
 		default_css = css.read()
 	with open("webUtils/newsgraph.js", "r") as js:
 		default_js = js.read()
 		default_js = default_js.replace("NG-NODES", dumps(nodes))
 		default_js = default_js.replace("NG-LINKS", dumps(links))
+		default_js = default_js.replace("NG-METRO-LINES", dumps(metro_lines))
 
 	page = (
 		E.html(
@@ -90,7 +91,7 @@ def writePage(nodes, links, line_lookup):
 					)
 				), 
 				E.div(
-					*buildCards(line_lookup),
+					*buildCards(articles),
 					id="cards"
 				), 
 				E("script", "NG-JS")

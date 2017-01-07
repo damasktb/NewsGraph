@@ -1,6 +1,7 @@
 import json
 import urllib
 
+from itertools import combinations
 from sys import maxint
 
 class NewsGraphResult:
@@ -43,11 +44,12 @@ class NewsGraphResult:
 
 
 class NewsGraphKnowledge:
-	LOG = False
-	default_api_key = 'keywordUtils/.api_key'
+	LOG = True
+	IGNORE = [u"AP", u"Getty Images", u"Getty", u"Photograph", u"Photo", u"Facebook Twitter Pinterest"]
+	API_KEY = 'keywordUtils/.api_key'
 
 	def __init__(self):
-		self.api_key = open(NewsGraphKnowledge.default_api_key).read()
+		self.api_key = open(NewsGraphKnowledge.API_KEY).read()
 		self.service_url = 'https://kgsearch.googleapis.com/v1/entities:search'
 
 	def query(self, queryText, limit=4):
@@ -74,36 +76,35 @@ class NewsGraphKnowledge:
 		mapping = {}
 		people = {}
 
+		strength = {e: entities.count(e) for e in entities}
+
+		popular_entities = list(set([e for e in entities if entities.count(e) > 2 and len(e) and e not in NewsGraphKnowledge.IGNORE]))
+
+		out = set()
+		for e1, e2 in combinations(popular_entities, 2):
+			if len(e1) > len(e2):
+				tmp = e1
+				e1 = e2
+				e2 = tmp
+			if e1 in e2:
+				if e1 in mapping:
+					print "Ambigious match;", e1, str(strength[e1]), "matches both", mapping[e1], str(strength[mapping[e1]]), "and", e2
+					del mapping[e1]
+					out.remove(e1)
+				else:
+					mapping[e1] = e2
+					out.add(e1)
+
+		popular_entities = [e for e in popular_entities if e not in out]
+
+		entities = list(set(entities))
 		entities.sort(key=lambda e:len(e), reverse=True)
 
-		popular_entities = list(set([e for e in entities if entities.count(e) > 1]))
-		entities = list(set(entities))
-
-		#print entities
 		for queryText in entities:
-			# early_match = False
-			# for e in entities:
-			# 	if queryText == e and queryText is not e:
-			# 		mapping[queryText] = queryText
-			# 		early_match = True
-			# 		break
-			# 	if queryText in e and queryText is not e:
-			# 		if queryText in mapping: #multiple matches
-			# 			print queryText, "matched with both", mapping[queryText], "and", e
-			# 			del mapping[queryText]
-			# 			early_match = False
-			# 		else:
-			# 			if e in mapping:
-			# 				mapping[queryText] = mapping[e]
-			# 				early_match = True
-
-			# if early_match:
-			# 	continue
-
 			result = self.query(queryText)
 			if result == None:
 				continue
-				
+
 			if result.certainty > certainty or e in popular_entities:
 				if NewsGraphKnowledge.LOG:
 					print "Certain: %s => %s (%s)" % (
@@ -128,13 +129,6 @@ class NewsGraphKnowledge:
 				if queryText in people:
 					mapping[queryText] = people[queryText]
 				else:
-					for n in range(2, 4):
-						candidate = result.nth(n)
-						if candidate and candidate[NewsGraphResult.NAME] in mapping:
-							if NewsGraphKnowledge.LOG:
-									print "Matching", queryText, "to", candidate[NewsGraphResult.NAME]
-							queryText = candidate[NewsGraphResult.NAME]
-							break
 					mapping[queryText] = queryText
 
 		return dict((entity, alias) for entity, alias in mapping.iteritems() if entity!=alias)

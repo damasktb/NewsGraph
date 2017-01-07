@@ -10,8 +10,6 @@ from unidecode import unidecode
 
 from graphKnowledge import NewsGraphKnowledge
 
-IGNORE = [u"Getty Images", u"Getty", u"Photograph", u"Photo", u"Facebook Twitter Pinterest"]
-
 def tokenize(doc, knowledge=True, ltze=True):
 	wnl = nltk.WordNetLemmatizer()
 	knowledge = NewsGraphKnowledge()
@@ -23,17 +21,22 @@ def tokenize(doc, knowledge=True, ltze=True):
 
 	stopWords = set(get_stop_words("en"))
 
+	prevTree = ""
 	for sentence in preprocess(doc):
+		if prevTree:
+			tokens.append(prevTree.strip())
+			entities.append(prevTree.strip())
+			prevTree = ""
 		for chunk in nltk.ne_chunk(sentence, binary=False):
 			if isinstance(chunk, nltk.Tree):
 				t = " ".join(ent[0] for ent in chunk.leaves()).strip()
-				for phrase in IGNORE:
-					t = t.replace(phrase, "")
-				if t:
-					tokens.append(t)
-					#if t not in entities: #No point querying KnowledgeGraph multiple times
-					entities.append(t)
+				prevTree += t+" "
 			else:
+				if prevTree:
+					tokens.append(prevTree.strip())
+					#if t not in entities: #No point querying KnowledgeGraph multiple times
+					entities.append(prevTree.strip())
+					prevTree = ""
 				t = chunk[0].lower()
 				if ltze: 
 					t = wnl.lemmatize(t)
@@ -41,7 +44,6 @@ def tokenize(doc, knowledge=True, ltze=True):
 					t = string.strip(t, string.punctuation)
 					tokens.append(t)
 	
-	entities = list(set([e for e in entities]))
 	aliases = knowledge.aliasEntities(entities)
 	entities = [aliases.get(e, e) for e in entities]
 	return tokens, entities

@@ -1,15 +1,15 @@
 import datetime
 import feedparser
+import math
 import newspaper
 import operator
 import pytz
 import uuid
 
-from collections import Counter
+from collections import defaultdict, Counter
 from itertools import combinations
-from math import log
 from newspaper import Article as RawArticle
-from time import strftime
+from time import mktime, strftime
 from tqdm import tqdm
 
 from ioUtils.newsSerialiser import *
@@ -52,8 +52,9 @@ class Article:
 		self.url = article.url
 		self.img = article.top_image
 		self.feed_name = feed
-		self.tokens, self.entities = tokenize(self.title)# +". "+ self.text)
-		self.entities = list(set(self.entities).difference(self.author, self.feed_name))
+		self.metro_lines = []
+		self.tokens, self.entities = tokenize(self.title +". "+ self.text)
+		self.entities = list(set(self.entities).difference(self.author, *self.feed_name.split()))
 		self.word_count = len(self.tokens)
 		self.term_frequency = {}
 		try:
@@ -75,6 +76,16 @@ class Article:
 
 	def containsTerm(self, term):
 		return term.lower() in self.text.lower()
+
+	def data(self):
+		return {
+			"title": self.title,
+			"date": 1000*mktime(self.publish_date),
+			"summary": self.summary,
+			"img": self.img,
+			"url": self.url,
+			"html": self.html
+		}
 
 
 class NewsCollection:
@@ -108,7 +119,7 @@ class NewsCollection:
 		for article in self.collection_by_id.values():
 			if article.containsTerm(term):
 				n_containing += 1
-		return log(self.article_count/n_containing)
+		return math.log(self.article_count/n_containing)
 
 	def tf_idf(self, term, article_id):
 		article = self.article(article_id)
@@ -148,7 +159,7 @@ class NewsCollection:
 		return dict((k, v[1]) for (k, v) in sorted(ret.iteritems(), key=operator.itemgetter(1), reverse=True)[:top_n])
 
 
-read_cache = True	
+read_cache = True
 write_cache = False
 
 cln = None
@@ -174,9 +185,9 @@ if write_cache:
 	wr = CacheWriter("io_ignore"+strftime("%Y%m%d-%H%M%S")+".ng")
 	wr.write(cln)
 
-#TF-IDF
-e_map = cln.top_article_keywords(5)
-top_25 = sorted(e_map.iteritems(), key=lambda (k,a): len(a), reverse=True)[:15]
+# #TF-IDF
+e_map = cln.top_article_keywords(12)
+top_25 = sorted(e_map.iteritems(), key=lambda (k,a): len(a), reverse=True)[:25]
 
 #TF-PDF
 # top_25 = sorted(cln.top_corpus_keywords(5).iteritems(), key=lambda (k,a): len(a), reverse=True)
@@ -186,42 +197,51 @@ for pair1, pair2 in combinations(top_25, 2):
 	kw1, articles1 = pair1[0], set(pair1[1])
 	kw2, articles2 = pair2[0], set(pair2[1])
 	unique = len(articles1.difference(articles2))/float(len(articles1))
-	if unique < 0.5:
+	if unique < 0.75:
 		print kw1, " subsumed by ", kw2
 		subsumed[kw1] = kw2
 
 new_top = {}
 for (k, articles) in top_25:
-	# while k in subsumed:
-	# 	print k, " subsumed by ", subsumed[k]
-	# 	k = subsumed[k]
+	while k in subsumed:
+		print k, " subsumed by ", subsumed[k]
+		k = subsumed[k]
 	
 	arts_for_keyword = new_top.get(k, set())
 	arts_for_keyword.update(articles)
 	new_top[k] = arts_for_keyword
 
-node_lookup = {}
+
 links = []
 nodes = []
+metro_lines = {}
+node_lookup = {}
 multiedge_counts = {}
-
-lines_for_article = {}
+arts = set()
+termini = set()
 
 for i, (e, articles) in enumerate(new_top.iteritems()):
-	if len(articles) > 3:
-		sorted_nodes = sorted(articles, key=lambda a:a.publish_date)
+	# We're only interested in lines of a reasonable length
+	if len(articles) > 4:
+		ordered_line = sorted(articles, key=lambda a:a.publish_date)
 		print e
-		for a in sorted_nodes:
+		for a in ordered_line:
 			print "-", a.title
-		for n, a in enumerate(sorted_nodes):
-			node_lookup[a] = node_lookup.get(a, len(node_lookup.keys()))
-			lines = lines_for_article.get(a, [])
-			lines.append(e)
-			lines_for_article[a] = lines
 
-		for n in range(len(sorted_nodes)-1):
-			source = node_lookup[sorted_nodes[n]]
-			target = node_lookup[sorted_nodes[n+1]]
+		# Add the articles to node_lookup if they aren't already - this is a simple
+		# 0 to (n-1) index of all n articles which will be in the graph.
+		# Also, update the lines passing through station a to include this one.
+		for n, a in enumerate(ordered_line):
+			node_lookup[a] = node_lookup.get(a, len(node_lookup.keys()))
+			a.metro_lines.append(e)
+			arts.add(a)
+
+		metro_lines[e] = []
+		termini.add(node_lookup[ordered_line[0]])
+		termini.add(node_lookup[ordered_line[-1]])
+		for n in range(len(ordered_line)-1):
+			source = node_lookup[ordered_line[n]]
+			target = node_lookup[ordered_line[n+1]]
 			count = multiedge_counts.get((source, target), 0)+1
 			multiedge_counts[(source, target)] = count
 			
@@ -231,9 +251,13 @@ for i, (e, articles) in enumerate(new_top.iteritems()):
 				"count": count,
 				"line": e,
 			})
+			metro_lines[e].append((source, target))
 
-nodes = [{"name": a[0].title, "lines":lines_for_article[a[0]]} for a in sorted(node_lookup.iteritems(), key=lambda x:x[1])]
+nodes = [{"name": a.title, "lines":a.metro_lines, "data":a.data()} for (a,i) in sorted(node_lookup.iteritems(), key=lambda x:x[1])]
 
-ng = NewsGraph(nodes, links, lines_for_article)
+for i, node in enumerate(nodes):
+	node["terminus"] = (i in termini)
+
+ng = NewsGraph(nodes, links, arts, metro_lines, node_lookup)
 
 

@@ -15,20 +15,41 @@
 
   var force = d3.layout.force()
       .size([width, height])
-      .charge(-500)
-      .linkDistance(50);
+      .charge(
+        function(d){
+          return -200*(d.weight>2?4:3); 
+      })
+      .linkDistance(function(d){
+          return 15*(1+Math.max(d.source.lines.length, d.target.lines.length)); 
+      })
+      .linkStrength(0.7)
+      .friction(0.91)
+      .alpha(1);
 
+  var metro_lines = NG-METRO-LINES;
   var graph = {
       "nodes": NG-NODES ,
       "links": NG-LINKS
   };
 
+  for (var n=0; n<graph.nodes.length;++n) {
+    graph.nodes[n].data.date = new Date(graph.nodes[n].data.date);
+  }
+
   var focusedLine = null;
+
+  function isInterchange(d) {
+    return d.lines.length > 1;
+  }
 
   var drawGraph = function (graph) {
       force.nodes(graph.nodes)
           .links(graph.links)
-          .on("tick", tick)
+          .on("tick", function() {
+            for (var i = 0; i < 10; i++) {
+              tick();
+            }
+          })
           .start();
 
       var link = svg.selectAll(".link")
@@ -70,33 +91,6 @@
       .style("fill", function (d) {
           return isInterchange(d) ? "white" : color(d.lines[0]);
       });
-
-      function isInterchange(d) {
-        return d.lines.length > 1;
-      }
-
-      function fixline(line) {
-        let total = graph.links.filter(function(d){return d.line===line}).length;
-        let spacing = (width-100)/total;
-        var x_i = 50;
-        for (var n=0; n<graph.nodes.length;++n) {
-          if (graph.nodes[n].lines.indexOf(line) != -1) {
-            graph.nodes[n].fixed = true;
-            graph.nodes[n].y = height/2;
-            graph.nodes[n].py = height/2;
-            graph.nodes[n].x = x_i;
-            graph.nodes[n].px = x_i;
-            x_i += spacing;
-          }
-        }
-        tick();
-      }
-
-      function unfixline(line) {
-        force.nodes().forEach(function(d) { d.fixed = false; });
-        force.start();
-      }
-
 
       function tick() {
           function multiTranslate(targetDistance, point0, point1) {
@@ -170,13 +164,6 @@
                       return d.line === line ? "visible": "visible";
                     }
                   });
-                if (line===focusedLine) {
-                  unfixline(focusedLine);
-                  focusedLine = null;
-                } else {
-                  focusedLine = line;
-                  fixline(focusedLine);
-                }
               });
 
           key.append("text")
@@ -186,6 +173,216 @@
               .text(function(d) { return d; });
       }
   };
+
+function move(time) {
+    for (var n=0; n<graph.nodes.length; n++) {
+      graph.nodes[n].fixed = false;
+    }
+    force.start();
+    window.setTimeout(function(){
+    // Use the force, Luke
+      for (var n=0; n<graph.nodes.length; n++) {
+        graph.nodes[n].fixed = true;
+      }
+    }, time);
+};
+
+function linelength(p1, p2){
+  return Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2));
+}
+
+function snap(){
+  var spacing = height/8;
+  var metrics = { x_min: width, x_max: 0,
+                  y_min: height, y_max: 0,
+                  x_avg: 0, y_avg: 0 };
+
+  force.stop();
+  for (var n=0; n<graph.nodes.length; n++) {
+    let node = graph.nodes[n];
+    c = { x: Math.ceil(node.x/spacing) * spacing,
+          y: Math.ceil(node.y/spacing) * spacing};
+
+    if (c.x < metrics.x_min) {
+      metrics.x_min = c.x;
+    }
+    if (c.x > metrics.x_max) {
+      metrics.x_max = c.x
+    }
+    if (c.y < metrics.y_min) {
+      metrics.y_min = c.y;
+    }
+    if (c.y > metrics.y_max) {
+      metrics.y_max = c.y;
+    }
+    metrics.x_avg += c.x;
+    metrics.y_avg += c.y;
+  
+    node.x, node.px = c.x, c.x;
+    node.y, node.py = c.y, c.y;
+  }
+
+  metrics.x_avg /= graph.nodes.length;
+  metrics.y_avg /= graph.nodes.length;
+
+  let v_scale = Math.abs(metrics.y_max - metrics.y_min)/(height-2*spacing);
+  let h_scale = Math.abs(metrics.x_max - metrics.x_min)/(height-2*spacing); // Deliberate
+
+  var taken = {}
+  for (var n=0; n<graph.nodes.length; n++) {
+    let node = graph.nodes[n];
+    node.x = (node.x-metrics.x_avg) * (1.0/h_scale);
+    node.y = (node.y-metrics.y_avg) * (1.0/v_scale);
+
+    c = { x: Math.ceil((node.x+metrics.x_avg)/spacing) * spacing,
+          y: Math.ceil((node.y+metrics.y_avg)/spacing) * spacing};
+
+    if (!taken[JSON.stringify(c)]) {
+      taken[JSON.stringify(c)] = true;
+      node.x, node.px = c.x, c.x;
+      node.y, node.py = c.y, c.y;
+      node.placed = true;
+    }
+  }
+
+  for (var line in metro_lines) {
+    line = metro_lines[line];
+    for (var s=1; s<line.length; s++) {
+      let a=graph.nodes[line[s-1][0]];
+      let b=graph.nodes[line[s][0]];
+      let c=graph.nodes[line[s][1]];
+      let candidate = {x:(a.px+c.px)/2, y:(a.py+c.py)/2};
+
+      if (octilinear(a, c) && !taken[JSON.stringify(candidate)] && b.weight==2)  {
+        taken[JSON.stringify(b)] = false;
+        taken[JSON.stringify(candidate)] = true;
+        b.x, b.px = candidate.x, candidate.x;
+        b.y, b.py = candidate.y, candidate.y;
+        a.placed = true;
+        b.placed = true;
+        c.placed = true;
+      }
+    }
+  }
+
+  for (var line in metro_lines) {
+    line = metro_lines[line];
+    for (var s=1; s<line.length; s++) {
+      let a=graph.nodes[line[s-1][0]];
+      let b=graph.nodes[line[s][0]];
+      let c=graph.nodes[line[s][1]];
+      let candidate = {x:(a.px+c.px)/2, y:(a.py+c.py)/2};
+
+      if (!b.placed && !taken[JSON.stringify(candidate)])  {
+        taken[JSON.stringify(b)] = false;
+        taken[JSON.stringify(candidate)] = true;
+        b.x, b.px = candidate.x, candidate.x;
+        b.y, b.py = candidate.y, candidate.y;
+        a.placed = true;
+        b.placed = true;
+        c.placed = true;
+      }
+    }
+  }
+
+  // for (var line in metro_lines) {
+  //   line = metro_lines[line];
+  //   for (var s=1; s<line.length; s++) {
+  //     let a=graph.nodes[line[s-1][0]];
+  //     let b=graph.nodes[line[s][0]];
+  //     let c=graph.nodes[line[s][1]];
+
+  //     if (a.weight==1 && octilinear(b, c)) {
+  //       let candidate = {x:b.px-(c.px-b.px), y:b.py-(c.py-b.py)};
+  //         a.x, a.px = candidate.x, candidate.x;
+  //         a.y, a.py = candidate.y, candidate.y;
+  //         a.placed = true;
+  //     }
+  //     if (c.weight==1 && octilinear(a, b)) {
+  //       let candidate = {x:b.px+(b.px-a.px), y:b.py+(b.py-a.py)};
+  //         c.x, a.px = candidate.x, candidate.x;
+  //         c.y, a.py = candidate.y, candidate.y;
+  //         c.placed = true;
+  //     }
+  //   }
+  // }
+  var unplaced = 0;
+  for (var n=0; n<graph.nodes.length; n++) {
+    unplaced += graph.nodes[n].placed? 0:1;
+  }
+  // for (var n=0; n<graph.nodes.length; n++) {
+  //   graph.nodes[n].x = 0.8* graph.nodes[n].x;
+  //   graph.nodes[n].y = 0.8* graph.nodes[n].y;
+  //   // graph.nodes[n].px = graph.nodes[n].x;
+  //   // graph.nodes[n].py = graph.nodes[n].y;
+  // }
+  force.start();
+  console.log(unplaced);
+}
+
+function octilinear(p1, p2) {
+  if (p1.py == p2.py) {
+    return true;
+  } else if (p1.px == p2.px) {
+    return true;
+  } else {
+    return Math.abs((p2.px-p1.px)/(p2.py-p1.py))==1;
+  }
+}
+
+var octilinearity = function(){
+  var total = 0;
+  for (var n=0; n<graph.links.length; n++) {
+      let s = graph.links[n].source;
+      let t = graph.links[n].target;
+      let theta = 4*Math.atan(Math.abs(s.y-t.y)/Math.abs(s.x-t.x));
+      total += Math.abs(Math.sin(theta));
+    }
+  return total;
+}
+
+var lineStraightness = function(){
+  var total = 0;
+  for (var line in metro_lines) {
+    line = metro_lines[line];
+    for (var s=0; s<line.length-1; s++) {
+      let a=graph.nodes[line[s][0]];
+      let b=graph.nodes[line[s+1][0]];
+      let c=graph.nodes[line[s+1][1]];
+      let v1 = {x:a.x - b.x, y:a.y - b.y};
+      let v2 = {x:c.x - b.x, y:c.y - b.y};
+      v1mag = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+      v1norm = {x:v1.x / v1mag, y:v1.y / v1mag};
+      v2mag =  Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+      v2norm = {x:v2.x / v2mag, y:v2.y / v2mag};
+      res = v1norm.x * v2norm.x + v1norm.y * v2norm.y;
+      var theta = Math.acos(res);
+      if (theta > Math.PI/2) {
+        theta = Math.PI-theta;
+      }
+      total+= theta;
+    }
+  }
+  return total;
+}
+
+force.on('tick', function(e) {
+  graph.nodes.forEach(function(d) {
+    d.y += (height/2 - d.y) * 1000;
+    d.py += (height/2 - d.py) * 1000;
+  });
+})
+
+function go() {
+    move(5*lineStraightness() + 2*octilinearity());
+    snap();
+}
+
+move(3500);
+setTimeout(function(){ snap(); }, 4000);
+
+
+
 
   $('#graphPane').click(function() {
     $("#cards").attr("hidden", true);
