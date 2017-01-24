@@ -19,7 +19,7 @@
 \usepackage{amsmath, amsthm, amsfonts}
 \newtheorem{definition}{Definition}
 \usepackage{bbm}
-\usepackage{enumitem}
+\usepackage[shortlabels]{enumitem}
 \usepackage{appendix}
 \usepackage{todonotes}
 
@@ -32,6 +32,8 @@
   \addcontentsline{toc}{subsection}{\protect\numberline{\thesubsection}#1}
   \subsectionmark{#1}}
 \makeatother
+
+\newcommand{\possessivecite}[1]{\citeauthor{#1}'s \citeyear{#1}}
 
   
 %%
@@ -113,9 +115,10 @@
   \end{spaced}
 
   \begin{spaced}{5em}
-    Signed: \includegraphics[width=3cm]{img/signature.png}
-  \end{spaced}
-  }
+    Signed: \vspace{1cm}\includegraphics[width=3cm]{img/signature.png}
+  \end{spaced}}
+  
+
 
 
 \newcommand{\consultation}[1]{%
