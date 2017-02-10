@@ -1,10 +1,9 @@
 \section{Requirements Gathering}
-This project is primarily research-based, so while I have chosen to follow typical software engineering practices by writing a requirements specification for organisational purposes, I did not undertake a formal requirements gathering process.
+This project was primarily research-based, so while I chose to follow typical software engineering practices by writing a requirements specification for organisational purposes, I did not undertake a formal requirements gathering process.
 
-Instead, my requirements were derived from the features of the existing system \citep{InformationCartography}
+Instead, my requirements were derived from the features of the existing news visualisation system \citep{GeneratingInformationMaps}, the transit map aesthetic principles formulated in \citep{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}, \possessivecite{TheEyesHaveIt}'s InfoVis task taxonomy, and the high-level recommendations for news producers specified by The \cite{anewmodelfornews}.
 
-
-\section{Categorisation}
+\subsection{Categorisation}
 The operation of the proposed system suggests a natural pipeline of four components through which data will be transformed, with each component comprising some distinct functionality which can be tested in isolation. The components are as follows;
 \begin{itemize}
 	\item Article acquisition - The process of parsing an RSS feed and downloading content from the articles within it.
@@ -14,7 +13,7 @@ The operation of the proposed system suggests a natural pipeline of four compone
 \end{itemize}
 In addition to the four components of the pipeline, the system requires an ancillary storage component, to allow processed corpora and their graphs to be imported and exported. In the specification, I chose to categorise all functional requirements according to these five components, to assist in the implementation planning and testing processes.
 
-\section{Prioritisation}
+\subsection{Prioritisation}
 I used the MoSCoW technique for assigning priority to requirements, since the size of the proposed system is not large enough to warrant more granularity in requirement priority. MoSCoW assigns requirements to one of four categories \citep{PrioritizationUsingMoscow};
 \begin{enumerate}
 	\item \textbf{M}ust have - Features which must be included for the project to be useful.
@@ -22,4 +21,6 @@ I used the MoSCoW technique for assigning priority to requirements, since the si
 	\item \textbf{C}ould have - Features which will be moved out of scope if timescales become at risk.
 	\item \textbf{W}on't have - Features which have been requested but won't be included. 
 \end{enumerate}
-As my requirements gathering process was based on analysing the findings of other studies rather than surveying potential users, there are no requirements with a \textit{won't have} modifier. All requirements were assigned on of the other three modifiers with my aim being to fully implement all the \textit{must have} and \textit{should have} requirements in the assigned timescale. Time permitting, I will assess which of the \textit{could have} requirements would be most beneficial to the system and implement a subset of these.
+As the requirements gathering process was based on analysing the findings of other researchers rather than surveying potential users, there were no requirements with a \textit{won't have} modifier. All requirements were assigned on of the other three modifiers with my aim being to fully implement all the \textit{must have} and partially implement the \textit{should have} requirements in the assigned timescale.
+
+\section{Architectural Design}
