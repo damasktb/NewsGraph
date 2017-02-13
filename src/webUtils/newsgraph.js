@@ -3,6 +3,8 @@ var width = window.innerWidth * 0.7,
 
 var energy;
 var unplaced = 0;
+var taken = {};
+var spacing = height/10.0;
 
 var color = color = d3.scale.ordinal()
             .domain(50)
@@ -29,10 +31,11 @@ var force = d3.layout.force()
         return -200*(d.weight); 
     })
     .linkDistance(function(d){
-        return 5*(1+Math.max(d.source.lines.length, d.target.lines.length));
+        return 40;
     })
-    .linkStrength(0.9)
+    .linkStrength(1)
     .friction(0.95)
+    .gravity(0.15)
     .alpha(1);
 
 var metro_lines = NG-METRO-LINES;
@@ -75,6 +78,7 @@ var drawGraph = function (graph) {
         .data(graph.nodes)
         .enter().append("g")
         .attr("class", "node")
+        .attr("marker-start", "url(#end)")
         .on("click", function(d){
           // Reset all the circles
           var nodes = d3.selectAll(".node");
@@ -124,8 +128,6 @@ var drawGraph = function (graph) {
                 y1 = d.source.y,
                 x2 = d.target.x,
                 y2 = d.target.y,
-                dx = x2 - x1,
-                dy = y2 - y1,
                 dr = 0;
                 var offset = multiTranslate((d.count-1)*7, d.source, d.target);
                 x1 += offset.dx;
@@ -232,46 +234,71 @@ function move(time) {
 };
 
 function linelength(p1, p2){
-return Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2));
+  return Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2));
 }
 
 function getMetrics(graph, spacing) {
-var metrics = { x_min: width, x_max: 0,
-                y_min: height, y_max: 0,
-                x_avg: 0, y_avg: 0,
-                v_scale: 0, h_scale: 0 };
+  var metrics = { x_min: width, x_max: 0,
+                  y_min: height, y_max: 0,
+                  x_avg: 0, y_avg: 0,
+                  v_scale: 0, h_scale: 0 };
 
-metrics.x_min = Math.min.apply(null, graph.nodes.map(function(d) {return d.px;}));
-metrics.y_min = Math.min.apply(null, graph.nodes.map(function(d) {return d.py;}));
-metrics.x_max = Math.max.apply(null, graph.nodes.map(function(d) {return d.px;}));
-metrics.y_max = Math.max.apply(null, graph.nodes.map(function(d) {return d.py;}));
+  metrics.x_min = Math.min.apply(null, graph.nodes.map(function(d) {return d.px;}));
+  metrics.y_min = Math.min.apply(null, graph.nodes.map(function(d) {return d.py;}));
+  metrics.x_max = Math.max.apply(null, graph.nodes.map(function(d) {return d.px;}));
+  metrics.y_max = Math.max.apply(null, graph.nodes.map(function(d) {return d.py;}));
 
-metrics.x_avg = (metrics.x_min+metrics.x_max)/2.0;
-metrics.y_avg = (metrics.y_min+metrics.y_max)/2.0;
+  metrics.x_avg = (metrics.x_min+metrics.x_max)/2.0;
+  metrics.y_avg = (metrics.y_min+metrics.y_max)/2.0;
 
-metrics.v_scale = Math.abs(metrics.y_max - metrics.y_min)/(height-2*spacing);
-metrics.h_scale = Math.abs(metrics.x_max - metrics.x_min)/(height-2*spacing); // Deliberate
-metrics.x_move = metrics.x_avg-width/2.0;
-metrics.y_move = metrics.y_avg-height/2.0;
+  metrics.v_scale = Math.abs(metrics.y_max - metrics.y_min)/(height-2*spacing);
+  metrics.h_scale = Math.abs(metrics.x_max - metrics.x_min)/(height-2*spacing); // Deliberate
+  metrics.x_move = metrics.x_avg-width/2.0;
+  metrics.y_move = metrics.y_avg-height/2.0;
 
-return metrics;
+  return metrics;
+}
+
+// start and stop are inclusive
+function spaceAlongLine(l, start, stop) {
+  for (var n=0; n<graph.nodes.length; n++) {
+    let node = graph.nodes[n];
+    node.px = node.x;
+    node.py = node.y;
+  }
+  let line = metro_lines[l];
+  let begin = start==0? graph.nodes[line[0][0]]: graph.nodes[line[start-1][1]];
+  let end = graph.nodes[line[stop-1][1]];
+  let delta = dist2d(begin, end);
+  delta.x = Math.ceil(delta.x*spacing)/(spacing*(stop-start));
+  delta.y = Math.ceil(delta.y*spacing)/(spacing*(stop-start));
+  for (var s=start; s<=stop; s++) {
+    let station = s==0? graph.nodes[line[0][0]]: graph.nodes[line[s-1][1]];
+    console.log(s, line, station);
+    station.x = begin.px + (s-start)*delta.x;
+    station.y = begin.py + (s-start)*delta.y;
+    station.px = station.x;
+    station.py = station.y;
+  }
 }
 
 function snap(){
-var spacing = height/10;
-
 force.stop();
-for (var n=0; n<graph.nodes.length; n++) {
-  let node = graph.nodes[n];
-  c = { x: Math.ceil(node.x/spacing) * spacing,
-        y: Math.ceil(node.y/spacing) * spacing};
-  node.x, node.px = c.x, c.x;
-  node.y, node.py = c.y, c.y;
-}
-
 var metrics = getMetrics(graph, spacing);
 
-var taken = {}
+for (var n=0; n<graph.nodes.length; n++) {
+  let node = graph.nodes[n];
+  node.x = (node.x/metrics.h_scale);
+  node.y = (node.y/metrics.v_scale);
+  c = { x: Math.ceil(node.x/spacing) * spacing,
+        y: Math.ceil(node.y/spacing) * spacing};
+  node.x = c.x; node.px = c.x;
+  node.y = c.y; node.py = c.y;
+}
+
+metrics = getMetrics(graph, spacing);
+
+
 for (var n=0; n<graph.nodes.length; n++) {
   let node = graph.nodes[n];
   node.x = (node.x-metrics.x_avg) * (1.0/metrics.h_scale);
@@ -280,13 +307,32 @@ for (var n=0; n<graph.nodes.length; n++) {
   c = { x: Math.ceil((node.x+metrics.x_avg)/spacing) * spacing,
         y: Math.ceil((node.y+metrics.y_avg)/spacing) * spacing};
 
-  if (!taken[JSON.stringify(c)]) {
-    taken[JSON.stringify(c)] = true;
+  if (!taken[coordinates(c)]){
+    taken[coordinates(c)] = true;
+    node.placed = true;
     node.x, node.px = c.x, c.x;
     node.y, node.py = c.y, c.y;
-    node.placed = true;
   }
 }
+
+  for (var line in metro_lines) {
+    line = metro_lines[line];
+    for (var s=1; s<line.length; s++) {
+      let a=graph.nodes[line[s-1][0]];
+      let b=graph.nodes[line[s][0]];
+      let c=graph.nodes[line[s][1]];
+      let candidate = {x:(a.px+c.px)/2.0, y:(a.py+c.py)/2.0};
+
+      if (!b.placed && octilinear(a, c) && !taken[coordinates(candidate)])  {
+        taken[coordinates(b)] = false;
+        taken[coordinates(candidate)] = true;
+        b.x, b.px = candidate.x, candidate.x;
+        b.y, b.py = candidate.y, candidate.y;
+        b.placed = true;
+      }
+    }
+  }
+
 
 for (var line in metro_lines) {
   line = metro_lines[line];
@@ -294,11 +340,11 @@ for (var line in metro_lines) {
     let a=graph.nodes[line[s-1][0]];
     let b=graph.nodes[line[s][0]];
     let c=graph.nodes[line[s][1]];
-    let candidate = {x:(a.px+c.px)/2, y:(a.py+c.py)/2};
+    let candidate = {x:(a.px+c.px)/2.0, y:(a.py+c.py)/2.0}; 
 
-    if (octilinear(a, c) && !taken[JSON.stringify(candidate)] && b.weight==2)  {
-      taken[JSON.stringify(b)] = false;
-      taken[JSON.stringify(candidate)] = true;
+    if (!b.placed && !taken[coordinates(candidate)])  {
+      taken[coordinates(b)] = false;
+      taken[coordinates(candidate)] = true;
       b.x, b.px = candidate.x, candidate.x;
       b.y, b.py = candidate.y, candidate.y;
       a.placed = true;
@@ -308,57 +354,119 @@ for (var line in metro_lines) {
   }
 }
 
-for (var line in metro_lines) {
-  line = metro_lines[line];
-  for (var s=1; s<line.length; s++) {
-    let a=graph.nodes[line[s-1][0]];
-    let b=graph.nodes[line[s][0]];
-    let c=graph.nodes[line[s][1]];
-    let candidate = {x:(a.px+c.px)/2, y:(a.py+c.py)/2}; 
+var to_space = {};
 
-    if (!b.placed && !taken[JSON.stringify(candidate)])  {
-      taken[JSON.stringify(b)] = false;
-      taken[JSON.stringify(candidate)] = true;
-      b.x, b.px = candidate.x, candidate.x;
-      b.y, b.py = candidate.y, candidate.y;
-      a.placed = true;
-      b.placed = true;
-      c.placed = true;
+for (var l in metro_lines) {
+  line = metro_lines[l];
+  var s = 0;
+  var start_from = graph.nodes[line[s][0]];
+  if (start_from.weight==1) {
+    var acc = graph.nodes[line[s][1]];
+    while ((s==0) || acc.weight<=2 && s<line.length) {
+      acc = graph.nodes[line[s][1]];
+      ++s;
+    }
+    var end = s;
+    if (end != 0) {
+      to_space[l] = [[0, end]];
+    }
+  }
+
+  s = line.length-1;
+  start_from = graph.nodes[line[s][1]];
+  if ((s==line.length-1) || start_from.weight==1) {
+    var acc = graph.nodes[line[s][0]];
+    while (acc.weight<=2 && s>0) {
+      acc = graph.nodes[line[s][0]];
+      --s;
+    }
+    var end = s;
+    if (end != line.length-1 && end != 0) {
+      // if end == 0, this is the start of that line and was already recorded
+      to_space[l] = to_space[l] || [];
+      to_space[l].push([end+1, line.length]);
     }
   }
 }
+for (line in to_space) {
+  for (x of to_space[line]) {
+    spaceAlongLine(line, x[0], x[1]);
+  }
+}
+for (var line in metro_lines) {
+    line = metro_lines[line];
+    for (var s=1; s<line.length; s++) {
+      let a=graph.nodes[line[s-1][0]];
+      let b=graph.nodes[line[s][0]];
+      let c=graph.nodes[line[s][1]];
+      let candidate = {x:(a.px+c.px)/2.0, y:(a.py+c.py)/2.0};
+
+      if (b.weight == 2 && octilinear(a, c) && !taken[coordinates(candidate)])  {
+        taken[coordinates(b)] = false;
+        taken[coordinates(candidate)] = true;
+        b.x = candidate.x; b.px = candidate.x;
+        b.y = candidate.y; b.py = candidate.y;
+        b.placed = true;
+      }
+    }
+  }
 
 var metrics = getMetrics(graph, spacing);
 
 for (var n=0; n<graph.nodes.length; n++) {
   let node = graph.nodes[n];
-  node.px = (node.px*metrics.v_scale) - metrics.x_move;
-  node.py = (node.py*metrics.h_scale) - metrics.y_move;
+  node.x = (node.x*metrics.v_scale) - metrics.x_move;
+  node.y = (node.y*metrics.h_scale) - metrics.y_move;
 
-  node.x = node.px;
-  node.y = node.py;
+  node.px = node.x;
+  node.py = node.y;
 }
 
 for (var n=0; n<graph.nodes.length; n++) {
   unplaced += graph.nodes[n].placed? 0:1;
-  // if (!graph.nodes[n].placed) {
-  //   console.log(graph.nodes[n]);
+  // if (unplaced) {
+  //   console.log(graph.nodes[n].name);
   // }
 }
+
 force.start();
 console.log(unplaced);
 }
 
+// why doesn't this work with x:p.px?????
+function coordinates(p) {
+  return JSON.stringify({x:p.x,y:p.y});
+}
+
 function octilinear(p1, p2) {
-if (p1.py == p2.py) {
+if (p1.y == p2.y) {
   return true;
-} else if (p1.px == p2.px) {
+} else if (p1.x == p2.x) {
   return true;
 } else {
-  return Math.abs((p2.px-p1.px)/(p2.py-p1.py))==1;
+  return Math.abs((p2.x-p1.x)/(p2.y-p1.y)) < 0.1;
 }
 }
 
+
+function gradient(a, b){
+  return (b.y-a.y)/(b.x-a.x);
+}
+
+function dist2d(a, b){
+  return {x: (b.px-a.px), y:(b.py-a.py)};
+}
+
+function direction(a, b){
+  let xdiff = b.x-a.x ? (b.x-a.x)/Math.abs(b.x-a.x): 0;
+  let ydiff = b.y-a.y ? (b.y-a.y)/Math.abs(b.y-a.y): 0;
+  if (xdiff > 2*ydiff) {
+    ydiff = 0;
+  } else if (ydiff > 2*xdiff) {
+    xdiff = 0;
+  }
+  return {x: xdiff, y: ydiff};
+}
 
 // This will fail if any link has the same source and target co-ordinates
 var octilinearity = function(){
@@ -405,11 +513,38 @@ return total;
 }
 
 move(5000);
-setTimeout(function(){ snap(); }, 5500);
+setTimeout(function(){
+  snap(); 
+}, 5500);
 
+function timeSince(date) {
+    var seconds = Math.floor((new Date() - date) / 1000);
+    var interval = Math.floor(seconds / 31536000);
+
+    if (interval > 1) {
+        return interval + " years";
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {
+        return interval + " months";
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {
+        return interval + " days";
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {
+        return interval + " hours";
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {
+        return interval + " minutes";
+    }
+    return Math.floor(seconds) + " seconds";
+}
 
 function showArticle(data) {
-  $('#article-container').get(0).innerHTML = data.html;
+  $('#article-container').get(0).innerHTML = "<h1>"+data.title+"</h1>"+"<h2>"+timeSince(data.date)+" ago</h2>"+ data.html;
     //`<h1>${data.title}</h1><h2>${data.date}</h2><img src='${data.img}'/>`
 }
 

@@ -78,13 +78,16 @@ class Article:
 		return term.lower() in self.text.lower()
 
 	def data(self):
+		html = self.html
+		if "</h1>" in self.html:
+			html = self.html[self.html.index("</h1>")+5:]
 		return {
 			"title": self.title,
 			"date": 1000*mktime(self.publish_date),
 			"summary": self.summary,
 			"img": self.img,
 			"url": self.url,
-			"html": self.html
+			"html": html
 		}
 
 
@@ -190,7 +193,7 @@ if write_cache:
 	wr = CacheWriter("io_ignore"+strftime("%Y%m%d-%H%M%S")+".ng")
 	wr.write(cln)
 
-interests = ["Berlin"]
+interests = ["Berlin", "Southampton"]
 
 # #TF-IDF
 e_map = cln.top_article_keywords(15, include=interests)

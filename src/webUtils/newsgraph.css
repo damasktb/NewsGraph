@@ -10,6 +10,7 @@ body {
 .nav-wrapper {
 	z-index: 999 !important;
  	position: relative;
+ 	box-shadow: none;
 }
 
 .nav-wrapper:before {
@@ -43,6 +44,7 @@ body {
 
 #cards {
 	margin-top: 20px;
+	overflow: scroll;
 }
 
 .card-title {
@@ -68,7 +70,8 @@ body {
     border: 0px;
     margin:0px;	
     box-shadow: -2px 2px 5px 0 rgba(0,0,0,0.16), -2px 2px 10px 0 rgba(0,0,0,0.12);
-    overflow: scroll;	
+    overflow: scroll;
+    display: none;
 }
 
 #article-container img {
