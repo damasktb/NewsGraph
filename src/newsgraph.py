@@ -78,13 +78,16 @@ class Article:
 		return term.lower() in self.text.lower()
 
 	def data(self):
+		html = self.html
+		if "</h1>" in self.html:
+			html = self.html[self.html.index("</h1>")+5:]
 		return {
 			"title": self.title,
 			"date": 1000*mktime(self.publish_date),
 			"summary": self.summary,
 			"img": self.img,
 			"url": self.url,
-			"html": self.html
+			"html": html
 		}
 
 
@@ -130,32 +133,37 @@ class NewsCollection:
 			#Probably a whitespace/punctuation error
 			#raise KeyError('Keyword "%s" does not exist in any article' % term)
 
-	def entity_tf_idf_vector(self, article_id, top_n=-1):
+	def entity_tf_idf_vector(self, article_id, top_n=-1, include=[]):
 		vector = {}
 		article = self.article(article_id)
 		for i, term in enumerate(article.entities):
 			tfidf = self.tf_idf(term, article_id)
 			if tfidf:
 				vector[term] = tfidf
+				if term in include:
+					vector[term] *= 10
 		return dict(sorted(vector.iteritems(), key=operator.itemgetter(1), reverse=True)[:top_n])
 
 	def tf_pdf(self, term):
 		return sum(feed.term_weighting(term) for feed in self.newsfeeds.values())
 
-	def top_article_keywords(self, top_n=10):
+	def top_article_keywords(self, top_n=10, include=[]):
 		ret = {}
 		for id, article in self.collection_by_id.iteritems():
-			for entity in self.entity_tf_idf_vector(id, top_n):
+			for entity in self.entity_tf_idf_vector(id, top_n, include):
 				update = ret.get(entity, [])
 				update.append(article)
 				ret[entity] = update
 		return ret
 
-	def top_corpus_keywords(self, top_n=25):
+	def top_corpus_keywords(self, top_n=25, include=[]):
 		ret = {}
 		for entity in set(e for a in self.collection_by_id.values() for e in a.entities):
 			update = ret.get(entity, [])
-		 	ret[entity] = (self.tf_pdf(entity), [a for a in self.collection_by_id.values() if entity in a.entities])
+			tfpdf = self.tf_pdf(entity)
+			if entity in include:
+				tfpdf *= 10
+		 	ret[entity] = (tfpdf, [a for a in self.collection_by_id.values() if entity in a.entities])
 		return dict((k, v[1]) for (k, v) in sorted(ret.iteritems(), key=operator.itemgetter(1), reverse=True)[:top_n])
 
 
@@ -185,19 +193,22 @@ if write_cache:
 	wr = CacheWriter("io_ignore"+strftime("%Y%m%d-%H%M%S")+".ng")
 	wr.write(cln)
 
+interests = ["Berlin", "Southampton"]
+
 # #TF-IDF
-e_map = cln.top_article_keywords(12)
-top_25 = sorted(e_map.iteritems(), key=lambda (k,a): len(a), reverse=True)[:25]
+e_map = cln.top_article_keywords(15, include=interests)
+top_25 = sorted(e_map.iteritems(), key=lambda (k,a): len(a), reverse=True)[:50]
 
 #TF-PDF
-# top_25 = sorted(cln.top_corpus_keywords(5).iteritems(), key=lambda (k,a): len(a), reverse=True)
+# top_25 = sorted(cln.top_corpus_keywords(7, include=interests).iteritems(), key=lambda (k,a): len(a), reverse=True)
+
 
 subsumed = {}
 for pair1, pair2 in combinations(top_25, 2):
 	kw1, articles1 = pair1[0], set(pair1[1])
 	kw2, articles2 = pair2[0], set(pair2[1])
 	unique = len(articles1.difference(articles2))/float(len(articles1))
-	if unique < 0.75:
+	if unique < 0.3 and kw1 not in interests:
 		print kw1, " subsumed by ", kw2
 		subsumed[kw1] = kw2
 
@@ -222,7 +233,7 @@ termini = set()
 
 for i, (e, articles) in enumerate(new_top.iteritems()):
 	# We're only interested in lines of a reasonable length
-	if len(articles) > 4:
+	if len(articles) > 4 or e in interests:
 		ordered_line = sorted(articles, key=lambda a:a.publish_date)
 		print e
 		for a in ordered_line:

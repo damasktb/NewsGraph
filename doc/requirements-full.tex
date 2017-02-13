@@ -28,7 +28,7 @@ The keyword extraction process will tokenise the parsed article text and determi
 
 \subsection{Topic Selection and Graph Formation}
 \subsubsection{Description}
-This process involves determining a set of corpus keywords from the union of all the articles' keywords to form paths of edges (``lines"), and fitting a maximal number of articles into the resulting graph.
+This process involves determining a set of corpus keywords from the union of all the articles' keywords to form connected paths of edges (\textit{lines}), and fitting a maximal number of articles into the resulting graph.
 \subsubsection{Functional Requirements}
 \begin{enumerate}[F\thesubsection.1]
 	\item\requirement{The system must analyse the keywords extracted from all articles in a corpus to choose a set of the $n$ most significant topics, where $n$ is either predetermined or user-specified.}{High}
@@ -40,8 +40,7 @@ This process involves determining a set of corpus keywords from the union of all
 	\item\requirement{The system could accept a user-specified topic or list of topics to include or exclude from the graph.}{Low}
 \end{enumerate}
 
-
-\subsection{Graph Visualisation}
+\subsection{Graph Drawing and Visualisation}
 \subsubsection{Description}
 The visualisation component will generate an interactive visualisation of the graph which can be used to explore the corpus as a whole and drill-down to the individual article level. 
 \subsubsection{Functional Requirements}
@@ -51,7 +50,6 @@ The visualisation component will generate an interactive visualisation of the gr
 	\item\requirement{The system should ensure the graphs generated are readable by ensuring nodes, edges and labels do not overlap with each other.}{Medium}
 	\item\requirement{The system could allow some degree of interactive customisation which does not change the underlying structure of the graph, such as dragging nodes or changing attributes including colour.}{Low}
 \end{enumerate}
-
 
 \subsection{Storage and Persistence}
 \subsubsection{Description}

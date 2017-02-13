@@ -13,37 +13,25 @@ def buildCards(articles):
 		title = article.title
 		text = article.text
 		card = E.div(
-			CLASS("card", *[l.replace(" ","-") for l in article.metro_lines]),
-			E.title(title),
+			CLASS("card horizontal", *[l.replace(" ","-") for l in article.metro_lines]),
 			E.div(
-				CLASS("card-image waves-effect waves-block waves-light"),
-				E.img(
-					CLASS("activator"), "",
-					src=article.img
-				)
+				CLASS("card-image"),
+				E.img(src=article.img)
 			),
 			E.div(
-				CLASS("card-content"),
-				E.span(
-					CLASS("card-title activator grey-text text-darken-4"),
+				CLASS("card-stacked"),
+				E.div(
+					CLASS("card-content"),
 					title,
 					E("i","more_vert", CLASS("material-icons right"))
 				),
-				E.p(
+				E.div(
+					CLASS("card-action"),
 					E.a(
 						"Read more at "+ article.feed_name,
 						href=article.url
 					)
 				)
-			),
-			E.div(
-				CLASS("card-reveal"),
-				E.span(
-					CLASS("card-title activator grey-text text-darken-4"),
-					title,
-					E("i","close",CLASS("material-icons right"))
-				),
-				article.html
 			)
 		)
 		cards.append(card)
@@ -60,11 +48,12 @@ def writePage(nodes, links, articles, metro_lines):
 		default_js = default_js.replace("NG-METRO-LINES", dumps(metro_lines))
 
 	page = (
+
 		E.html(
 			E.head(
 				E.title("NewsGraph"),
 				E.link(
-					href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css",
+					href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css",
 					rel="stylesheet",
 					type="text/css"
 				),
@@ -89,7 +78,7 @@ def writePage(nodes, links, articles, metro_lines):
 							id="nav-mobile"
 						)
 					)
-				), 
+				),
 				E.div(
 					*buildCards(articles),
 					id="cards"
@@ -100,4 +89,4 @@ def writePage(nodes, links, articles, metro_lines):
 	)
 
 	with open("ng.html", "w") as ng:
-		ng.write(etree.tostring(page, pretty_print=True).replace("NG-JS", default_js))
+		ng.write(etree.tostring(page, pretty_print=True, encoding="UTF-8", doctype="<!DOCTYPE html>").replace("NG-JS", default_js))

@@ -77,7 +77,7 @@ Viewing the dimensions of overload from a news domain perspective, it is clear t
 
 Sensemaking is the basis for forming contextual knowledge; the process by which we incorporate new information into our existing cognitive frameworks, and how we go from reading something to understanding it \citep{FromInformationToKnowing}. In broader terms, \citeauthor{OrganizingAndTheProcessOfSensemaking} describe sensemaking as ``[being] about the question: What does an event mean? In the context of everyday life, when people confront something unintelligible and ask, `What's the story here?'{}'' \citep[p.85]{OrganizingAndTheProcessOfSensemaking} 
 
-This definition relates directly to the news overload problem because sensemaking describes the contextual story resolution the \citet{anewmodelfornews} study identified news consumers are craving. It has also been observed that often readers are not interested in specific articles on a subject, and only the thematic content of the topic they belong to \citep{AnalysingUserAccessToAnOnlineNewspaper}. How then, do readers make sense of a collection of articles surrounding a particular topic?
+This definition relates directly to the news overload problem because one component of sensemaking relates to the contextual story resolution the \citet{anewmodelfornews} study identified news consumers are craving. It has also been observed that often readers are not interested in specific articles on a subject, and only the thematic content of the topic they belong to \citep{AnalysingUserAccessToAnOnlineNewspaper}. How then, do readers make sense of a collection of articles surrounding a particular topic?
 
 When presented with a large document collection, \citet{BeingLiteratreWithLargeDocumentCollections} found all of their subjects began by clustering the contents into groups which formed a heuristic representation or mental model, used to provide an overview. However, current information infrastructure has been criticised for not supporting the cross-correlation between connected news articles \citep{GalaxyOfNews}.
 
@@ -116,7 +116,7 @@ To reduce the scope of suitable visualisations, we return to the original proble
 
 \subsection{InfoVis for Sensemaking}
 
-In addition to the insight that visualisation may be able to provide, there is evidence that visual representation metaphors also focus users' attention, support the learning process, and utilise memory more effectively than isomorphic text representations \citep{LearningFromArchitects}.
+In addition to the insight that visualisation may be able to provide, there is evidence that visual representation metaphors better support the learning process and are more easily remembered than isomorphic text representations alone\citep{KnowledgeMapsAsScaffolds, ImageBasedConceptMapping}.
 
 \citet{UnderstandingAndCharacterizingInsights} identified four overlapping InfoVis processes which describe how insight can be gained after sensemaking; \textit{Provide Overview}, \textit{Adjust}, \textit{Detect Pattern}, and \textit{Match Mental Model}. These four processes can be roughly mapped to \citeauthor{TheEyesHaveIt}'s high-level tasks, which are as follows:
 
@@ -136,29 +136,31 @@ The \textit{Provide Overview} process allows a reader to recognise what they kno
 
 The \textit{Detect Pattern} procedure is where structure and trends are found (whether expected or otherwise). Coupled with \textit{Match Mental Model}, where the links are formed between the new data and the users' existing cognitive frameworks, this corresponds to \textit{Relate}.
 
-At this point, \citeauthor{TheEyesHaveIt}'s taxonomy diverges from \citeauthor{UnderstandingAndCharacterizingInsights}, are \citeauthor{UnderstandingAndCharacterizingInsights} is concerned with the cognition enabled by visualisation, whereas  \citeauthor{TheEyesHaveIt} additionally considers other use cases for visualisations, such as querying and sharing.
+At this point, \citeauthor{TheEyesHaveIt}'s taxonomy diverges from the processes of \citep{UnderstandingAndCharacterizingInsights}, as \citeauthor{UnderstandingAndCharacterizingInsights} are concerned with the cognition enabled by visualisation, whereas  \citeauthor{TheEyesHaveIt} additionally considers other use cases for visualisations, such as querying and sharing.
 
 From these two models, it is apparent that certain views and functions are crucial for tools which use visualisation to support the sensemaking process; an high-level overview visualisation which emphasises links between data, the ability to adjust scope to show more or less detail, and the ability to filter information of specific interest within the dataset.
 
 \subsection{Visual Metaphors}
 
+\citeauthor{AComparisonBetweenConceptMaps} defines visual metaphors as ``a graphic structure that uses the shape and elements of a familiar natural or man-made artefact or of an easily recognizable activity or story to organize content meaningfully and use the associations with the metaphor to convey additional meaning about the content.'' \citep[p.203]{AComparisonBetweenConceptMaps} This definition highlights the main advantage to using visual metaphors; users are intuitively familiar with how they present and structure information.
+
 The use of preexisting visual metaphors--specifically those with which a large number of people will already be familiar--has been shown to support readers' comprehension, as it requires both significant time and effort for a reader to interpret visual metaphors which are new to them \citep{PreconceptionsVisualMetaphors}.
 
-\citeauthor{AComparisonBetweenConceptMaps} defines visual metaphors as ``a graphic structure that uses the shape and elements of a familiar natural or man-made artefact or of an easily recognizable activity or story to organize content meaningfully and use the associations with the metaphor to convey additional meaning about the content.'' \citep[p.203]{AComparisonBetweenConceptMaps} 
+In a previous paper, \citeauthor{VisuelleKommunikation} also describes six advantages of visual metaphors specifically for the transfer of knowledge: ``(1) to motivate people; (2) to present new perspectives; (3) to increase remembrance; (4) to support the process of learning; (5) to focus the attention of the viewer and (6) to structure and coordinate communication.'' \citep[p.2, citing \citep{VisuelleKommunikation}]{LearningFromArchitects}.
 
-Examples of visual metaphors commonly used to represent collections of data include calendars, bookshelves, timelines and maps. These do not have to be visually skeuomorphic to be effective, but to avoid misinterpretation, there should be a match between the underlying structure of the metaphor and the underlying structure of the data.
+Examples of visual metaphors commonly used to represent collections of data include calendars, bookshelves, timelines, maps and other schematics. Metaphors based on physical objects do not have to be visually skeuomorphic to be effective, but to avoid misinterpretation, there should be a match between the underlying structure of the metaphor and the underlying structure of the data. Two common and highly structured visual metaphors will be explored in the following sections in the context of potential for news representation; timelines and schematic maps.
 
-\subsubsection{Timelines}
+\subsubsection{Timeline Visualisations}
 
 Chronological ordering is an important characteristic of news articles and should be preserved in any visualisation of news data as it provides a natural ordering \citep{StructuredSummarizationForNewsEvents}. Perhaps the simplest visual metaphor for a collection of dated documents is the timeline.
 
-\citeauthor{SchemaLine} explore the role of timelines in the sensemaking process,  emphasising that the interactions supported by such visualisations should be as intuitive as possible in order to not disrupt users' trains of thought, and should be tightly coupled with other elements of the sensemaking process so temporal connections are not viewed solely in isolation.
+\citep{SchemaLine} explores the role of timelines in the sensemaking process,  emphasising that the interactions supported by such visualisations should be as intuitive as possible in order to not disrupt users' trains of thought, and should be tightly coupled with other elements of the sensemaking process so temporal connections are not viewed solely in isolation.
 
 Criticisms of previous timeline visualisations made by the authors are that linear layouts  are often too simple for the data they represent, and that a lack of automatic layout generation results in additional manual work for the user \citep{SchemaLine}.
 
 The colouring technique used to distinguish sets of related events within a single timeline is a flexible extension to \citep{TimeSets}, where the authors coloured events belonging to multiple sets with a gradient composed of the colours of both sets. 
 
-The gradient approach does not scale to events belonging to more than two sets, and the colour grouping restricts the number of possible intersections of each set. From a news storyline perspective, this would place an upper limit of two on the number of possible topics a story could belong to, which is an impractical constraint.
+However, \citep{SchemaLine}'s gradient approach does not scale to events belonging to more than two sets, since the colour grouping restricts the number of possible intersections of each set. From a news storyline perspective, this would place an upper limit of two on the number of possible topics a story could belong to, which is a low constraint for all but the highest level topics.
 
 \citet{ExploringLongRunningNewsStoriesUsingWikipedia} designed a prototype for generating annotated timelines based on the Wikipedia entries long-running news stories. The use of Wikipedia rather than news feeds meant their document retrieval model was heavily dependent on Wikipedia's structure, but it also afforded a huge wealth of contextual information that made such detailed annotations possible. Not all stories are long running however, so while this would be useful as a retrospective tool it would be impossible to generate timelines in the same way for news articles which did not already belong to a long-running chain of events.
 
@@ -185,81 +187,38 @@ TIARA \citep{InteractiveTopicBasedVisualTextSummarizationAndAnalysis} which cite
 
 Taking into consideration both the critiques of  oversimplification identified in \citep{SchemaLine} and the physical limitations highlighted in \citep{TimeSets, ThemeRiver}, it is clear that timelines may not be the most appropriate visual metaphor for news visualisation, especially not for highly connected events and topics. 
 
-However, for more linear storylines in which span fewer categories or topics, a visualisation such as \citep{SchemaLine} could be used, for example as part of \citeauthor{TheEyesHaveIt}'s \textit{Zoom and Filter} task where the dataset is pruned.
+However, for more linear storylines which span fewer categories or topics, a visualisation such as \citep{SchemaLine} could be used, for example as part of \citeauthor{TheEyesHaveIt}'s \textit{Zoom and Filter} task where the dataset is pruned.
 
-\subsubsection{Cartographs}
-\todo{Write this}
+\subsubsection{Topological and Schematic Map Visualisations}
 
+The use of cartographic representations for abstract objects and the relationships between them is such a common and natural metaphor that it is often unnoticed in digital contexts. Maps take advantage of humans' natural ability to perceive and organise in a spatial context, and [the fact that we live in a spatial world] ``leads naturally to metaphors that provide cues for orientation and navigation.'' \citep[p.2]{InformationCartographyUsingGIS}
 
+Topological maps\footnote{Not to be confused with \textit{topographic} maps, which represent relief and other geographic features of physical regions at a large scale and in fine detail.} are a specific class of map which abstract away detail so that only significant features within desired subsets of the mapped dataset remain; from a news overload perspective, this is a highly desirable property. These maps are often used to visualise networks and are represented as schematics, where elements on the map are transformed into abstract visual representations for ease of understanding.
 
+Today, the most recognisable examples of topological maps are transit maps. Divorced from the strictness of geographical accuracy and scale, emphasis is instead placed on the usability of the map for planning and the understanding of relative positioning which the maps enable \citep{TheInfluenceOfMapDesignOnRouteChoice}.
 
-
-\section{Towards News Feed Visualisation}
-
-The fact that news articles form a fairly narrow class of document is an advantage from a visualisation design perspective, due to the common elements they share. Articles published by commercial news producers typically contain:
-\begin{itemize}[noitemsep]
-	\item A headline;
-	\item A description, or \textit{subhead};
-	\item A publish date;
-	\item One or more categories to which the article belongs.
-\end{itemize}
-These attributes are useful for visualisation, since creating a spatial representation from text requires documents to be represented as vectors in high-dimensional feature space \citep{VisualizingTheNonVisual}, and the presence of existing attributes makes articles more inherently comparable than their unstructured contents would be. 
-
-There is also a well-known existing standard for publishing links to articles with their metadata for use by other applications; RSS.
-
-\subsection{Mining Articles}
-The de-facto web format for news feed publishing is RSS (Rich Site Summary, or Really Simple Syndication.) The rise of the internet as a news platform has lead to many readers finding the most efficient method of reading news articles is to subscribe to various topic-specific news feeds and read what is automatically collated by their computers \citep{Nreader}.
-
-Although RSS--which is a subset of XML--is standardised\footnote{http://cyber.harvard.edu/rss/rss.html}, the practice of feed categorisation is not, meaning the granularity of topics which can be subscribed to is dependent on the publisher. This issue was addressed by \citet{PersonalNewsRss}, with the design of a system which could essentially split or join existing RSS feeds to synthesise new ones based on user-specified keywords and queries.
-
-Despite its shortcomings, RSS remains the most universal option for accessing news feed content from a huge variety of news producers 
-\citep{MiningAndVisualisingInformationFromRSSFeeds}.
-
-\subsection{Keyword Extraction}
-
-Extracting relevant keywords from documents is not a new domain of research. Various methods have been presented, the most well-known being the intuitively logical TF-IDF (term frequency, inverse document frequency) \citep{TermWeightingApproachesInAutomaticTextRetrieval} which ranks the significance of a term \textit{t} in a document \textit{d} which belongs to a corpus \textit{C} as follows:
-
-\begin{equation}
-	\text{TF-IDF}(t, d, C) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
-\label{eqn:tfidf}
-\end{equation}
-
-TF-IDF will extract the most unique keywords from a document within a corpus, because it penalises words which are common to many documents. However, in the context of a corpus of news articles, this uniqueness can lead to significant topic keywords being ignored because they appear with such frequency. 
-
-\citet{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm} found that for news archive keyword extraction, a better alternative to TF-IDF is TF-PDF (term frequency, proportional document frequency) as it is not biased against frequently repeated keywords.
-
-Using TF-PDF, articles are modelled as belonging to one of a finite number of sources or \textit{channels} within a corpus. The weighting of a term from an article within a channel is in this case linearly proportional to its frequency in the channel and exponentially proportional to the number documents in the channel where it occurs. A term's total weighting is the sum of its weightings across all channels, as can be seen in Equation \ref{eqn:tfpdf} \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}, where:
-\begin{itemize}[noitemsep]
-	\item $D$ = The number of channels in the corpus;
-	\item $K$ = The total number of terms in a channel;
-	\item $F_{tc}$ = Frequency of term $t$ in channel $c$;
-	\item $n_{tc}$ = The number of articles in channel $c$ where term $t$ occurs;
-	\item $N_c$ = The total number of articles in channel $c$.
-\end{itemize}
-\begin{equation}
-	\label{eqn:tfpdf}
-	\text{TF-PDF}(t) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k=K}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
-\end{equation}
-
-The reliance of both TF-IDF and TF-PDF on a fixed background corpus results in a need to recompute the function for every document if any are added to or removed from the collection. This is impractical for large collections, and even in the case of large fixed collections it does not scale well, which has resulted in the development of other methods.
-
-An approach derived from energy levels in quantum systems was proposed in \citep{LevelStatisticsOfWords}, where keywords were extracted based on their spatial distributions within a single text. The theory behind the approach is that typically, keywords occurrences are distributed in significant frequency clusters throughout a document, whereas non-relevant words are distributed with uniform frequency (see Figure \ref{fig:ols-spectra}).
-
-\begin{figure}[htbp!]
+\begin{figure}[hp!]
 	\centering
-	\includegraphics[width=.6\textwidth]{img/lit-survey/ols-keyword-spectra.pdf}
-	\caption{Frequency spectra of `Quixote' (keyword, clustered distribution) and `but' (non-relevant, uniform distribution) in the first 50,000 words of \textit{Don Quixote}.}
-	\label{fig:ols-spectra}
+	\includegraphics[width=.9\textwidth]{img/lit-survey/1930-pre-beck.png}
+	\caption{1930 London Underground map, designed by F. Stingemore \citep{Tube150}.}
+	\label{fig:pre-beck}
 \end{figure}
 
-This technique allows relevant keywords to be distinguished from non-relevant common words with similar total frequencies without the use of a background corpus for comparison.
+\begin{figure}[hp!]
+	\centering
+	\includegraphics[width=.9\textwidth]{img/lit-survey/1933-beck.png}
+	\caption{1933 London Underground Map, designed by H. Beck \citep{Tube150}.}
+	\label{fig:beck}
+\end{figure}
 
-Several important observations have been made regarding keyword extraction for news articles specifically. Firstly, that important phrases in text are likely to be references to people, places and other named entities \citep{NewsStand}. Libraries such as the Stanford Named Entity Recognizer (NER) \citep{NestedNamedEntityRecognition} exist to extract these from text. Secondly, while 30\% of an article's keywords are inferred and cannot be found within the text without intelligent input, 60\% are present in the article's title and first few sentences \citep{IdentifyingTopicsByPosition}, since important facts are generally stated as part of an article's \textit{above the fold} content.
+Figures \ref{fig:pre-beck} and \ref{fig:beck} show the geographically accurate 1930 London Underground map designed by Frederick Stingemore, and the iconic 1933 redesign by Henry Beck, which was based on the concept of an electrical circuit diagram \citep{HarryBeck}.
 
-%\subsection{Entity Disambiguation}
+While Beck's simplification of the structure of the map was seen as radical and even controversial at the time, the hallmarks of his design are now recognisable not just in other schematic maps, but in posters, infographics and diagrams across various domains.
 
-\section{The Metro Maps Metaphor}
-Significant work in the area of information visualisation--and in particular, information \textit{cartography}--has been undertaken by Shahaf et al. \citep{ConnectingTheDots, GeneratingInformationMaps, MetroMapsOfScience, InformationCartographyPre}, in the domains of both news and science through the visualisation of article and journal data on metro maps.
+In terms of usability of visual metaphors, simple timeline visualisations can provide the chronological ordering which is intrinsic within collections of news articles. However, topological and schematic maps can represent complex relationships between topics in a structure which is linear but has an additional dimension, to prevent linearity becoming a design or usability constraint.
+
+\section{Metro Maps for Information Cartography}
+Significant work in the area of information cartography has been undertaken by Shahaf et al. \citep{ConnectingTheDots, GeneratingInformationMaps, MetroMapsOfScience, InformationCartographyPre}, in the domains of both news and science through the visualisation of article and journal data on metro maps.
 
 The the metro map was introduced in \citep{GeneratingInformationMaps} to address the fact that previous timeline-based news summarisation systems could only represent simple linear stories; ``In contrast, complex stories display a very non-linear structure: stories split into branches, side stories, dead ends, and intertwining narratives.'' \citep[p.1]{InformationCartographyPre}
 
@@ -318,7 +277,7 @@ Therefore, an alternative definition for map coverage was chosen, which will not
 	\label{eqn:multiplicative-coverage}
 	cover_\mathcal{M}(w) = 1 - \prod_{d_i\in docs(\mathcal{M})}(1-cover_{d_i}(w))
 \end{equation}
-Finally, the definition of map coverage is extended to the coverage of the corpus $\mathcal{D}$, rather than just single features. If each feature is weighted, according to frequency, then for each $w \in \mathcal{W}$ we have some $\lambda_w$. The coverage of a corpus $\mathcal{D}$ by a metro map $\mathcal{M}$ can then be defined as in Equation \ref{eqn:map-coverage} \citep{GeneratingInformationMaps}.
+Finally, the definition of map coverage is extended to the coverage of the corpus $\mathcal{D}$, rather than just single features. If each feature is weighted according to frequency, then for each $w \in \mathcal{W}$ we have some $\lambda_w$. The coverage of a corpus $\mathcal{D}$ by a metro map $\mathcal{M}$ can then be defined as in Equation \ref{eqn:map-coverage} \citep{GeneratingInformationMaps}.
 \begin{equation}
 	\label{eqn:map-coverage}
 	Cover(\mathcal{M}, \mathcal{D}) = \sum_{w \in \mathcal{W}}\lambda_w cover_\mathcal{M}(w)
@@ -335,13 +294,106 @@ The final property is the most simply defined; the connectivity of a metro map i
 \subsubsection{Corpus}
 Perhaps the biggest limitation of the system developed in \citep{GeneratingInformationMaps, InformationCartographyPre} is the nature of the corpus $\mathcal{D}$; it is a fixed dataset, meaning users can only query it for certain non-recent events with no way of specifying a different corpus themselves. 
 
-From a historical reference perspective the output provided for certain queries is interesting, but it is not possible to use the system as a replacement to a news feed aggregator or similar.
+From a historical reference perspective the output provided for certain queries is interesting, but it is not possible to use the system as a replacement to a news feed aggregator or similar. 
 
-\subsubsection{Transit Map Aesthetics}
-\todo{Write this}
+\subsubsection{Graph Layout Aesthetic Principles}
+
+From a usability perspective, a second limitation of the work of \citeauthor{GeneratingInformationMaps} is the lack of focus given to the desirable aesthetic properties of transit maps.
+
+A formative empirical study \citep{TheBasisForGraphDrawingAlgorithms} on how graph layout affects usability identified a collection of five measurable aesthetic principles from previous research, which aid human understanding when reading graphs:
+\begin{itemize}[noitemsep]
+	\item Minimise the number of line bends \citep{MinimiseBends};
+	\item Minimise the number of edge crossings \citep{MinimiseEdgeCrossings};
+	\item Preserve any symmetry in the structure of the graph \citep{PreserveSymmetry};
+	\item Draw orthogonally where possible \citep{MinimiseBends};
+	\item Maximise the minimum angle between incident edges for each node \citep{IncidentEdges}.
+\end{itemize}
+These criteria, when numerically calculated and weighted relative to one another, allow the aesthetic quality of any graph to be evaluated. This is particularly useful for graphs generated by automatic layout algorithms, which aren't as much a product of human design intuition as their manually designed counterparts.
+
+The origins of the principles above predate much of the early InfoVis research because several of them \citep{MinimiseBends, MinimiseEdgeCrossings} were formalised as guidelines for the design of electronic circuits.
+
+In a later study, \citeauthor{WhichAesthetic} evaluated information-finding task performance with a set of graphs which varied the above principles, to establish which the most and least significant aesthetics were for graph usability. The results of the study were that maximising incident edge angles and orthogonality did not lead to better performance, preserving symmetry and minimising line bends were somewhat important, and minimising edge crossings was the most significant influencing factor for performance \citep{WhichAesthetic}. 
+ 
+Metro maps, however--particularly those representing non-physical data such as in the previous section--do not share all the structural principles of the wider set of directed graphs. Consequentially, \citeauthor{AutomaticMetroMapLayout} developed a set of criteria for metro maps specifically, including criteria for the labelling of stations. The criteria are as follows \citep{AutomaticMetroMapLayout}:
+
+\begin{itemize}
+	\item \textbf{Angular Resolution Criterion:} Maximise the angle between incident edges at each node. This criterion is also the fifth principle in \citep{TheBasisForGraphDrawingAlgorithms}. 
+	\item \textbf{Edge Length Criterion:} All edges on the map should be approximately equal.
+	\item \textbf{Balanced Edge Length Criterion:} The length of edges incident to a given node should be approximately equal.
+	\item \textbf{Edge Crossings Criterion:} Crossings should be minimised. This criterion is also the second principle in \citep{TheBasisForGraphDrawingAlgorithms}, identified as the most important.
+	\item \textbf{Line Straightness Criterion:} Edges on the same metro line should be collinear, i.e. they should form a 180$^{\circ}$ line through every station that line passes through. This criterion relates closely to the first principle in \citep{TheBasisForGraphDrawingAlgorithms}.
+	\item \textbf{Octilinearity Criterion:} Edges should be drawn at multiples of 45$^{\circ}$. This criterion is an extension to the fourth principle in \citep{TheBasisForGraphDrawingAlgorithms}, as orthogonality is here analogous to rectilinearity.
+\end{itemize}
+
+Evaluating Figure \ref{fig:greecemetro} according to the above, we observe that despite only containing 16 stations, the map unnecessarily violates five  of \citeauthor{AutomaticMetroMapLayout}'s six criteria (there are no edge crossings.)
+
+Therefore, to improve the usability of the metro maps drawn in \citep{ConnectingTheDots, GeneratingInformationMaps, MetroMapsOfScience, InformationCartographyPre}, it would be advisable to attempt to satisfy more of the aesthetic principles for graphs and metro maps described in \citep{TheBasisForGraphDrawingAlgorithms, AutomaticMetroMapLayout}.
+
+
+\section{Towards News Feed Visualisation}
+
+The fact that news articles form a fairly narrow class of document is an advantage from a visualisation design perspective, due to the common elements they share. Articles published by commercial news producers typically contain:
+\begin{itemize}[noitemsep]
+	\item A headline;
+	\item A description, or \textit{subhead};
+	\item A publish date;
+	\item One or more categories to which the article belongs.
+\end{itemize}
+These attributes are useful for visualisation, since creating a spatial representation from text requires documents to be represented as vectors in high-dimensional feature space \citep{VisualizingTheNonVisual}, and the presence of existing attributes makes articles more inherently comparable than their unstructured contents would be.
+
+There is also a well-known existing standard for publishing links to articles with their metadata for use by other applications; RSS.
+
+\subsection{Mining Articles}
+The de-facto web format for news feed publishing is RSS (Rich Site Summary, or Really Simple Syndication.) The rise of the internet as a news platform has lead to many readers finding the most efficient method of reading news articles is to subscribe to various topic-specific news feeds and read what is automatically collated by their computers \citep{Nreader}.
+
+Although RSS--which is a subset of XML--is standardised\footnote{http://cyber.harvard.edu/rss/rss.html}, the practice of feed categorisation is not, meaning the granularity of topics which can be subscribed to is dependent on the publisher. This issue was addressed by \citet{PersonalNewsRss}, with the design of a system which could essentially split or join existing RSS feeds to synthesise new ones based on user-specified keywords and queries.
+
+Despite its shortcomings, RSS remains the most universal option for accessing news feed content from a huge variety of news producers 
+\citep{MiningAndVisualisingInformationFromRSSFeeds}.
+
+\subsection{Keyword Extraction}
+
+Extracting relevant keywords from documents is not a new domain of research. Various methods have been presented, the most well-known being the intuitively logical TF-IDF (term frequency, inverse document frequency) \citep{TermWeightingApproachesInAutomaticTextRetrieval} which ranks the significance of a term \textit{t} in a document \textit{d} which belongs to a corpus \textit{C} as follows:
+
+\begin{equation}
+	\text{TF-IDF}(t, d, C) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
+\label{eqn:tfidf}
+\end{equation}
+
+TF-IDF will extract the most unique keywords from a document within a corpus, because it penalises words which are common to many documents. However, in the context of a corpus of news articles, this uniqueness can lead to significant topic keywords being ignored because they appear with such frequency. 
+
+\citet{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm} found that for news archive keyword extraction, a better alternative to TF-IDF is TF-PDF (term frequency, proportional document frequency) as it is not biased against frequently repeated keywords.
+
+Using TF-PDF, articles are modelled as belonging to one of a finite number of sources or \textit{channels} within a corpus. The weighting of a term from an article within a channel is in this case linearly proportional to its frequency in the channel and exponentially proportional to the number documents in the channel where it occurs. A term's total weighting is the sum of its weightings across all channels, as can be seen in Equation \ref{eqn:tfpdf} \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}, where:
+\begin{itemize}[noitemsep]
+	\item $D$ = The number of channels in the corpus;
+	\item $K$ = The total number of terms in a channel;
+	\item $F_{tc}$ = Frequency of term $t$ in channel $c$;
+	\item $n_{tc}$ = The number of articles in channel $c$ where term $t$ occurs;
+	\item $N_c$ = The total number of articles in channel $c$.
+\end{itemize}
+\begin{equation}
+	\label{eqn:tfpdf}
+	\text{TF-PDF}(t) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k=K}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
+\end{equation}
+
+The reliance of both TF-IDF and TF-PDF on a fixed background corpus results in a need to recompute the function for every document if any are added to or removed from the collection. This is impractical for large collections, and even in the case of large fixed collections it does not scale well, which has resulted in the development of other methods.
+
+An approach derived from energy levels in quantum systems was proposed in \citep{LevelStatisticsOfWords}, where keywords were extracted based on their spatial distributions within a single text. The theory behind the approach is that typically, keywords occurrences are distributed in significant frequency clusters throughout a document, whereas non-relevant words are distributed with uniform frequency (see Figure \ref{fig:ols-spectra}).
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.6\textwidth]{img/lit-survey/ols-keyword-spectra.pdf}
+	\caption{Frequency spectra of `Quixote' (keyword, clustered distribution) and `but' (non-relevant, uniform distribution) in the first 50,000 words of \textit{Don Quixote}.}
+	\label{fig:ols-spectra}
+\end{figure}
+
+This technique allows relevant keywords to be distinguished from non-relevant common words with similar total frequencies without the use of a background corpus for comparison.
+
+Several important observations have been made regarding keyword extraction for news articles specifically. Firstly, that important phrases in text are likely to be references to people, places and other named entities \citep{NewsStand}. Libraries such as the Stanford Named Entity Recognizer (NER) \citep{NestedNamedEntityRecognition} exist to extract these from text. Secondly, while 30\% of an article's keywords are inferred and cannot be found within the text without intelligent input, 60\% are present in the article's title and first few sentences \citep{IdentifyingTopicsByPosition}, since important facts are generally stated as part of an article's \textit{above the fold} content.
 
 \section{Evaluation Methods}
-\citet{GeneratingInformationMaps} evaluated their system both for accuracy and with a user study. The accuracy evaluation tested whether the system included the most `important' (as decided by experts) documents in the map. The user study focused on the strength of the results returned by specific queries, where output was transformed into a structureless list in order for the study to be double-blind against the other methods. The evaluation was performed between-subjects, so background knowledge had to be controlled for. Output was compared with that from Google News and a TDT (Topic Detection and Tracking) method presented in \citep{SemanticLanguageModelsForTDT}. This approach to evaluation is less relevant to my proposed system, since it was actually evaluating the performance of the system in selecting documents based on a query, rather than visualising the documents on a map. In contrast, a visualisation and its usability is precisely the aspect of my process which I would ultimately need to evaluate.
+\citet{GeneratingInformationMaps} evaluated their system both for accuracy and with a user study, though as previously discussed they did not evaluate the aesthetic properties of the generated maps. The accuracy evaluation tested whether the system included the most `important' (as decided by experts) documents in the map. The user study focused on the strength of the results returned by specific queries, where output was transformed into a structureless list in order for the study to be double-blind against the other methods. The evaluation was performed between-subjects, so background knowledge had to be controlled for. Output was compared with that from Google News and a TDT (Topic Detection and Tracking) method presented in \citep{SemanticLanguageModelsForTDT}. This approach to evaluation is less relevant to my proposed system, since it was actually evaluating the performance of the system in selecting documents based on a query, rather than visualising the documents on a map. In contrast, a visualisation and its usability is precisely the aspect of my process which I would ultimately need to evaluate.
 
 \citet{EvaluatingInformationVisualisations} found that the evaluation of measures of usability such as task completion time and effectiveness can only be accurately conducted as part of a summative formal experiment. This is because formative tests such as think-aloud experiments require users to alter their behaviour and leads to slower actions \citep{VerbalReportsAsData}.
 
@@ -350,10 +402,8 @@ The evaluation of TIARA \citep{InteractiveTopicBasedVisualTextSummarizationAndAn
 \section{Summary}
 In summary, this review began with an exploration of the issue of news overload using the findings of \citep{anewmodelfornews}, a field study conducted into the news consumption habits of young people. The findings of the study were then discussed, firstly in the context of four dimensions of information overload \citep{TowardsAnOptimalResolutionToInformationOverload, GuestEditorsIntroductionInformationOverload} and secondly in terms of how they relate to sensemaking; the cognitive process this project aims to support.
 
-Information visualisation was identified as one common approach to both support sensemaking and reduce information overload, so various methods for visualising text-based documents and news articles specifically were presented and compared \citep{ESTHETE, ThemeRiver, InteractiveTopicBasedVisualTextSummarizationAndAnalysis, ExploringLongRunningNewsStoriesUsingWikipedia, Nreader} as well as methods for transforming news articles into feature vectors for visualisation, such as mining, entity recognition, and keyword extraction.
+Information visualisation was identified as one common approach to both support sensemaking and reduce information overload, so various methods for visualising text-based documents and news articles specifically were presented and compared \citep{ESTHETE, ThemeRiver, InteractiveTopicBasedVisualTextSummarizationAndAnalysis, ExploringLongRunningNewsStoriesUsingWikipedia, Nreader} as well as a more in-depth exploration of visual metaphors, in particular timeline and schematic map visualisations.
 
-Lastly, the work of Shahaf et al. \citep{ConnectingTheDots, GeneratingInformationMaps, MetroMapsOfScience, InformationCartographyPre} which is particularly relevant to the aims and objectives of this project was discussed in detail, with an explanation of key concepts (\textit{coherence}, \textit{coverage} and \textit{complexity}) defined in \citep{GeneratingInformationMaps} which are applicable to all graph-based representations of document collections.
+Centrally, the work of Shahaf et al. \citep{ConnectingTheDots, GeneratingInformationMaps, MetroMapsOfScience, InformationCartographyPre} which is particularly relevant to the aims and objectives of this project was discussed in detail, with an explanation of key concepts (\textit{coherence}, \textit{coverage} and \textit{complexity}) defined in \citep{GeneratingInformationMaps} which are applicable to all graph-based representations of document collections. My main critiques of this body of work were the fixed background corpus and the physical layouts of the drawn maps when evaluated against \citep{TheBasisForGraphDrawingAlgorithms, AutomaticMetroMapLayout}.
 
-Conducting this research has resulted in a clear direction of focus and scope for my project, and an understanding of what I could contribute to the domain of visualisation-based solutions to information overload. My aim is to integrate user-specified news feeds into the approach outlined in \citep{GeneratingInformationMaps} to generate custom maps based on current events, with a richer interactive display format and the addition of other techniques for reducing information load such as removing subsumed articles from the model \citep{UtilizingPhraseSimilarityMeasures} and attempting to provide contextual background in the visualisation itself \citep{ExploringLongRunningNewsStoriesUsingWikipedia}.
-
-The resultant system would be a news feed aggregator with graphically structured visual output, and to the best of my knowledge would be the first of its kind.  
+Then followed a practical overview of methods for transforming news articles into entities with visual or comparative properties, such as RSS feed mining, entity recognition, and keyword extraction. Lastly, approaches to experimental design and evaluation by several of the aforementioned studies were discussed in the context of their relevance to the proposed system.
