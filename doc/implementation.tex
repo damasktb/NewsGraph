@@ -1,9 +1,184 @@
-\section{Software Implementation}
+\section{Introduction}
+I developed the design of the system in Python 2.7 and JavaScript 1.7. This chapter provides a detailed and run-time ordered description of how the methods outlined in the previous chapter were implemented, followed by a discussion of the significant challenges and successes during development.
 
-\section{Algorithm Design and Implementation}
+\section{Code Reuse}
+I used various open-source libraries and APIs in the development of the system, the most central of which I describe below and discuss in context in the following sections.
 
-\subsection{Map Formation}
+\begin{itemize}[noitemsep]
+	\item\textbf{FeedParser}\footnote{http://pythonhosted.org/feedparser}: A Python module for downloading and parsing RSS feeds.
+	\item\textbf{Newspaper}\footnote{http://newspaper.readthedocs.io}: A Python library for downloading and extracting content and metadata from online articles.
+	\item\textbf{lxml}\footnote{http://lxml.de}: A Python library for generating, parsing and manipulating XML and HTML.
+	\item\textbf{NLTK (The Natural Language Toolkit)}\footnote{http://www.nltk.org}: A Python library for natural language processing and analysis.
+	\item\textbf{Google Knowledge Graph Search}\footnote{https://developers.google.com/knowledge-graph}: The API for Google's knowledge base, which returns structured semantic search results.
+	\item\textbf{D3.js}\footnote{http://d3js.org}: A JavaScript library for creating and manipulating interactive web visualisations and their underlying data.
+\end{itemize}
 
-\subsection{Automatic Map Layout}
 
-\section{Summary}
+\section{Article Retrieval}
+
+The first stage of article retrieval is the parsing of RSS feeds, in order for article URLs and metadata to be extracted. The Python library FeedParser was used, as at the time of writing it provided the best support for RSS 0.9x, 1.0 and 2.0. For each item in the feed, the parsing process extracts a link to each article, the name of the channel, and the parsed publish date, but it will also attempt to extract the author name if the \texttt{author} attribute is found.
+
+Once the feed data has been extracted, it is used to construct an instance of \texttt{ArticleCollection}, which acts a wrapper around the contents of one or more feeds and provides the mechanism necessary to perform corpus-wide queries such as calculating inverse document frequency for TF-IDF, and proportional document frequency for TF-PDF. Individual articles are downloaded using the Newspaper library, however due to the requirement that \texttt{ArticleCollection} must be serialisable with cPickle to provide intermediate cache format, it was necessary to create a new \texttt{Article} class which unpacks the necessary members of \texttt{Newspaper.Article} and discards the XML which prevents instances of \texttt{Newspaper.Article} from being serialisable.  The \texttt{Article} encapsulates the functions for computing article-specific terms such as term-frequency for TF-IDF, and the term-weighting component of TF-PDF. 
+
+\subsection{Sanitisation}
+
+An early problem encountered was the embedding of unrelated content into the body of articles by news publishers in order to encourage readers to seek out additional content from the same website. This content typically takes the form of a gallery or list of images and article titles with brief summaries or subheads (see Listing \ref{lst:gallery}).
+
+\begin{HTML}{Unrelated content nested into the body of an article}{lst:gallery}
+<div id=`article'>
+	<h1> Article Title </h1>
+	<p> ... </p>
+	<p> ... </p>
+	<div id=`gallery'>
+		<h1> Related Articles </h1>
+		<p> ... </p>
+	</div>
+</div>	
+\end{HTML}
+
+If this content was left and processed as part of an article, it would result in keywords being falsely detected in the articles when in fact they were only present in the form of a link to unrelated content. It was therefore necessary to sanitise the article HTML before tokenisation and keyword extraction. The semantic structure of HTML made this a simpler task; any child elements of the element containing the body text of the article are removed (using lxml) unless they are a paragraph or heading.
+
+The result of this pre-processing stage is an \texttt{ArticleCollection} containing one or more serialisable \texttt{Article}s from one or more RSS feeds, where each \texttt{Article} contains extracted and sanitised but unparsed data, and associated metadata.
+
+\section{Keyword Extraction}
+
+The keyword extraction stage begins with the process of tokenising the body text of every article. Tokenisation here has three substages, all of which were implemented using NLTK (The Natural Language Toolkit for Python), and which are as follows:
+\begin{enumerate}
+	\item Sentence segmentation: Split the text into a list of sentences and remove sentence punctuation.
+	\item Tokenisation: Split each sentence into a list of individual words and remove both whitespace and clause punctuation.
+	\item Part-of-Speech (POS) tagging: Categorise each token according to its lexical class, e.g. adjective. This more of an extension to the tokenisation process than a part of it, but it is performed directly after tokenisation and is necessary for the next stage of processing.
+\end{enumerate}
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/implementation/Tokenisation.pdf}
+	\caption{Stepping through the tokenisation process.}
+	\label{fig:tokenisation}
+\end{figure}
+
+\subsection{Named Entity Recognition}
+
+The second half of the keyword extraction process is exclusively concerned with named entities within articles. This is because, intuitively, the names of people, places, events companies and other \textit{things} form a set of strong candidate keywords. Restricting the candidates to entities alone reduces the search space by an order of magnitude when using frequency-based methods for keyword extraction, and removes the need for other natural language processing processes such as stop-word removal and lemmatisation.
+
+Once tokens have been POS tagged, named-entity chunking can be performed, again using NLTK. This process groups tokens into contiguous and non-overlapping \textit{chunks}, where each chunk is a named entity; typically a proper noun or some other noun phrase.
+
+It is possible for chunks to contain other chunks (consider the chunk `Bank of England', which contains the chunk `England'), but this is typically undesirable for entity recognition -- where we desire specificity -- so after chunking the tokens, we flatten the chunk structure so chunks cannot be any further decomposed.
+
+At this stage, we have a list of chunks, each of which will be an eventual candidate for becoming a metro line. However, the chunks require some further processing before we can determine whether or not they are significant keywords.
+
+\subsubsection{Name Disambiguation: Substring Matching}
+It is common stylistic practice in journalism to refer to the subjects of articles by their surnames. However, to avoid any confusion, the full names of those mentioned will often appear in the title or first few paragraphs of the article. If keyword strength is determined by frequency, then regardless of whether we use TF-IDF or TF-PDF, we need every occurrence of an entity to refer to that entity by the same name; preferably the most specific, which is typically the longest.
+
+During name disambiguation, we only consider entities with more than one mention in the source text as candidates. This is because the chunking process can produce false positives by combining unrelated adjectives with valid chunks, but the likelihood of the same false positive being produced twice or more in the same article is low.
+
+Let $P$ denote the set of entities with more than one occurrence in the source article; $S$:
+\begin{align*}
+P &= \{e\;|\;\text{occurences}(e, S) > 1\}.
+\intertext{$\forall (e_1, e_2) \in \{P\times{P}\;|\;$length$(e_1)\;<\;$length$(e_2)\}, $ if $e_1 $ is a substring of $e_2$, we call $e_1$ an \textit{alias} of $e_2$. Let $A$ be the set of alias pairs in $S$;} 
+A &= \{(a, e) \;|\;a \text{ is an alias of } e\}
+\intertext{We require the first term of every pair in $A$ to be unique, but there is no such constraint for the second term ($e$); this allows multiple aliases to map to the same entity. For example,} 
+ & \{(\text{`Zuckerberg'}, \text{`Mark Zuckerberg'}), (\text{`Zuck'}, \text{`Mark Zuckerberg'})\} 
+%\intertext{and}
+%& \{(\text{`Zuck'}, \text{`Zuckerberg'}), (\text{`Zuckerberg'}, \text{`Mark Zuckerberg'})\}
+\intertext{would be unambiguous and therefore valid, but}
+ & \{(\text{`Mark'}, \text{`Mark Zuckerberg'}), (\text{`Mark'}, \text{`Zuckerberg'})\}
+\intertext{would not be. Let $U$ be the set of unambiguous alias-entity pairs in $S$:}
+U &= \{(a, e) \;|\; (a, e)\in{A} \cap \forall(e_1, e_2)\in A, \; a = e_1 \implies e = e_2 \}
+\end{align*}
+
+We have a reasonable degree of confidence that for every alias-entity pair $(a, e) \in U$, occurrences of $a$ in the source text can be replaced by $e$, making $e$ a stronger candidate for keyword detection. Pairs in $(a, e) \in A\setminus{U}$, that is, aliases which could map to multiple entities in the source, are disregarded at this stage and left unchanged. A more sophisticated method of name disambiguation could address this.
+
+Algorithm \ref{alg:u} illustrates how, given a list of entities, we can find the unambiguous pairs deterministically in $\mathcal{O}(n^2)$ time. 
+
+\begin{algorithm}
+\label{alg:u}
+ \caption{Finding unambiguous alias-entity pairs}
+ \KwData{$names$: a list of recognised entities}
+ \KwResult{$U$: the set of unambiguous pairs in $names$}
+ $U \Leftarrow$ \{\}\;
+ \ForEach{$e_1, e_2$ $\in ($names $\times$ names$)$}{
+   \If{len($e_1$) $>$ len($e_2$)}{
+   	swap($e_1$, $e_2$)\;
+   }
+  \If(\tcc*[f]{If $e_1$ is a substring of $e_2$}){$e_1 \in e_2$}{
+   	\eIf{$e_1 \notin U$}{
+   	  $U$[$e_1$] $\Leftarrow e_2$ \tcc*[r]{$(e_1, e_2)$ are a candidate pair}
+    }{
+      delete $U$[$e_1$] \tcc*[r]{$e_1$ is now ambiguous, so remove it}
+    }
+   }
+ }
+\end{algorithm}
+
+
+\subsubsection{Entity Disambiguation with Knowledge Graph}
+
+Entity disambiguation describes the process of determining the identity of entities in a body of text. Performing this process on the sentence `The UK has voted to leave the EU,' should identify `UK' as The United Kingdom and `EU' as The European Union. As advanced methods for entity disambiguation are both complex and computationally expensive, I did not attempt to implement a formal method for this. 
+
+Instead, the list of recognised entities are queried against Google's publicly accessible Knowledge Graph API, which returns a list of potential results as Schema.org\footnote{http://schema.org is an online hierarchy of types managed by W3C (The World Wide Web Consortium)} types. Knowledge Graph is the service which replaced Freebase in 2015, and currently contains over 70 billion facts \citep{knowledgegraph}.
+
+Each result has a score attributed to it by Knowledge Graph, which is an indicator the strength of the match between the entity and the original query. Results are sorted by descending score; the higher the \texttt{resultScore}, the better the match. Although there is no defined upper limit for this value, comparing the scores of the top two results for a query can provide a measure of certainty, for all but particularly esoteric or unknown entities.
+
+We specify a threshold $\frac{1}{t}$, which is roughly proportional to the likelihood of accepting a false positive match. Then, if dividing the score of the first result by the score of the second yields a number greater than $\frac{1}{t}$, we accept the match.
+
+Empirically, I determined the best values for $t$ are in the range $0.5 < t < 0.67$, meaning we accept top results which are at least 1.5x-2x higher than the next best candidate.
+
+Using a knowledge base also inadvertently solves another problem I encountered while parsing articles, this time as a result the expositional style of journalistic writing. While keywords are typically nouns or noun phrases, they can also appear in the form of denominal adjectives (adjectives which are derived from nouns, e.g. `French' implies `France' might be a keyword). Denominal adjectives are not amenable to traditional stemming or lemmatising, but querying Knowledge Graph for `French' returns a top match of `Franch' with a \texttt{resultScore} of 432.42807; more than four times larger than the next result.
+
+Given a list of entities $E$, and the scores of top two results of a Knowledge Graph query for some $e \in E$ $S_e(1)$ and $S_e(1)$, our aim is to return a set of pairs mapping zero or more entities in $E$ to their disambiguated forms;
+
+\begin{align*}
+K &= \bigg\{(e, d)\;|\;\frac{S_e(1)}{S_e(2)} > \frac{1}{t}\bigg\}
+\end{align*}
+
+Algorithm \ref{alg:kg} describes this process. For higher values of $t$, the likelihood of accepting a false positive increases, and for lower values, the likelihood of accepting a false negative increases. For corpora which do not contain references to public figures and place names, choice of $t$ should be empirically tuned against the prevalence of the expected entities.
+
+\begin{algorithm}
+\label{alg:kg}
+ \caption{Entity disambiguation with Knowledge Graph}
+ \KwData{$names$: a list of recognised entities \\ 
+ 		\hspace{1.2cm}$t$: the acceptance threshold for results, default = 0.6}
+ \KwResult{$K$: a set of disambiguation mappings for elements in $names$}
+ $K \Leftarrow$ \{\}\;
+ $T \Leftarrow 1\div{t}$\;
+ \ForEach{$e \in names$}{
+ 	$results \Leftarrow$ KnowledgeGraphResults($e$)\;
+ 	\If{$results$.length $>$ 1}{
+	   \If{$results$[0].score $\div$ $results$[1].score $> T$}{
+	   		$K[e] = results[0].name$\;
+	   }
+	}
+ }
+\end{algorithm}
+
+It is unclear what should become of queries that Knowledge Graph only returns a single result for, but in this implementation they are ignored.
+
+
+\subsection{Keyword Ranking}
+
+
+
+\begin{itemize}[noitemsep]
+	\item Implementation of TF-IDF
+	\item Implementation of TF-PDF
+\end{itemize}
+
+\section{Graph Building}
+
+\subsection{Choosing Lines}
+
+\subsection{Connecting Articles}
+
+\section{Map Drawing}
+
+\subsection{Initial Node Positioning}
+\begin{itemize}[noitemsep]
+	\item D3.js for force directed layout
+	\item Initial force parameters; adjusting based on \cite{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}
+\end{itemize}
+
+\subsection{Heuristic Layout}
+\begin{itemize}[noitemsep]
+	\item \cite{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout} for snap()
+	\item Repeated averaging along lines for sensible octilinearity
+	\item Straightening the ends of lines
+\end{itemize}

@@ -1,54 +1,58 @@
 \renewcommand{\thesubsection}{\arabic{subsection}}
-\section{Functional Requirements}
+\renewcommand{\labelenumi}{\alph{enumi})}
+\section{Functional Requirements} \label{sec:freqs}
 
-\subsection{Article Acquisition}
+\subsection{Article Retrieval}
 \subsubsection{Description}
-The article acquisition component of the system will accept the URL of one or more RSS feeds, collect links to the articles referenced and parse the text of those articles for further processing.
+The article retrieval component of the system will accept the URL of one or more RSS feeds, collect links to the articles referenced and parse the text of those articles for further processing.
 \subsubsection{Functional Requirements}
 \begin{enumerate}[F\thesubsection.1]
-	\item\requirement{The system must accept any standard XML document compliant with the RSS 2.0 specification\footnote{http://cyber.harvard.edu/rss/rss.html}, i.e. it should not be specific to any particular news provider.}{High}
-	\item\requirement{The system must be able to extract a specified number of articles from an RSS feed, in reverse chronological order.}{High}
-	\item\requirement{The system must be able to download the textual content and/or raw HTML for each article.}{High}
-	\item\requirement{The system should accept multiple RSS feeds from one or more news provider(s) and merge their content into one collection.}{Medium}
-	\item\requirement{The system could verify new article URLs against the URLs of imported articles to ensure no articles are duplicated.}{Medium}
+	\item\label{f1.1}\requirement{The system must accept any standard XML document compliant with the RSS 2.0 specification\footnote{http://cyber.harvard.edu/rss/rss.html}, i.e. it should not be specific to any particular news provider}{High}
+	\item\label{f1.2}\requirement{The system must be able to extract a specified number of articles from an RSS feed, in reverse chronological order.}{High}
+	\item\label{f1.3}\requirement{The system must be able to download the textual content and/or raw HTML for each article.}{High}
+	\item\label{f1.4}\requirement{The system should accept multiple RSS feeds from one or more news provider(s) and merge their content into one collection.}{Medium}
+	\item\label{f1.5}\requirement{The system could verify new article URLs against the URLs of imported articles to ensure no articles are duplicated.}{Medium}
 \end{enumerate}
 
 \subsection{Keyword Extraction}
 \subsubsection{Description}
-The keyword extraction process will tokenise the parsed article text and determine a set of significant keywords for each article individually.
+The keyword extraction stage will tokenise the parsed article text and determine a set of significant keywords for each article individually.
 \subsubsection{Functional Requirements}
 \begin{enumerate}[F\thesubsection.1]
-	\item\requirement{The system must tokenise articles in order to perform basic natural language processing such as stop-word extraction and lemmatising.}{High}
-	\item\requirement{The system must implement a method for keyword extraction.}{High}
-	\item\requirement{The system must calculate and store a corresponding measure of relative importance for each keyword such as TF-IDF.}{High}
-	\item\requirement{The system should attempt to combine keywords it considers equivalent (e.g. \textit{UK} and \textit{United Kingdom}) to form stronger keyword matches between or within articles.}{Medium}
-	\item\requirement{The system could use external services (e.g. Google's Knowledge Graph API\footnote{http://www.google.com/intl/es419/insidesearch/features/search/knowledge.html}) to query any extracted keywords, in order to gain further insight or perform entity disambiguation \citep{EntityDisambiguationForKnowledgeBasePopulation}.}{Low}
+	\item\label{f2.1}\requirement{The system must tokenise articles in order to perform basic natural language processing such as stop-word extraction and lemmatising.}{High}
+	\item\label{f2.2}\requirement{The system must implement a method for keyword extraction, and calculate a corresponding measure of relative importance for each keyword such as TF-IDF.}{High}
+	\item\label{f2.3}\requirement{The system could attempt to combine keywords it considers equivalent (e.g. \textit{UK} and \textit{United Kingdom}) to form stronger keyword matches between or within articles.}{Medium}
+	\item\label{f2.4}\requirement{The system could use external services (e.g. Google's Knowledge Graph API\footnote{http://www.google.com/intl/es419/insidesearch/features/search/knowledge.html}) to query any extracted keywords, in order to gain further insight or perform entity disambiguation \citep{EntityDisambiguationForKnowledgeBasePopulation}.}{Low}
 \end{enumerate}
 
-
-\subsection{Topic Selection and Graph Formation}
+\subsection{Graph Building}
 \subsubsection{Description}
 This process involves determining a set of corpus keywords from the union of all the articles' keywords to form connected paths of edges (\textit{lines}), and fitting a maximal number of articles into the resulting graph.
 \subsubsection{Functional Requirements}
 \begin{enumerate}[F\thesubsection.1]
-	\item\requirement{The system must analyse the keywords extracted from all articles in a corpus to choose a set of the $n$ most significant topics, where $n$ is either predetermined or user-specified.}{High}
-	\item\requirement{The system must use the extracted topics and the publish dates (which form a natural ordering of nodes) of the articles to form a directed graph, with articles as vertices and common topic storylines as edges.}{High}
-	\item\requirement{The system should choose topics which are specific to some but not all articles in the collection, so as to avoid highly correlated topic keywords.}{Medium}
-	\item\requirement{The system should support exporting generated graphs in a graph description language e.g. DOT\footnote{http://www.graphviz.org/content/dot-language} or GraphML\footnote{http://graphml.graphdrawing.org}.}{Medium}
-	\item\requirement{The system could attempt to combine keywords to form topics if it considers them highly correlated.}{Medium}
-	\item\requirement{The system could attempt to maximise the coverage of the topic selection, i.e. maximise the number of articles covered by a given set of keywords.}{Medium}
-	\item\requirement{The system could accept a user-specified topic or list of topics to include or exclude from the graph.}{Low}
+	\item\label{f3.1}\requirement{The system must analyse the keywords extracted from all articles in a corpus to choose a set of the $n$ most significant topics, where $n$ is either predetermined or user-specified.}{High}
+	\item\label{f3.2}\requirement{The system must use the extracted topics and the publish dates (which form a natural ordering of nodes) of the articles to form a directed graph, with articles as vertices and common topic storylines as edges.}{High}
+	\item\label{f3.3}\requirement{The system should accept a user-specified topic or list of topics to include or exclude from the graph.}{High}
+	\item\label{f3.4}\requirement{The system should choose topics which are specific to some but not all articles in the collection, so as to avoid highly correlated topic keywords.}{Medium}
+	\item\label{f3.5}\requirement{The system could support exporting generated graphs in a graph description language e.g. DOT\footnote{http://www.graphviz.org/content/dot-language} or GraphML\footnote{http://graphml.graphdrawing.org}.}{Medium}
+	\item\label{f3.6}\requirement{The system could attempt to combine keywords to form topics if it considers them highly correlated.}{Medium}
+	\item\label{f3.7}\requirement{The system could attempt to maximise the coverage of the topic selection, i.e. maximise the number of articles covered by a given set of keywords.}{Medium}
 \end{enumerate}
 
-\subsection{Graph Drawing and Visualisation}
+\subsection{Map Drawing}
 \subsubsection{Description}
 The visualisation component will generate an interactive visualisation of the graph which can be used to explore the corpus as a whole and drill-down to the individual article level. 
 \subsubsection{Functional Requirements}
 \begin{enumerate}[F\thesubsection.1]
-	\item\requirement{The system must provide the capability for users to visualise the graph structures it generates using any HTML5 compliant web browser.}{High}
-	\item\requirement{The system must provide drill-down details for nodes, e.g. by providing a hyperlink to the original article or embedding static content from each article within the visualisation itself to provide a preview.}{High}
-	\item\requirement{The system should ensure the graphs generated are readable by ensuring nodes, edges and labels do not overlap with each other.}{Medium}
-	\item\requirement{The system could allow some degree of interactive customisation which does not change the underlying structure of the graph, such as dragging nodes or changing attributes including colour.}{Low}
+	\item\label{f4.1}\requirement{The system must provide the capability for users to visualise the graph structures it generates using any HTML5 compliant web browser.}{High}
+	\item\label{f4.2}\requirement{Metro lines must each be drawn in a different colour which contrasts that of other lines.}{High}
+	\item\label{f4.3}\requirement{The visualisation must include a key mapping metro line names to their colours on the map.}{High}
+	\item\label{f4.4}\requirement{Stations must be drawn with common (non-unique) symbols, with a distinction made for interchange stations.}{High}
+	\item\label{f4.5}\requirement{The system must provide drill-down details for nodes, e.g. by providing a hyperlink to the original article or embedding static content from each article within the visualisation itself to provide a preview.}{High}
+	\item\label{f4.6}\requirement{The maps generated should be readable by ensuring nodes and edges do not overlap with each other where possible.}{Medium}
+	\item\label{f4.7}\requirement{In support of \ref{f4.6}, to improve the readability of the map, nodes should not be labelled with article titles.}{Medium}
+	\item\label{f4.8}\requirement{The maps generated should adhere (where possible) to the metro map aesthetics defined in \citep{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout} to preserve the familiarity of the metaphor.}{Medium}
+	\item\label{f4.9}\requirement{The system could allow some degree of interactive customisation which does not change the underlying structure of the graph, such as dragging nodes or changing attributes including colour.}{Low}
 \end{enumerate}
 
 \subsection{Storage and Persistence}
@@ -56,17 +60,17 @@ The visualisation component will generate an interactive visualisation of the gr
 This component of the system is responsible for saving and importing previously downloaded corpora and reconstructing their graphs.
 \subsubsection{Functional Requirements}
 \begin{enumerate}[F\thesubsection.1]
-	\item\requirement{The system must support the importing/exporting of graph and article data in an intermediate data form, in order to fully reconstruct graphs it had previously created.}{High}
-	\item\requirement{By default, the articles collected by each run of the system must be treated as a new corpus so keyword ranking is deterministic for any given feed.}{High}
+	\item\label{nf1.1}\requirement{The system must support the importing/exporting of graph and article data in an intermediate data form, in order to fully reconstruct graphs it had previously created.}{High}
+	\item\label{nf1.2}\requirement{By default, the articles collected by each run of the system must be treated as a new corpus so keyword ranking is deterministic for any given feed.}{High}
 \end{enumerate}
 
-\section{Nonfunctional Requirements}
+\section{Nonfunctional Requirements} \label{sec:nfreqs}
 
 \subsection{Security}
 The system will not require any kind of authentication to use, and will only stores data which is publicly available. As there are no security regulations which govern its usage, security is not a critical consideration and there are only two associated requirements.
 \begin{enumerate}[NF\thesubsection.1]
-	\item\requirement{The system will not collect any data during installation and usage without obtaining consent from the user.}{High}
-	\item\requirement{The system will not transmit any data which was necessary to collect or generate, including log files, without obtaining explicit consent from the user.}{Medium}
+	\item\label{nf2.1}\requirement{The system will not collect any data during installation and usage without obtaining consent from the user.}{High}
+	\item\label{nf2.2}\requirement{The system will not transmit any data which was necessary to collect or generate, including log files, without obtaining explicit consent from the user.}{Medium}
 \end{enumerate}
 
 \subsection{Software Quality}
@@ -74,14 +78,14 @@ The system will not require any kind of authentication to use, and will only sto
 The following list specifies the system's core requirements in terms of portability, source control, testability, usability and documentation. There are no specific performance metric requirements for the system at this stage of its development.
 
 \begin{enumerate}[NF\thesubsection.1]
-	\item\requirement{The system must not use any platform-specific libraries, functions or commands.}{High}
-	\item\requirement{The system must provide a \texttt{requirements.txt}\footnote{https://pip.readthedocs.io/en/1.1/requirements.html} file or similar, to allow its dependencies to be installed using Pip.}{Medium}
-	\item\requirement{The system must be versioned and privately hosted on GitHub.}{High}
-%	\item\requirement{As a secondary solution, the system should be automatically backed up at least daily to Google Drive's cloud storage.}{High}
-%	\item\requirement{The implementation of the system should include a suite of automated unit tests with at least 80\% code coverage.}{Medium}
-	\item\requirement{The implementation of the system should include a severity-based logging facility which writes to a text file, for use during debugging and testing.}{Medium}
-	\item\requirement{The system must provide a non-interactive help facility for users.}{High}
-	\item\requirement{The system should provide visual feedback during computationally expensive tasks to show task progress, e.g. with loading bars.}{Medium}
+	\item\label{nf3.1}\requirement{The system must not use any platform-specific libraries, functions or commands.}{High}
+	\item\label{nf3.2}\requirement{The system must provide a \texttt{requirements.txt}\footnote{https://pip.readthedocs.io/en/1.1/requirements.html} file or similar, to allow its dependencies to be installed using Pip.}{Medium}
+	\item\label{nf3.3}\requirement{The system must be versioned and privately hosted on GitHub.}{High}
+%	\item\label{\theenumi}\requirement{As a secondary solution, the system should be automatically backed up at least daily to Google Drive's cloud storage.}{High}
+%	\item\label{\theenumi}\requirement{The implementation of the system should include a suite of automated unit tests with at least 80\% code coverage.}{Medium}
+	\item\label{nf3.4}\requirement{The implementation of the system should include a severity-based logging facility which writes to a text file, for use during debugging and testing.}{Medium}
+	\item\label{nf3.5}\requirement{The system must provide a non-interactive help facility for users.}{High}
+	\item\label{nf3.6}\requirement{The system should provide visual feedback during computationally expensive tasks to show task progress, e.g. with loading bars.}{Medium}
 \end{enumerate}
 
 

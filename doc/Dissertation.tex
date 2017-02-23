@@ -1,13 +1,11 @@
-\documentclass[11pt, a4paper]{report}
+\documentclass[11pt, a4paper, openright]{report}
 \include{DissertationDefs}
 
-\title{\Huge\bfseries{Map-Based Newsfeed Visualisation in Support of Sensemaking}}
+\title{\Huge\textbf{Mind The Gap:\\Newsfeed Visualisation\\with Metro Maps}}
 \author{Damask Talary-Brown}
 \date{Bachelor of Science in Computer Science with Honours\\The University of Bath\\ \the\year}
 
 \begin{document}
-
-\lstset{language=Python, breaklines, breakatwhitespace, basicstyle=\small}
 
 
 \setcounter{page}{0}
@@ -18,32 +16,39 @@
 \consultation{0}
 \newpage
 
-\declaration{Map-Based Newsfeed Visualisation in Support of Sensemaking}{Damask Talary-Brown}
+\declaration{Mind The Gap: Newsfeed Visualisation with Metro Maps}{Damask Talary-Brown}
 \newpage
 
 \abstract
+\addcontentsline{toc}{chapter}{Abstract}
 \newpage
 \tableofcontents
 \newpage
 \listoffigures
-\newpage
-\listoftables
+\addcontentsline{toc}{chapter}{List of Figures}
+%\newpage
+%\listoftables
+%\addcontentsline{toc}{chapter}{List of Tables}
+%\newpage
+%\chapter*{Acknowledgements}
+%\addcontentsline{toc}{chapter}{Acknowledgements}
 \newpage
 
-\chapter{Acknowledgements}
-\newpage
-
-%\setcounter{page}{1}
+\setcounter{page}{1}
 \pagenumbering{arabic}
 
-\chapter{Introduction}
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
 \input{introduction.tex}
 
 \chapter{Literature and Technology Review}
 \input{litsurvey.tex}
 
-\chapter{Requirements Analysis}
+\chapter{Requirements}
 \input{requirements.tex}
+
+\chapter{Design}
+\input{design.tex}
 
 \chapter{Implementation}
 \input{implementation.tex}
@@ -66,4 +71,3 @@
 \end{appendices}
 
 \end{document}
-m

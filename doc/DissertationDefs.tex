@@ -6,8 +6,82 @@
 \usepackage{hyperref}   % Provides hyperlinks to sections automatically
 \usepackage{pdflscape}  % Provides landscape mode for end code listings
 \usepackage{multicol}   % Provides ability to split output into columns
+
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{color}
 \usepackage{listings}   % Provides styled code listings
-\usepackage[left=3.5cm, right=2.5cm, top=3.5cm, bottom=3cm]{geometry} % Margins
+
+% AS IF LISTINGS DOESN'T SUPPORT JAVASCRIPT OR HTML
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\definecolor{editorLightGray}{cmyk}{0.05, 0.05, 0.05, 0.1}
+\definecolor{editorGray}{cmyk}{0.6, 0.55, 0.55, 0.2}
+\definecolor{editorPurple}{cmyk}{0.5, 1, 0, 0}
+\definecolor{editorWhite}{cmyk}{0, 0, 0, 0}
+\definecolor{editorBlack}{cmyk}{1, 1, 1, 1}
+\definecolor{editorOrange}{cmyk}{0, 0.8, 1, 0}
+\definecolor{editorBlue}{cmyk}{1, 0.6, 0, 0}
+\definecolor{editorPink}{cmyk}{0, 1, 0, 0}
+
+\lstdefinelanguage{JavaScript}{
+  keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  sensitive=true,
+}
+
+\lstnewenvironment{HTML}[2]{\lstset{
+  language=html,
+  tagstyle=\color{editorBlue},
+  basicstyle={\small\ttfamily},
+  identifierstyle=\color{editorOrange},
+  keywordstyle=\color{editorPink},
+  commentstyle=\color{editorGray},
+  stringstyle=\color{editorPurple},
+  showstringspaces=false,
+  showspaces=false,
+  numbers=left,
+  numberstyle=\footnotesize,
+  numbersep=9pt,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=b,
+  caption={#1},
+  label={#2}
+}}{}
+
+\lstnewenvironment{Python}[2]
+  {\lstset{language=Python, breaklines, breakatwhitespace, caption={#1}, label={#2}, basicstyle=\small}}{}
+
+\lstnewenvironment{JS}[2]{\lstset{
+   language=JavaScript,
+   backgroundcolor=\color{lightgray},
+   extendedchars=true,
+   basicstyle=\footnotesize\ttfamily,
+   showstringspaces=false,
+   showspaces=false,
+   numbers=left,
+   numberstyle=\footnotesize,
+   numbersep=9pt,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b,
+   caption={#1},
+   label={#2}
+}}{}
+
+  
+\usepackage[top=4cm, bottom=3cm]{geometry} % Margins
 \usepackage{titlesec}
 \usepackage{lipsum}
 \usepackage[numbers]{natbib}
@@ -27,24 +101,29 @@
   {#1} %\textbf{Priority: {#2}.}
 }
 
+\setcounter{tocdepth}{2}
+
 \newcommand\invisiblesubsection[1]{
   \refstepcounter{subsection}
   \addcontentsline{toc}{subsection}{\protect\numberline{\thesubsection}#1}
   \subsectionmark{#1}}
 \makeatother
 
-\newcommand{\possessivecite}[1]{\citeauthor{#1}'s \citeyear{#1}}
+\newcommand{\possessivecite}[1]{\citeauthor{#1}'s [\citeyear{#1}]}
 
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{10pt}{40pt}
   
 %%
 %% Set some page size changes from the standard article class
 %%
 \usepackage{calc}
-\setlength{\parskip}{6pt}
+\setlength{\parskip}{7pt}
 \setlength{\parindent}{0pt}
-\addtolength{\hoffset}{-0.5cm}
-%\addtolength{\textwidth}{2.5cm}
-\titleformat{\chapter}[display]{\vspace{-2cm}\normalfont\bfseries}{}{0pt}{\huge}
+%\addtolength{\hoffset}{-0.5cm}
+\addtolength{\textwidth}{0.9cm}
+%\titleformat{\chapter}[display]{\vspace{-1cm}\normalfont\bfseries}{}{0pt}{\huge}
 
 %%
 %% Format definitions for the style
