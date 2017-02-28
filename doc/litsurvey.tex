@@ -337,7 +337,7 @@ There is also a well-known existing standard for publishing links to articles wi
 \subsection{Content Retrieval}
 The de-facto web format for feed publishing is RSS (Rich Site Summary, or Really Simple Syndication.) The rise of the internet as a news platform has lead to many readers finding the most efficient method of reading news articles is to subscribe to various topic-specific newsfeeds and read what is automatically collated by their computers \citep{Nreader}.
 
-Although RSS--which is a subset of XML--is standardised\footnote{http://cyber.harvard.edu/rss/rss.html}, the practice of feed categorisation is not, meaning the granularity of topics which can be subscribed to is dependent on the publisher. This issue was addressed by \citet{PersonalNewsRss}, with the design of a system which could essentially split or join existing RSS feeds to synthesise new ones based on user-specified keywords and queries.
+Although RSS--which is a subset of XML--is standardised\footnote{\url{http://cyber.harvard.edu/rss/rss.html}}, the practice of feed categorisation is not, meaning the granularity of topics which can be subscribed to is dependent on the publisher. This issue was addressed by \citet{PersonalNewsRss}, with the design of a system which could essentially split or join existing RSS feeds to synthesise new ones based on user-specified keywords and queries.
 
 Despite its shortcomings, RSS remains the most universal option for accessing feed content from a wide variety of news producers 
 \citep{MiningAndVisualisingInformationFromRSSFeeds}.
@@ -347,7 +347,7 @@ Despite its shortcomings, RSS remains the most universal option for accessing fe
 Extracting relevant keywords from documents is not a new domain of research. Various methods have been presented, the most well-known being the intuitively logical TF-IDF (term frequency, inverse document frequency) \citep{TermWeightingApproachesInAutomaticTextRetrieval} which ranks the significance of a term \textit{t} in a document \textit{d} which belongs to a corpus \textit{C} as follows:
 
 \begin{equation}
-	\text{TF-IDF}(t, d, C) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
+	\text{TF-IDF}(t) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
 \label{eqn:tfidf}
 \end{equation}
 
@@ -358,14 +358,14 @@ TF-IDF will extract the most unique keywords from a document within a corpus, be
 Using TF-PDF, articles are modelled as belonging to one of a finite number of sources or \textit{channels} within a corpus. The weighting of a term from an article within a channel is in this case linearly proportional to its frequency in the channel and exponentially proportional to the number documents in the channel where it occurs. A term's total weighting is the sum of its weightings across all channels, as can be seen in Equation \ref{eqn:tfpdf} \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}, where:
 \begin{itemize}[noitemsep]
 	\item $D$ = The number of channels in the corpus;
-	\item $K$ = The total number of terms in a channel;
+	\item $K_c$ = The total number of terms in channel $c$;
 	\item $F_{tc}$ = Frequency of term $t$ in channel $c$;
 	\item $n_{tc}$ = The number of articles in channel $c$ where term $t$ occurs;
 	\item $N_c$ = The total number of articles in channel $c$.
 \end{itemize}
 \begin{equation}
 	\label{eqn:tfpdf}
-	\text{TF-PDF}(t) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k=K}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
+	\text{TF-PDF}(t, D, K) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k={K_c}}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
 \end{equation}
 
 The reliance of both TF-IDF and TF-PDF on a fixed background corpus results in a need to recompute the function for every document if any are added to or removed from the collection. This is impractical for large collections, and even in the case of large fixed collections it does not scale well, which has resulted in the development of other methods.

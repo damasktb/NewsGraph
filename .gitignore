@@ -15,3 +15,4 @@ doc/.texpadtmp/*
 *.gz
 *api_key
 io_ignore
+doc/data*

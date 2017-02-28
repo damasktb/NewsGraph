@@ -1,18 +1,31 @@
 \section{Introduction}
-I developed the design of the system in Python 2.7 and JavaScript 1.7. This chapter provides a detailed and run-time ordered description of how the methods outlined in the previous chapter were implemented, followed by a discussion of the significant challenges and successes during development.
+During the requirements gathering process, four distinct components of the system were identified which form a pipeline of execution; \textit{Article Retrieval}, \textit{Keyword Extraction}, \textit{Graph Building} and \textit{Map Drawing}. Crucially, each is specified as being modular, allowing both for flexible extensibility and for alternative implementations to be tested directly against each other without requiring changes to the other components.
+
+This chapter further decomposes these components to provide a detailed overview of the methodology used to implement them, followed by a discussion of the significant challenges and successes which arose during development.
 
 \section{Code Reuse}
-I used various open-source libraries and APIs in the development of the system, the most central of which I describe below and discuss in context in the following sections.
+I developed the design of the system in Python 2.7 and JavaScript 1.7 using various open-source libraries and APIs for its ancillary functionality. The most notable are detailed below and discussed in context in the following sections.
 
 \begin{itemize}[noitemsep]
-	\item\textbf{FeedParser}\footnote{http://pythonhosted.org/feedparser}: A Python module for downloading and parsing RSS feeds.
-	\item\textbf{Newspaper}\footnote{http://newspaper.readthedocs.io}: A Python library for downloading and extracting content and metadata from online articles.
-	\item\textbf{lxml}\footnote{http://lxml.de}: A Python library for generating, parsing and manipulating XML and HTML.
-	\item\textbf{NLTK (The Natural Language Toolkit)}\footnote{http://www.nltk.org}: A Python library for natural language processing and analysis.
-	\item\textbf{Google Knowledge Graph Search}\footnote{https://developers.google.com/knowledge-graph}: The API for Google's knowledge base, which returns structured semantic search results.
-	\item\textbf{D3.js}\footnote{http://d3js.org}: A JavaScript library for creating and manipulating interactive web visualisations and their underlying data.
+	\item\textbf{FeedParser}\footnote{\url{http://pythonhosted.org/feedparser}}: A Python module for downloading and parsing RSS feeds.
+	\item\textbf{Newspaper}\footnote{\url{http://newspaper.readthedocs.io}}: A Python library for downloading and extracting content and metadata from online articles.
+	\item\textbf{lxml}\footnote{\url{http://lxml.de}}: A Python library for generating, parsing and manipulating XML and HTML.
+	\item\textbf{NLTK (The Natural Language Toolkit)}\footnote{\url{http://www.nltk.org}}: A Python library for natural language processing and analysis.
+	\item\textbf{Google Knowledge Graph Search}\footnote{\url{https://developers.google.com/knowledge-graph}}: The API for Google's knowledge base, which returns structured semantic search results.
+	\item\textbf{D3.js}\footnote{\url{http://d3js.org}}: A JavaScript library for creating and manipulating interactive web visualisations and their underlying data.
 \end{itemize}
 
+\section{High-Level Design}
+Figure \ref{fig:dfp} outlines the decomposition of the four pipeline into their most important subtasks.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/design/DataFlow.pdf}
+	\caption{A conceptual model of data flow between components of the system.}
+	\label{fig:dfp}
+\end{figure}
+
+Not included in Figure \ref{fig:dfp} is the boundary between the \textit{Build Graph} and \textit{Draw Map} stages of the pipeline, which marks the transition from the run-time Python which extracts and processes the article data, to JavaScript which only runs once the visualisation is opened in the browser; the entirety of the  \textit{Draw Map} stage. The boundary takes the form of an intermediate stage between \textit{Build Graph} and \textit{Draw Map}, where the topological map and the article data required for the visualisation are serialised to JSON\footnote{JavaScript Object Notation; \url{http://www.json.org}}.
 
 \section{Article Retrieval}
 
@@ -51,13 +64,13 @@ The keyword extraction stage begins with the process of tokenising the body text
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{img/implementation/Tokenisation.pdf}
-	\caption{Stepping through the tokenisation process.}
+	\caption{Stepping through the tokenisation process}
 	\label{fig:tokenisation}
 \end{figure}
 
 \subsection{Named Entity Recognition}
 
-The second half of the keyword extraction process is exclusively concerned with named entities within articles. This is because, intuitively, the names of people, places, events companies and other \textit{things} form a set of strong candidate keywords. Restricting the candidates to entities alone reduces the search space by an order of magnitude when using frequency-based methods for keyword extraction, and removes the need for other natural language processing processes such as stop-word removal and lemmatisation.
+The second half of the keyword extraction process is exclusively concerned with named entities within articles. This is because, intuitively, the names of people, places, events companies and other \textit{things} form a set of strong candidate keywords. Restricting the candidates to entities alone reduces the search space by an order of magnitude when using frequency-based methods for keyword extraction, and bypasses the need for other natural language processing tasks such as stop-word removal and lemmatisation.
 
 Once tokens have been POS tagged, named-entity chunking can be performed, again using NLTK. This process groups tokens into contiguous and non-overlapping \textit{chunks}, where each chunk is a named entity; typically a proper noun or some other noun phrase.
 
@@ -110,7 +123,7 @@ Algorithm \ref{alg:u} illustrates how, given a list of entities, we can find the
 \end{algorithm}
 
 
-\subsubsection{Entity Disambiguation with Knowledge Graph}
+\subsubsection{Entity Disambiguation}
 
 Entity disambiguation describes the process of determining the identity of entities in a body of text. Performing this process on the sentence `The UK has voted to leave the EU,' should identify `UK' as The United Kingdom and `EU' as The European Union. As advanced methods for entity disambiguation are both complex and computationally expensive, I did not attempt to implement a formal method for this. 
 
@@ -118,16 +131,14 @@ Instead, the list of recognised entities are queried against Google's publicly a
 
 Each result has a score attributed to it by Knowledge Graph, which is an indicator the strength of the match between the entity and the original query. Results are sorted by descending score; the higher the \texttt{resultScore}, the better the match. Although there is no defined upper limit for this value, comparing the scores of the top two results for a query can provide a measure of certainty, for all but particularly esoteric or unknown entities.
 
-We specify a threshold $\frac{1}{t}$, which is roughly proportional to the likelihood of accepting a false positive match. Then, if dividing the score of the first result by the score of the second yields a number greater than $\frac{1}{t}$, we accept the match.
+We specify a threshold $\frac{1}{t}$, which is roughly proportional to the likelihood of accepting a false positive match. Then, if dividing the score of the first result by the score of the second yields a number greater than $\frac{1}{t}$, we accept the match. Provisionally we set $t=0.5$; a discussion of how I arrived at this value is provided in the next section.
 
-Empirically, I determined the best values for $t$ are in the range $0.5 < t < 0.67$, meaning we accept top results which are at least 1.5x-2x higher than the next best candidate.
+Using a knowledge base for disambiguation also inadvertently solves another problem I encountered while parsing articles, this time as a result the expositional style of journalistic writing. While keywords are typically nouns or noun phrases, they can also appear in the form of denominal adjectives. These adjectives are derived from nouns; e.g. `French' implies `France' might be a keyword. Denominal adjectives are not amenable to traditional stemming or lemmatising, but querying Knowledge Graph for `French' returns a top match of `France' with a \texttt{resultScore} of 432.42807; more than four times larger than the next result.
 
-Using a knowledge base also inadvertently solves another problem I encountered while parsing articles, this time as a result the expositional style of journalistic writing. While keywords are typically nouns or noun phrases, they can also appear in the form of denominal adjectives (adjectives which are derived from nouns, e.g. `French' implies `France' might be a keyword). Denominal adjectives are not amenable to traditional stemming or lemmatising, but querying Knowledge Graph for `French' returns a top match of `Franch' with a \texttt{resultScore} of 432.42807; more than four times larger than the next result.
-
-Given a list of entities $E$, and the scores of top two results of a Knowledge Graph query for some $e \in E$ $S_e(1)$ and $S_e(1)$, our aim is to return a set of pairs mapping zero or more entities in $E$ to their disambiguated forms;
+Given a list of entities $E$, and top two results of a Knowledge Graph query for each $e \in E$; $R_e(1)$ and $R_e(2)$ with scores $S_e(1)$ and $S_e(2)$ respectively, our aim is to return a set of pairs mapping zero or more entities in $E$ to their disambiguated forms;
 
 \begin{align*}
-K &= \bigg\{(e, d)\;|\;\frac{S_e(1)}{S_e(2)} > \frac{1}{t}\bigg\}
+K &= \bigg\{(e, R_e(1))\;|\;\frac{S_e(1)}{S_e(2)} > \frac{1}{t}\bigg\}
 \end{align*}
 
 Algorithm \ref{alg:kg} describes this process. For higher values of $t$, the likelihood of accepting a false positive increases, and for lower values, the likelihood of accepting a false negative increases. For corpora which do not contain references to public figures and place names, choice of $t$ should be empirically tuned against the prevalence of the expected entities.
@@ -136,13 +147,13 @@ Algorithm \ref{alg:kg} describes this process. For higher values of $t$, the lik
 \label{alg:kg}
  \caption{Entity disambiguation with Knowledge Graph}
  \KwData{$names$: a list of recognised entities \\ 
- 		\hspace{1.2cm}$t$: the acceptance threshold for results, default = 0.6}
+ 		\hspace{1.2cm}$t$: the acceptance threshold for results, default = 0.5}
  \KwResult{$K$: a set of disambiguation mappings for elements in $names$}
  $K \Leftarrow$ \{\}\;
  $T \Leftarrow 1\div{t}$\;
  \ForEach{$e \in names$}{
  	$results \Leftarrow$ KnowledgeGraphResults($e$)\;
- 	\If{$results$.length $>$ 1}{
+ 	\If{len($results$) $>$ 1}{
 	   \If{$results$[0].score $\div$ $results$[1].score $> T$}{
 	   		$K[e] = results[0].name$\;
 	   }
@@ -152,15 +163,65 @@ Algorithm \ref{alg:kg} describes this process. For higher values of $t$, the lik
 
 It is unclear what should become of queries that Knowledge Graph only returns a single result for, but in this implementation they are ignored.
 
+\subsubsection{Determining Optimal Values for $t$}
+
+Empirically, I found the best values for $t$ are in the range $0.35 < t < 0.65$, meaning we accept top results which are at least 1.5x-3x higher than the next best candidate. To determine this, I logged all the disambiguation pairs found in 20 articles from the BBC Politics RSS feed, letting $t$ range over \{0.3, 0.5, 0.7, 0.9\}. I then manually classified the pairs as either true or false positives. 
+
+Figure \ref{fig:dthreshold} shows the results of this investigation, with total pairs plotted alongside the percentage of those pairs which were false positives.\footnote{Since it is both extensive and tangential to the focus of the project, raw data for this table can be found at \url{http://bit.ly/DisambiguationThresholding}.} Although we see a reduction in false positives for smaller values of $t$, the trend-line illustrates that this is a game of diminishing returns; reducing $t$ from 0.3 to 0.1 only reduces the false positives by 4.34\%, but it leads to 43 fewer pairs being identified. 
+
+There is a clear trade-off between the accuracy of the disambiguation and the number of false negatives we discard, but the cost of false positives in this case is less than the cost of false negatives. While a false positive could result in unrelated entities appearing as keywords for certain articles, the likelihood of the same false positive appearing with high frequency in enough articles to result in an erroneous metro line is incredibly low. In contrast, the cost of disregarding a false negative could result in articles being left off certain metro lines altogether. It is for this reason that we don't simply choose the value of $t$ which yields the minimum ratio of false positives.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/implementation/DisambiguationThreshold.pdf}
+	\caption{Disambiguation threshold against pairs found and false positives (\%)}
+	\label{fig:dthreshold}
+\end{figure}
+
+
 
 \subsection{Keyword Ranking}
 
+Given a set of disambiguated entities for every article, the union of which forms a set of candidates keywords or \textit{metro lines} for the collection, we must now determine which keywords are the most relevant. To do this, the two methods described in Chapter \ref{c:litreview} will be revisited; TF-IDF \citep{tfidf} and TF-PDF \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}. Both were implemented in the system so they could be compared directly against each another.
+
+From an implementation perspective, the main difference between these two algorithms are the level at which they operate. TF-IDF is calculated on a per-article basis, returning a vector of an article's keywords and their corresponding scores.
+
+%\begin{itemize}[noitemsep]
+%	\item $d$ = The contents of the document containing $t$;
+%	\item $C$ = The background corpus, which contains one or more documents;
+%\end{itemize}
+%
+%\begin{equation}
+%	\text{TF-IDF}(t) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
+%\tag{\ref{eqn:tfidf}}
+%\end{equation}
+
+In contrast, TF-PDF is specified at corpus level, where there are one or more channels within the corpus. In our case, channels can be conveniently defined as RSS feeds, to correct the bias which could arise from all articles within a channel containing a specific keyword which is then identified as significant due to the relatively small size of that channel against the rest of the corpus. Similarly to TF-IDF however, it produces a vector of pairs of keywords and their scores.
+
+%\subsubsection{Implementation of TF-PDF Vectorisation}
+%
+%\begin{itemize}[noitemsep]
+%	\item $D$ = The number of channels in the corpus;
+%	\item $K_c$ = The total number of terms in channel $c$;
+%	\item $F_{tc}$ = Frequency of term $t$ in channel $c$;
+%	\item $n_{tc}$ = The number of articles in channel $c$ where term $t$ occurs;
+%	\item $N_c$ = The total number of articles in channel $c$.
+%\end{itemize}
+%\begin{equation}
+%	\text{TF-PDF}(t) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k={K_c}}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
+%\tag{\ref{eqn:tfpdf}}
+%\end{equation}
+
+For both equations, the advantage to restricting the set of candidates to named entities is apparent. Figure \ref{fig:tokensentities} shows the number of tokens against the percentage of extracted entities for 40 articles from the BBC's Politics RSS Feed.\footnote{http://feeds.bbci.co.uk/news/politics/rss.xml (Accessed: 27/02/2017, Full data in Appendix \ref{tab:entitiestokens})} The interquartile range is shown, illustrating that 50\% of articles had entities comprising 5.4\%-8.2\% of their tokens after stop-word removal. With the mean equal to 6.65\%, the implications of this are a search space which can be reduced by a factor of more than ten. Although performance optimisation was not specified in the aims of the project, gains of this nature are still significant.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/implementation/TokensEntities.pdf}
+	\caption{Entities as a percentage of Tokens across 40 BBC Politics articles.}
+	\label{fig:tokensentities}
+\end{figure}
 
 
-\begin{itemize}[noitemsep]
-	\item Implementation of TF-IDF
-	\item Implementation of TF-PDF
-\end{itemize}
 
 \section{Graph Building}
 
