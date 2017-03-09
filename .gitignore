@@ -16,3 +16,4 @@ doc/.texpadtmp/*
 *api_key
 io_ignore
 doc/data*
+*.gdraw
