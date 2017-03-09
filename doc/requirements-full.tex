@@ -20,7 +20,7 @@ The keyword extraction stage will tokenise the parsed article text and determine
 \subsubsection{Functional Requirements}
 \begin{enumerate}[F\thesubsection.1]
 	\item\label{f2.1}\requirement{The system must tokenise articles in order to perform basic natural language processing such as stop-word extraction and lemmatising.}{High}
-	\item\label{f2.2}\requirement{The system must implement a method for keyword extraction, and calculate a corresponding measure of relative importance for each keyword such as TF-IDF.}{High}
+	\item\label{f2.2}\requirement{The system must implement a method for keyword extraction, and calculate a corresponding measure of relative importance for each keyword such as tf-idf.}{High}
 	\item\label{f2.3}\requirement{The system could attempt to combine keywords it considers equivalent (e.g. \textit{UK} and \textit{United Kingdom}) to form stronger keyword matches between or within articles.}{Medium}
 	\item\label{f2.4}\requirement{The system could use external services (e.g. Google's Knowledge Graph API\footnote{http://www.google.com/intl/es419/insidesearch/features/search/knowledge.html}) to query any extracted keywords, in order to gain further insight or perform entity disambiguation \citep{EntityDisambiguationForKnowledgeBasePopulation}.}{Low}
 \end{enumerate}

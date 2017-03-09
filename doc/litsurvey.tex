@@ -60,14 +60,14 @@ The rise of social media sites such as Twitter delivering news to consumers has 
 
 It logically follows from the fragmented nature of real-time news journalism that temporal quality suffers; stories are published and updated intermittently over short periods of time, meaning there is more content for the consumer to piece together in order to understand a story. The fragmentation is somewhat mitigated by Twitter's use of hashtags to denote a Tweet's topics. Hashtags help readers form a coherent and picture of unfolding events from the incremental contributions of thousands of participating users \citep{BlogsTwitterAndBreakingNews}.
 
-\citet{BreakingNewsDetectionAndTrackingInTwitter} developed a methodology to collect and group Tweets on breaking news topics, using hashtags for topic identification or \textit{story-finding}, and grouping similar messages together to form a single news story. Their algorithm for similarity is a function of the TF-IDF \citep{TermWeightingApproachesInAutomaticTextRetrieval} of the two messages and the number of named entities they have in common.
+\citet{BreakingNewsDetectionAndTrackingInTwitter} developed a methodology to collect and group Tweets on breaking news topics, using hashtags for topic identification or \textit{story-finding}, and grouping similar messages together to form a single news story. Their algorithm for similarity is a function of the tf-idf \citep{TermWeightingApproachesInAutomaticTextRetrieval} of the two messages and the number of named entities they have in common.
 
 \subsubsection{Redundancy (Spatial Quantity)}
 It is in the nature of news that newsworthy stories get repeated across multiple sources. When consumers read news on a particular from more than once source, it is likely that they will read variations on the same facts in multiple articles.
 
 Attempts such as \citep{InformationFusionInTheContextOfMultiDocumentSummarization} have been made to synthesise summaries of collections of similar online documents, a practice here termed \textit{information fusion}, with news articles from different sources being given as a specific use-case. However, the process of extracting common sentences between documents was in order to reformulate them into a single summary, rather than to determine the level of similarity between the documents.
 
-A more relevant approach was presented in \citep{UtilizingPhraseSimilarityMeasures}, where the \textit{title} and \textit{description} attributes of elements in RSS feeds were used as content descriptors to mitigate the overhead of processing entire documents for phrases. The content descriptors are then used to compute phrase \textit{n}-grams as a measure of similarity between any two documents. The similarities in this case were used to remove subsumed articles and cluster non-redundant similar ones, in order to streamline feed content for readers.
+A more relevant approach was presented by \cite{UtilizingPhraseSimilarityMeasures}, who used the \textit{title} and \textit{description} attributes of elements in RSS feeds as content descriptors to mitigate the overhead of processing entire documents for phrases. The content descriptors are then used to compute phrase \textit{n}-grams as a measure of similarity between any two documents. The similarities in this case were used to remove subsumed articles and cluster non-redundant similar ones, in order to streamline feed content for readers.
 
 It should be noted that there is an overlap between the notion of spatial quantity and one of the four influencing factors in information quality; contextual quality. If a feed contains two articles which state the same number of identical facts, they therefore contribute to information overload on both the qualitative and quantitative fronts.
 
@@ -224,6 +224,7 @@ In this section, the formalisation of the metro map metaphor, its associated cha
 
 \begin{definition}{Metro Map \citep{GeneratingInformationMaps}:}
 A metro map $\mathcal{M}$ is a pair $(G, \Pi)$, where $G=(V, E)$ is a directed graph and $\Pi$ is a set of paths, or \textit{metro lines} in $G$. Each $e \in E$ must belong to at least one metro line.
+\label{def:mm}
 \end{definition}
 
 A previously published method \citep{ConnectingTheDots} for linking together chains of articles  was discussed, and an objective function was created to formalise the characteristics of a `good' metro map. The function defined was a composite based on three important characteristics, all of which are broadly applicable to the visualisation of any similar corpora; coherence, coverage, and connectivity.
@@ -253,10 +254,10 @@ Let $\mathcal{D}$ be a set of articles, and $\mathcal{W}$ be a set of words or p
 Coherence, intuitively, seems to be closely linked to idea of story resolution detailed in Section \ref{sec:information-overload}. This presents a question which could later be explored further; does forming coherent chains of articles provide the story resolution that participants in the Associated Press study were so desperately seeking from current events journalism?
 	
 \subsection{Coverage}
-As in the previous section, let $\mathcal{D}$ be a set of articles, and $\mathcal{W}$ be a set of words or phrases of which the articles are composed. The coverage function for a word in a given document $d_i \in \mathcal{D}$ specified in Equation \ref{eqn:doc-coverage} can be quantified using any measure of how well $d_i$ covers $w$, for example TF-IDF$(w, d_i, \mathcal{D})$ (See Equation \ref{eqn:tfidf}) \citep{GeneratingInformationMaps}.
+As in the previous section, let $\mathcal{D}$ be a set of articles, and $\mathcal{W}$ be a set of words or phrases of which the articles are composed. The coverage function for a word in a given document $d_i \in \mathcal{D}$ specified in Equation \ref{eqn:doc-coverage} can be quantified using any measure of how well $d_i$ covers $w$, for example tf-idf$(w, d_i, \mathcal{D})$ (See Equation \ref{eqn:tfidf}) \citep{GeneratingInformationMaps}.
 \begin{equation}
-	\label{eqn:doc-coverage}
 	cover_{d_i}(w) : \mathcal{W} \rightarrow [0,1]
+	\label{eqn:doc-coverage}
 \end{equation}
 Extending the notion of coverage to maps--which can be abstracted to sets of documents--introduces the idea of \textit{diversity}. If a map already contains documents which for a sufficient coverage for some word $w$, then there is nothing to be gained by adding another document to $\mathcal{D}$ which has high coverage of $w$ alone. This relates back to the principles of spatial and information quality discussed in Section \ref{sec:information-overload}, especially the importance of value-added by every individual document in a collection. In this case, maps which cover a maximal number of $w \in \mathcal{W}$ should be preferential. A simple additive definition for map coverage such as Equation \ref{eqn:additive-coverage} \citep{GeneratingInformationMaps} would not reward this kind of diversity;
 \begin{equation}
@@ -280,7 +281,7 @@ The final property is the most simply defined; the connectivity of a metro map i
 	Connectivity(\mathcal{M}) = \sum_{i<j}\mathbbm{1}(p_i \cap p_j \neq\emptyset)
 \end{equation}
 
-\subsection{Limitations of \citep{GeneratingInformationMaps, InformationCartographyPre}}
+\subsection{Limitations of \cite{GeneratingInformationMaps, InformationCartographyPre}}
 
 \subsubsection{Corpus}
 Perhaps the biggest limitation of the system developed in \citep{GeneratingInformationMaps, InformationCartographyPre} is the nature of the corpus $\mathcal{D}$; it is a fixed dataset, meaning users can only query it for certain past events with no way of specifying a different corpus themselves.
@@ -344,18 +345,18 @@ Despite its shortcomings, RSS remains the most universal option for accessing fe
 
 \subsection{Keyword Extraction}
 
-Extracting relevant keywords from documents is not a new domain of research. Various methods have been presented, the most well-known being the intuitively logical TF-IDF (term frequency, inverse document frequency) \citep{TermWeightingApproachesInAutomaticTextRetrieval} which ranks the significance of a term \textit{t} in a document \textit{d} which belongs to a corpus \textit{C} as follows:
+Extracting relevant keywords from documents is not a new domain of research. Various methods have been presented, the most well-known being the intuitively logical tf-idf (term frequency, inverse document frequency) \citep{TermWeightingApproachesInAutomaticTextRetrieval} which ranks the significance of a term \textit{t} in a document \textit{d} which belongs to a corpus \textit{C} as follows:
 
 \begin{equation}
-	\text{TF-IDF}(t) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
+	\text{tf-idf}(t) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
 \label{eqn:tfidf}
 \end{equation}
 
-TF-IDF will extract the most unique keywords from a document within a corpus, because it penalises words which are common to many documents. However, in the context of a corpus of news articles, this uniqueness can lead to significant topic keywords being ignored because they appear with such frequency. 
+tf-idf will extract the most unique keywords from a document within a corpus, because it penalises words which are common to many documents. However, in the context of a corpus of news articles, this uniqueness can lead to significant topic keywords being ignored because they appear with such frequency. 
 
-\citet{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm} found that for news archive keyword extraction, a better alternative to TF-IDF is TF-PDF (term frequency, proportional document frequency) as it is not biased against frequently repeated keywords.
+\citet{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm} found that for news archive keyword extraction, a better alternative to tf-idf is tf-pdf (term frequency, proportional document frequency) as it is not biased against frequently repeated keywords.
 
-Using TF-PDF, articles are modelled as belonging to one of a finite number of sources or \textit{channels} within a corpus. The weighting of a term from an article within a channel is in this case linearly proportional to its frequency in the channel and exponentially proportional to the number documents in the channel where it occurs. A term's total weighting is the sum of its weightings across all channels, as can be seen in Equation \ref{eqn:tfpdf} \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}, where:
+Using tf-pdf, articles are modelled as belonging to one of a finite number of sources or \textit{channels} within a corpus. The weighting of a term from an article within a channel is in this case linearly proportional to its frequency in the channel and exponentially proportional to the number documents in the channel where it occurs. A term's total weighting is the sum of its weightings across all channels, as can be seen in Equation \ref{eqn:tfpdf} \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}, where:
 \begin{itemize}[noitemsep]
 	\item $D$ = The number of channels in the corpus;
 	\item $K_c$ = The total number of terms in channel $c$;
@@ -365,10 +366,10 @@ Using TF-PDF, articles are modelled as belonging to one of a finite number of so
 \end{itemize}
 \begin{equation}
 	\label{eqn:tfpdf}
-	\text{TF-PDF}(t, D, K) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k={K_c}}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
+	\text{tf-pdf}(t, D, K) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k={K_c}}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
 \end{equation}
 
-The reliance of both TF-IDF and TF-PDF on a fixed background corpus results in a need to recompute the function for every document if any are added to or removed from the collection. This is impractical for large collections, and even in the case of large fixed collections it does not scale well, which has resulted in the development of other methods.
+The reliance of both tf-idf and tf-pdf on a fixed background corpus results in a need to recompute the function for every document if any are added to or removed from the collection. This is impractical for large collections, and even in the case of large fixed collections it does not scale well, which has resulted in the development of other methods.
 
 An approach derived from energy levels in quantum systems was proposed in \cite{LevelStatisticsOfWords}, where keywords were extracted based on their spatial distributions within a single text. The theory behind the approach is that typically, keywords occurrences are distributed in significant frequency clusters throughout a document, whereas non-relevant words are distributed with uniform frequency (see Figure \ref{fig:ols-spectra}).
 

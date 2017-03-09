@@ -15,43 +15,11 @@ I developed the design of the system in Python 2.7 and JavaScript 1.7 using vari
 	\item\textbf{D3.js}\footnote{\url{http://d3js.org}}: A JavaScript library for creating and manipulating interactive web visualisations and their underlying data.
 \end{itemize}
 
-\section{High-Level Design}
-Figure \ref{fig:dfp} outlines the decomposition of the four pipeline into their most important subtasks.
-
-\begin{figure}[htbp!]
-	\centering
-	\includegraphics[width=\textwidth]{img/design/DataFlow.pdf}
-	\caption{A conceptual model of data flow between components of the system.}
-	\label{fig:dfp}
-\end{figure}
-
-Not included in Figure \ref{fig:dfp} is the boundary between the \textit{Build Graph} and \textit{Draw Map} stages of the pipeline, which marks the transition from the run-time Python which extracts and processes the article data, to JavaScript which only runs once the visualisation is opened in the browser; the entirety of the  \textit{Draw Map} stage. The boundary takes the form of an intermediate stage between \textit{Build Graph} and \textit{Draw Map}, where the topological map and the article data required for the visualisation are serialised to JSON\footnote{JavaScript Object Notation; \url{http://www.json.org}}.
-
 \section{Article Retrieval}
 
-The first stage of article retrieval is the parsing of RSS feeds, in order for article URLs and metadata to be extracted. The Python library FeedParser was used, as at the time of writing it provided the best support for RSS 0.9x, 1.0 and 2.0. For each item in the feed, the parsing process extracts a link to each article, the name of the channel, and the parsed publish date, but it will also attempt to extract the author name if the \texttt{author} attribute is found.
+The first stage of article retrieval is the parsing of RSS feeds, in order for article URLs and metadata to be extracted. The Python library FeedParser was used, as at the time of writing it provided the best support for RSS 0.9x, 1.0 and 2.0. The parsing process extracts a link, channel name, and the parsed publish date from every article in the feed, but it will also attempt to extract the author name if the \texttt{author} attribute is found.
 
-Once the feed data has been extracted, it is used to construct an instance of \texttt{ArticleCollection}, which acts a wrapper around the contents of one or more feeds and provides the mechanism necessary to perform corpus-wide queries such as calculating inverse document frequency for TF-IDF, and proportional document frequency for TF-PDF. Individual articles are downloaded using the Newspaper library, however due to the requirement that \texttt{ArticleCollection} must be serialisable with cPickle to provide intermediate cache format, it was necessary to create a new \texttt{Article} class which unpacks the necessary members of \texttt{Newspaper.Article} and discards the XML which prevents instances of \texttt{Newspaper.Article} from being serialisable.  The \texttt{Article} encapsulates the functions for computing article-specific terms such as term-frequency for TF-IDF, and the term-weighting component of TF-PDF. 
-
-\subsection{Sanitisation}
-
-An early problem encountered was the embedding of unrelated content into the body of articles by news publishers in order to encourage readers to seek out additional content from the same website. This content typically takes the form of a gallery or list of images and article titles with brief summaries or subheads (see Listing \ref{lst:gallery}).
-
-\begin{HTML}{Unrelated content nested into the body of an article}{lst:gallery}
-<div id=`article'>
-	<h1> Article Title </h1>
-	<p> ... </p>
-	<p> ... </p>
-	<div id=`gallery'>
-		<h1> Related Articles </h1>
-		<p> ... </p>
-	</div>
-</div>	
-\end{HTML}
-
-If this content was left and processed as part of an article, it would result in keywords being falsely detected in the articles when in fact they were only present in the form of a link to unrelated content. It was therefore necessary to sanitise the article HTML before tokenisation and keyword extraction. The semantic structure of HTML made this a simpler task; any child elements of the element containing the body text of the article are removed (using lxml) unless they are a paragraph or heading.
-
-The result of this pre-processing stage is an \texttt{ArticleCollection} containing one or more serialisable \texttt{Article}s from one or more RSS feeds, where each \texttt{Article} contains extracted and sanitised but unparsed data, and associated metadata.
+Once the feed data has been extracted, it is used to construct an instance of \texttt{ArticleCollection}, which acts a wrapper around the contents of one or more feeds and provides the mechanism necessary to perform corpus-wide queries. The \texttt{Article} class encapsulates the functions for computing article-specific terms such as term-frequency for tf-idf, and the term-weighting component of tf-pdf. The result of this pre-processing stage is an \texttt{ArticleCollection} containing one or more serialisable \texttt{Article}s from one or more RSS feeds, where each \texttt{Article} contains extracted but unparsed data and associated metadata.
 
 \section{Keyword Extraction}
 
@@ -72,16 +40,14 @@ The keyword extraction stage begins with the process of tokenising the body text
 
 The second half of the keyword extraction process is exclusively concerned with named entities within articles. This is because, intuitively, the names of people, places, events companies and other \textit{things} form a set of strong candidate keywords. Restricting the candidates to entities alone reduces the search space by an order of magnitude when using frequency-based methods for keyword extraction, and bypasses the need for other natural language processing tasks such as stop-word removal and lemmatisation.
 
-Once tokens have been POS tagged, named-entity chunking can be performed, again using NLTK. This process groups tokens into contiguous and non-overlapping \textit{chunks}, where each chunk is a named entity; typically a proper noun or some other noun phrase.
-
-It is possible for chunks to contain other chunks (consider the chunk `Bank of England', which contains the chunk `England'), but this is typically undesirable for entity recognition -- where we desire specificity -- so after chunking the tokens, we flatten the chunk structure so chunks cannot be any further decomposed.
+Once tokens have been POS tagged, named-entity chunking can be performed, again using NLTK. This process groups tokens into contiguous and non-overlapping \textit{chunks}, where each chunk is a named entity; typically a proper noun or some other noun phrase. It is possible for chunks to contain other chunks (consider the chunk `Bank of England', which contains the chunk `England'), but this is typically undesirable for entity recognition -- where we desire specificity -- so after chunking the tokens, we flatten the chunk structure so chunks cannot be any further decomposed.
 
 At this stage, we have a list of chunks, each of which will be an eventual candidate for becoming a metro line. However, the chunks require some further processing before we can determine whether or not they are significant keywords.
 
-\subsubsection{Name Disambiguation: Substring Matching}
-It is common stylistic practice in journalism to refer to the subjects of articles by their surnames. However, to avoid any confusion, the full names of those mentioned will often appear in the title or first few paragraphs of the article. If keyword strength is determined by frequency, then regardless of whether we use TF-IDF or TF-PDF, we need every occurrence of an entity to refer to that entity by the same name; preferably the most specific, which is typically the longest.
+\subsubsection{Substring Matching}
+It is common stylistic practice in journalism to refer to the subjects of articles by their surnames. However, to avoid any confusion, the full names of those mentioned will often appear in the title or first few paragraphs of the article. If keyword strength is determined by frequency, then regardless of whether we use tf-idf or tf-pdf, we need every occurrence of an entity to refer to that entity by the same name; preferably the most specific, which is typically the longest.
 
-During name disambiguation, we only consider entities with more than one mention in the source text as candidates. This is because the chunking process can produce false positives by combining unrelated adjectives with valid chunks, but the likelihood of the same false positive being produced twice or more in the same article is low.
+During this stage of disambiguation, we only consider entities with more than one mention in the source text as candidates. This is because the chunking process can produce false positives by combining unrelated adjectives with valid chunks, but the likelihood of the same false positive being produced twice or more in the same article is low.
 
 Let $P$ denote the set of entities with more than one occurrence in the source article; $S$:
 \begin{align*}
@@ -98,9 +64,7 @@ A &= \{(a, e) \;|\;a \text{ is an alias of } e\}
 U &= \{(a, e) \;|\; (a, e)\in{A} \cap \forall(e_1, e_2)\in A, \; a = e_1 \implies e = e_2 \}
 \end{align*}
 
-We have a reasonable degree of confidence that for every alias-entity pair $(a, e) \in U$, occurrences of $a$ in the source text can be replaced by $e$, making $e$ a stronger candidate for keyword detection. Pairs in $(a, e) \in A\setminus{U}$, that is, aliases which could map to multiple entities in the source, are disregarded at this stage and left unchanged. A more sophisticated method of name disambiguation could address this.
-
-Algorithm \ref{alg:u} illustrates how, given a list of entities, we can find the unambiguous pairs deterministically in $\mathcal{O}(n^2)$ time. 
+We have a reasonable degree of confidence that for every alias-entity pair $(a, e) \in U$, occurrences of $a$ in the source text can be replaced by $e$, making $e$ a stronger candidate for keyword detection. Pairs in $(a, e) \in A\setminus{U}$, that is, aliases which could map to multiple entities in the source, are disregarded at this stage and left unchanged.  Algorithm \ref{alg:u} illustrates how, given a list of entities, we can find the unambiguous pairs deterministically. 
 
 \begin{algorithm}
 \label{alg:u}
@@ -123,13 +87,17 @@ Algorithm \ref{alg:u} illustrates how, given a list of entities, we can find the
 \end{algorithm}
 
 
-\subsubsection{Entity Disambiguation}
+\subsubsection{Entity Disambiguation with Knowledge Graph}
 
-Entity disambiguation describes the process of determining the identity of entities in a body of text. Performing this process on the sentence `The UK has voted to leave the EU,' should identify `UK' as The United Kingdom and `EU' as The European Union. As advanced methods for entity disambiguation are both complex and computationally expensive, I did not attempt to implement a formal method for this. 
+The process described above is a simplistic approach which only addresses the matching of partial to full name mentions. In comparison, entity disambiguation describes the process of determining the identity of entities in a body of text. Performing this process on the sentence `The UK has voted to leave the EU,' should identify `UK' as 'The United Kingdom' and `EU' as 'The European Union'. As advanced methods for entity disambiguation are both complex and computationally expensive, I did not attempt to implement a formal method for this. 
 
 Instead, the list of recognised entities are queried against Google's publicly accessible Knowledge Graph API, which returns a list of potential results as Schema.org\footnote{http://schema.org is an online hierarchy of types managed by W3C (The World Wide Web Consortium)} types. Knowledge Graph is the service which replaced Freebase in 2015, and currently contains over 70 billion facts \citep{knowledgegraph}.
 
-Each result has a score attributed to it by Knowledge Graph, which is an indicator the strength of the match between the entity and the original query. Results are sorted by descending score; the higher the \texttt{resultScore}, the better the match. Although there is no defined upper limit for this value, comparing the scores of the top two results for a query can provide a measure of certainty, for all but particularly esoteric or unknown entities.
+\cite{EntityDisambiguationForKnowledgeBasePopulation} identify three key challenges in entity linking using knowledge bases; name variations, ambiguity, and absence. Absence describes the lack of a corresponding entry for the entity in the knowledge base, which is not an easily tackled problem. Ambiguity is a consequence of the polysemy of many names and acronyms and requires disambiguation to be performed using more contextual methods. 
+
+Both of these problems are left unsolved in the design and implementation of the system due to scoping constraints. However, naïve substring matching combined with the use of Knowledge Graph and some empirical parametric estimation are enough to disambiguate name variations of all forms (partial matches, abbreviations, and acronyms) to a sufficient degree, and with surprising accuracy.
+
+The key to using Knowledge Graph for disambiguation lies in its most vaguely defined return value. Each result has a score attributed to it by Knowledge Graph, which is an indicator the strength of the match between the entity and the original query. Results are sorted by descending score; the higher the \texttt{resultScore}, the better the match. Although there is no defined upper limit for this value and no official documentation on how the score is derived, comparing the scores of the top two results for a query can provide a measure of certainty, for all but particularly esoteric or unknown entities.
 
 We specify a threshold $\frac{1}{t}$, which is roughly proportional to the likelihood of accepting a false positive match. Then, if dividing the score of the first result by the score of the second yields a number greater than $\frac{1}{t}$, we accept the match. Provisionally we set $t=0.5$; a discussion of how I arrived at this value is provided in the next section.
 
@@ -165,11 +133,7 @@ It is unclear what should become of queries that Knowledge Graph only returns a 
 
 \subsubsection{Determining Optimal Values for $t$}
 
-Empirically, I found the best values for $t$ are in the range $0.35 < t < 0.65$, meaning we accept top results which are at least 1.5x-3x higher than the next best candidate. To determine this, I logged all the disambiguation pairs found in 20 articles from the BBC Politics RSS feed, letting $t$ range over \{0.3, 0.5, 0.7, 0.9\}. I then manually classified the pairs as either true or false positives. 
-
-Figure \ref{fig:dthreshold} shows the results of this investigation, with total pairs plotted alongside the percentage of those pairs which were false positives.\footnote{Since it is both extensive and tangential to the focus of the project, raw data for this table can be found at \url{http://bit.ly/DisambiguationThresholding}.} Although we see a reduction in false positives for smaller values of $t$, the trend-line illustrates that this is a game of diminishing returns; reducing $t$ from 0.3 to 0.1 only reduces the false positives by 4.34\%, but it leads to 43 fewer pairs being identified. 
-
-There is a clear trade-off between the accuracy of the disambiguation and the number of false negatives we discard, but the cost of false positives in this case is less than the cost of false negatives. While a false positive could result in unrelated entities appearing as keywords for certain articles, the likelihood of the same false positive appearing with high frequency in enough articles to result in an erroneous metro line is incredibly low. In contrast, the cost of disregarding a false negative could result in articles being left off certain metro lines altogether. It is for this reason that we don't simply choose the value of $t$ which yields the minimum ratio of false positives.
+Empirically, I found the best values for $t$ are in the range $0.35 < t < 0.65$, meaning we accept top results which are at least 1.5x-3x higher than the next best candidate. To determine this, I logged all the disambiguation pairs found in 20 articles from the BBC Politics RSS feed, letting $t$ range over \{0.3, 0.5, 0.7, 0.9\}. I then manually classified the pairs as either true or false positives, where a true positive indicates a correctly identified entity, and a false positive is either an incorrectly identified entity or a non-entity which was not identified at all. Figure \ref{fig:dthreshold} shows the results of this investigation.
 
 \begin{figure}[htbp!]
 	\centering
@@ -178,27 +142,19 @@ There is a clear trade-off between the accuracy of the disambiguation and the nu
 	\label{fig:dthreshold}
 \end{figure}
 
+Although we see a reduction in false positives for smaller values of $t$, the trend-line illustrates that this is a game of diminishing returns; reducing $t$ from 0.3 to 0.1 only reduces the false positives by 4.34\%, but it leads to 43 fewer pairs being identified\footnote{Since it is both extensive and tangential to the focus of the project, raw data for this table can be found at \url{http://bit.ly/DisambiguationThresholding}.}. 
 
+There is a clear trade-off between the accuracy of the disambiguation and the number of false negatives we discard, but the cost of false positives in this case is less than the cost of false negatives. While a false positive could result in unrelated entities appearing as keywords for certain articles, the likelihood of the same false positive appearing with high frequency in enough articles to result in an erroneous metro line is incredibly low. In contrast, the cost of disregarding a false negative could result in articles being left off certain metro lines altogether. It is for this reason that we don't simply choose the value of $t$ which yields the minimum ratio of false positives.
 
-\subsection{Keyword Ranking}
+\subsection{Choosing a Term-Weighting Metric for Keyword Ranking}
 
-Given a set of disambiguated entities for every article, the union of which forms a set of candidates keywords or \textit{metro lines} for the collection, we must now determine which keywords are the most relevant. To do this, the two methods described in Chapter \ref{c:litreview} will be revisited; TF-IDF \citep{tfidf} and TF-PDF \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}. Both were implemented in the system so they could be compared directly against each another.
+Given a set of disambiguated entities for every article, the union of which forms a set of candidates keywords or \textit{metro lines} for the collection, we must now determine which keywords are the most relevant. To do this, the two term-weighting methods described in Chapter \ref{c:litreview} will be revisited; tf-idf \citep{tfidf} and tf-pdf \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}. Both were implemented in the system so they could be compared directly against each another.
 
-From an implementation perspective, the main difference between these two algorithms are the level at which they operate. TF-IDF is calculated on a per-article basis, returning a vector of an article's keywords and their corresponding scores.
+From an implementation perspective, the main difference between these two algorithms are the level at which they operate. tf-idf ranks keywords on a per-article basis, returning a vector of an article's keywords and their corresponding score against the background corpus. In contrast, tf-pdf is specified at corpus level and only returns a single metric for a given word; the sum of its significance across the whole corpus. In tf-pdf, corpuses have one or more \textit{channels}, which contain articles. In our case, channels can be conveniently defined as RSS feeds from different publishers. 
 
-%\begin{itemize}[noitemsep]
-%	\item $d$ = The contents of the document containing $t$;
-%	\item $C$ = The background corpus, which contains one or more documents;
-%\end{itemize}
-%
-%\begin{equation}
-%	\text{TF-IDF}(t) = \frac{Occurrences(t, d)}{WordCount(d)} \times log_e\bigg(\frac{|C|}{|\{c \in C \mid t \in c\}|}\bigg)
-%\tag{\ref{eqn:tfidf}}
-%\end{equation}
+\citeauthor{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm} argue that tf-pdf is a more suitable metric for news corpora, because it discriminates between articles which originated from the same channel and articles in different channels, allowing keywords which are highly (and uniformly) frequent in one channel to be identified as significant in documents from a different channel. Similarly to tf-idf however, this process can be used to produce a vector of pairs of an article's highest ranked keywords. The actual scores attributed to keywords by either algorithm are not of direct importance, since it is only relative scores we use to construct the keyword vectors.
 
-In contrast, TF-PDF is specified at corpus level, where there are one or more channels within the corpus. In our case, channels can be conveniently defined as RSS feeds, to correct the bias which could arise from all articles within a channel containing a specific keyword which is then identified as significant due to the relatively small size of that channel against the rest of the corpus. Similarly to TF-IDF however, it produces a vector of pairs of keywords and their scores.
-
-%\subsubsection{Implementation of TF-PDF Vectorisation}
+%\subsubsection{Implementation of tf-pdf Vectorisation}
 %
 %\begin{itemize}[noitemsep]
 %	\item $D$ = The number of channels in the corpus;
@@ -208,11 +164,11 @@ In contrast, TF-PDF is specified at corpus level, where there are one or more ch
 %	\item $N_c$ = The total number of articles in channel $c$.
 %\end{itemize}
 %\begin{equation}
-%	\text{TF-PDF}(t) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k={K_c}}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
+%	\text{tf-pdf}(t) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k={K_c}}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
 %\tag{\ref{eqn:tfpdf}}
 %\end{equation}
 
-For both equations, the advantage to restricting the set of candidates to named entities is apparent. Figure \ref{fig:tokensentities} shows the number of tokens against the percentage of extracted entities for 40 articles from the BBC's Politics RSS Feed.\footnote{http://feeds.bbci.co.uk/news/politics/rss.xml (Accessed: 27/02/2017, Full data in Appendix \ref{tab:entitiestokens})} The interquartile range is shown, illustrating that 50\% of articles had entities comprising 5.4\%-8.2\% of their tokens after stop-word removal. With the mean equal to 6.65\%, the implications of this are a search space which can be reduced by a factor of more than ten. Although performance optimisation was not specified in the aims of the project, gains of this nature are still significant.
+Regardless of which algorithm is used, the advantage to restricting the set of candidates to named entities becomes quickly apparent. Figure \ref{fig:tokensentities} shows the number of tokens against the percentage of extracted entities for 40 articles from the BBC's Politics RSS Feed.\footnote{http://feeds.bbci.co.uk/news/politics/rss.xml (Accessed: 27/02/2017, Full data in Appendix \ref{tab:entitiestokens})} The interquartile range shows 50\% of articles had entities comprising 5.4\%-8.2\% of their tokens after stop-word removal. With the mean equal to 6.65\%, the implications of this are a search space which can be reduced by a factor of more than ten. Although performance optimisation was not specified in the aims of the project, gains of this nature are still significant.
 
 \begin{figure}[htbp!]
 	\centering
@@ -221,24 +177,125 @@ For both equations, the advantage to restricting the set of candidates to named 
 	\label{fig:tokensentities}
 \end{figure}
 
+At this point, given optional user-specified lists of keywords to either \textit{include} or \textit{ignore}, we can filter out or boost the scores of articles which mention these topics, which in the case of \textit{include} will guarantee the keyword is selected as a metro line in the map, as long as it is mentioned in at least two articles. 
 
+The function of the \textit{ignore} set is not to blacklist certain topics, as it will have no effect on articles which contain ignored keywords being placed on other metro lines. Instead, it performs domain specific stop-word removal for metro line candidates, preventing non-useful keywords with inevitably high scores (such as `United Kingdom' for a metro map based on a UK news corpus) from being selected. During implementation, it was found to be useful to automatically append the names of every news publisher (e.g. `The Guardian') in the feeds to the \textit{ignore} set, as well as the names of the feeds themselves. This forces the system to select more specific candidates, even though their scores may be significantly lower.
+
+While implementing the \textit{ignore} functionality that the differing results of using tf-idf and tf-pdf on the same corpus became obvious. Because tf-idf penalises words which appear with low but constant frequency across a number of documents, keywords we intuitively would wish to ignore such as `United Kingdom' are not scored as highly as they would be with tf-pdf. This is in line with the findings of \citeauthor{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}; tf-pdf does do a better job at detecting low-frequency keywords which are consistent across many documents. However, this behaviour is exactly the opposite of what we desire from our metro lines; those low-frequency keywords are most likely already known or could be easily inferred by a user reading the map. Therefore, it is my recommendation that tf-idf be given preference in any implementations of this or similar systems, where the names of more specific low-level themes are being sought.
+
+\clearpage
 
 \section{Graph Building}
 
-\subsection{Choosing Lines}
+The key challenge in graph building is generalising the characteristics of a good overview, from both news consumer and metro map user perspectives. It is at this point that a significant difference between this system and the work of \cite{MetroMapsOfScience, GeneratingInformationMaps, InformationCartographyPre} becomes apparent. 
 
-\subsection{Connecting Articles}
+\citeauthor{GeneratingInformationMaps} generated maps in response to a query (such as the name of an event or time) period, meaning the entire map would then be oriented around that query. In contrast, in our system the only query is an implied one; ``What's going on today?" which offers no starting point for choosing metro lines. Instead of a query-based search problem, we have a multi-document summarisation problem. While they were choosing a set of lines to fit a given query, we are concerned with choosing a set of lines which best cover an entire corpus.
 
+\subsection{Extending the Definition of Coverage to Paths}
+
+Our starting point is a corpus of articles and their associated keyword vectors, which form a metro map by \citeauthor{GeneratingInformationMaps}'s definition, but one with too many edges and paths (metro lines) to be readable in practice. Therefore, in order to intelligently prune the number of paths to some fixed upper bound, we need a metric for comparing the relative importance of paths within a corpus.
+
+To do this, we first recall the original definition of document coverage (equation \ref{eqn:doc-coverage} \citep{GeneratingInformationMaps, MetroMapsOfScience, InformationCartographyPre}), where $d$ is a document, $w$ is a keyword, and $\mathcal{W}$ is some normalised measure of term-frequency, such as tf-idf.
+
+\begin{equation}
+	cover_{d}(w) : \mathcal{W} \rightarrow [0,1]
+	\tag{\ref{eqn:doc-coverage}}
+\end{equation}
+
+In order to compare candidate metro lines, we build on this definition of coverage to extend it to paths (Equation \ref{eqn:line-coverage}).
+
+\begin{equation}
+	Coverage(\mathcal{P}) = {|\mathcal{P}|}\sum_{d\,\in\,\mathcal{P}}\frac{cover_{d}(\mathcal{P})}{|\{\,p\in{\Pi}\;|\;d \in p,\,p \neq \mathcal{P}\}|}
+	\label{eqn:line-coverage}
+\end{equation}
+
+Here, the extent to which a path $\mathcal{P}$ covers a document $d$ within a corpus $\mathcal{D}$ is proportional to its tf-idf coverage of that document and inversely proportional to the number of other candidate paths which \textit{also} cover that document. The coverage of the entire corpus by $\mathcal{P}$ is then given the sum of its coverage of the articles along it multiplied by the length of the path, with high coverage being desirable.
+
+It is important to note that although with the final multiplication we show preference to longer metro lines, the objective of the system is not simply to maximise the number of articles which are included on the generated maps. This could easily be achieved by choosing the most nonspecific universal keywords as metro lines, but the resulting map would be uninformative and would most likely do nothing to counter news overload. It is in the nature of summarisation that not all information can be preserved, and in doing this kind of graph selection, the information lost is those articles which don't form links to the significant topics within the corpus.
+
+%This means tf-idf is preferable to tf-pdf, because while tf-idf is really good at identifying high-level topics which cover a lot of articles, it can cover those articles very poorly and generate a) too few lines, which; b) all run adjacent to each other anyway (see the next section).
+
+\subsection{Penalising Affinity}
+
+The principle of topic connectivity was the basis for choosing the metro map visualisation. Without it, we have simply generated a set of two-dimensional timelines with no contextual links. However, maps which are overly connected will quickly become unusable. In particular, maps where multiple lines runs adjacently through more than two nodes (see figure \ref{fig:lowaffinity}) a sign of poor line choice. This is not simply hyper-connectivity, but correlation between two or more lines, often resulting from keywords which are semantically close.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.4\textwidth]{img/implementation/lowaffinity.pdf}
+	\caption{An example of three metro lines, each with high affinity.}
+	\label{fig:lowaffinity}
+\end{figure}
+
+We call this function of two lines their \textit{affinity}, and define the affinity of a single line as the sum of its affinities over the set of paths, excluding itself.
+
+\begin{equation}
+	Affinity(\mathcal{P}) = \frac{1}{|\mathcal{P}|} \sum_{p\,\in{\,\Pi}} 2^{|\{\,d\,|\,d\,\in\,{\mathcal{P}}\,\cap\,d\,\in\,{p},\,p\,\neq\,\mathcal{P}\}|}
+\end{equation}
+
+The affinity of two lines is defined as the number of articles they have in common, as a power of two. The effect of the power of two is illustrated in Figure \ref{fig:abcaffinity}. On the right, line $a$ (orange) which shares one article with line $b$ (green) and another with line $c$ (blue) does not indicate as strong a correlation as on the left, where $a$ shares two articles with $b$ and none with $c$. As with line coverage, we penalise shorter lines.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.7\textwidth]{img/implementation/abcaffinity.pdf}
+	\caption{`Run-on' affinity (left) is penalised more heavily than `one-off' affinity (right).}
+	\label{fig:abcaffinity}
+\end{figure}
+
+Since we desire metro lines to have both high line coverage and low affinity, we can compute a score for every path by dividing the two composite measures (Equation \ref{eq:score}).
+\begin{equation}
+	LineScore(\mathcal{P}) = \frac{Coverage(\mathcal{P})}{Affinity(\mathcal{P})}
+	\label{eq:score}
+\end{equation}
+
+Sorting the list of candidates by descending score and filtering out those candidates which contain too few articles to be beneficial, we can then take the top $n$ from the range $7 \leq\;n\;\leq 12$, to become the metro lines in our map. Any article which contains the name of a metro line in its keyword vector will be represented as a station, and articles with more than one will be represented as interchanges.
+
+\subsection{Coherence}
+The last metric proposed by \citeauthor{GeneratingInformationMaps} is the one which presented the greatest conflict with the predefined scope of the system. For all but the most rapidly unfolding stories, forming a coherent chain of articles on one topic or event is not possible when only considering a single day's news. \citeauthor{GeneratingInformationMaps} had the advantage of assuming any topic well-known enough to be queried against their system would most likely be made up of a coherent chain of events, such as the Greek debt crisis or Brexit. In contrast, at a daily summarisation level, often no such chains exist; many articles exist in isolation or instead represent the \textit{beginning} of a potential future storyline. 
+
+Given a large enough background corpus, it would be possible to link the day's summary back in time to older articles, extending metro lines further back to support the \textit{zoom and filter} or \textit{details-on-demand} processes. A great deal of potential lies in this idea, as it could provide the story resolution the participants in the \cite{anewmodelfornews} study craved, allowing users to explore further back in time along individual metro lines while still centring itself around the most recent news. Unfortunately however, this is not something I could have achieved within the assigned timescale. 
+
+
+\subsection{Serialisation}
+The intermediate stage of the pipeline between graph building and map drawing is purely an issue of implementation, with few design choices to be made. Starting with the Python representation of the metro map, we group articles by metro line to be serialised, along with their metadata and summaries, to JSON. This JSON is then copied into a preexisting JavaScript file which is responsible for representing and drawing the graph using d3.js, and the contents of the JavaScript file are embedded as a script in an HTML file, which contains general template markup for the page. The advantage to this process is that it results in a single file, meaning the resultant visualisations are portable, shareable and platform independent, just like the news sources they were derived from.
+
+\clearpage
 \section{Map Drawing}
 
+In this section, we are no longer concerned with the contents of articles or the entities they reference. The map drawing context marks a shift in the terminology from the previous stages of the pipeline to the domain of graph drawing, but many terms have a one-to-one correspondence. A list of definitions is given below, and in addition we recall \citeauthor{GeneratingInformationMaps}'s formal definition of a metro map from Chapter \ref{c:litreview}, which ties the terms together:
+
+\addtocounter{definition}{-1}
+\begin{definition}{Metro Map:}
+A metro map $\mathcal{M}$ is a pair $(G, \Pi)$, where $G=(V, E)$ is a directed graph and $\Pi$ is a set of paths, or \textit{metro lines} in $G$. Each $e \in E$ must belong to at least one metro line.
+\end{definition}
+
+\begin{description}[leftmargin=7em,style=nextline]
+	\item [Station] A single article $v \in V$, represented by a node in the graph.
+	\item [Interchange] A station with more than two incident edges, i.e an article which spans more than one topic in the graph.
+	\item [Metro Line] A contiguous path $p \in \Pi$ which is incident to two or more nodes, represented by a line of single colour. The line, which represents a single topic theme, has an associated name. Metro lines are composed of \textit{links}.
+	\item [Link] A direct edge $e \in E$ between two nodes, which does not pass through any other node. In contrast to \citeauthor{GeneratingInformationMaps}'s definition, here, links must belong to \textit{exactly one} metro line. The case of two lines running side-by-side through the same two nodes is represented by two distinct links. This difference is due only to an implementation detail of the graphing library chosen.
+	\item [Terminus] A node with only one incident edge. This is not the definition of a terminus in the sense of the underlying metaphor, since by our definition a station which is the terminus for two lines (see Figure \ref{fig:mapdefinitions}.f) is no longer categorised as a terminus at all. Instead, the definition requires that the position of a terminus only determine the position of a single link in the graph.
+\end{description}
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/implementation/mapdefinitions.pdf}
+	\caption{Left-to-Right: A station (a), an interchange (b), a metro line (c), a link (d), a terminus (e) and a non-terminus station (f).}
+	\label{fig:mapdefinitions}
+\end{figure}
+
+Returning to \possessivecite{AutomaticMetroMapLayoutThesis}
+
+The metro map layout problem, that is, determining whether an optimal layout exists for a map and a set of hard constraints which include drawing straight octilinear lines and the map being planar, is proven to be NP-Hard by \cite{AutomatedDrawingOfMetroMaps}. The authors present a mixed-integer program (MIP) approach to metro map layouts, which both guarantees an octilinear layout and avoids falling into local maxima  -- unlike \citeauthor{AutomaticMetroMapLayoutThesis}'s, but not in polynomial time.
+
+
+
 \subsection{Initial Node Positioning}
-\begin{itemize}[noitemsep]
+\begin{itemize}
 	\item D3.js for force directed layout
 	\item Initial force parameters; adjusting based on \cite{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}
 \end{itemize}
 
 \subsection{Heuristic Layout}
-\begin{itemize}[noitemsep]
+\begin{itemize}
 	\item \cite{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout} for snap()
 	\item Repeated averaging along lines for sensible octilinearity
 	\item Straightening the ends of lines

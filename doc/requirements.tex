@@ -15,9 +15,7 @@ The aim of this work was ultimately the implementation of an end-to-end process 
 \section{Requirements Gathering}
 This project was primarily research-based, so while I chose to follow typical software engineering practices by writing a requirements specification for organisational purposes, I did not undertake a formal requirements gathering process with potential users.
 
-Instead, my requirements were derived from the work discussed in my literature review; features of the existing news visualisation system \citep{GeneratingInformationMaps}, the transit map aesthetic principles formulated in \citep{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}, and \possessivecite{TheEyesHaveIt} InfoVis task taxonomy. Underpinning the technical requirements are the high-level recommendations for news producers specified by The \cite{anewmodelfornews} and \cite{overloadjournalismsbattle}.
-
-The full requirements specification can be found in Appendices \ref{sec:freqs} and \ref{sec:nfreqs}, with a discussion on certain conflicts and important decisions later in this chapter.
+Instead, my requirements were derived from the work discussed in my literature review; features of the existing news visualisation system \citep{GeneratingInformationMaps}, the transit map aesthetic principles formulated in \citep{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}, and \possessivecite{TheEyesHaveIt} InfoVis task taxonomy. Underpinning the technical requirements are the high-level recommendations for news producers specified by The \cite{anewmodelfornews} and \cite{overloadjournalismsbattle}. The full requirements specification can be found in Appendices \ref{sec:freqs} and \ref{sec:nfreqs}, with a discussion on certain conflicts and important decisions later in this chapter.
 
 \section{Prioritisation}
 Requirements were assigned priorities using the MoSCoW technique, since the size of the proposed system was not large enough to warrant more granularity in requirement priority. MoSCoW assigns requirements to one of four categories \citep{PrioritizationUsingMoscow};
@@ -38,6 +36,18 @@ The operation of the proposed system suggests a natural pipeline of four compone
 	\item \textit{Map Drawing} - The generation of a visual representation of the graph structure in the form of a metro map, which the user will interact with.
 \end{itemize}
 In addition to the four stages of the pipeline, the system requires an ancillary storage component, to allow processed corpora and their graphs to be imported and exported. In the specification, all functional requirements were grouped according to one of the four stages, to assist in the implementation planning and testing processes.
+
+\section{High-Level Design}
+Figure \ref{fig:dfp} outlines the decomposition of the four pipeline components into their most important subtasks, with descriptions of the data transformations which occur at each stage.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/design/DataFlow.pdf}
+	\caption{A conceptual model of data flow between components of the system.}
+	\label{fig:dfp}
+\end{figure}
+
+Not included in Figure \ref{fig:dfp} is the boundary between the \textit{Build Graph} and \textit{Draw Map} stages of the pipeline, which marks the transition from the run-time Python which extracts and processes the article data, to JavaScript which only runs once the visualisation is opened in the browser; the entirety of the  \textit{Draw Map} stage. The boundary takes the form of an intermediate stage between \textit{Build Graph} and \textit{Draw Map}, where the topological map and the article data required for the visualisation are serialised to JSON\footnote{JavaScript Object Notation; \url{http://www.json.org}}.
 
 \section{Discussion}
 
