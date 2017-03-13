@@ -71,14 +71,14 @@ We have a reasonable degree of confidence that for every alias-entity pair $(a, 
  \caption{Finding unambiguous alias-entity pairs}
  \KwData{$names$: a list of recognised entities}
  \KwResult{$U$: the set of unambiguous pairs in $names$}
- $U \Leftarrow$ \{\}\;
+ $U \gets$ \{\}\;
  \ForEach{$e_1, e_2$ $\in ($names $\times$ names$)$}{
    \If{len($e_1$) $>$ len($e_2$)}{
-   	swap($e_1$, $e_2$)\;
+   	swap($e_1$, $e_2$) \;
    }
   \If(\tcc*[f]{If $e_1$ is a substring of $e_2$}){$e_1 \in e_2$}{
    	\eIf{$e_1 \notin U$}{
-   	  $U$[$e_1$] $\Leftarrow e_2$ \tcc*[r]{$(e_1, e_2)$ are a candidate pair}
+   	  $U$[$e_1$] $\gets e_2$ \tcc*[r]{$(e_1, e_2)$ are a candidate pair}
     }{
       delete $U$[$e_1$] \tcc*[r]{$e_1$ is now ambiguous, so remove it}
     }
@@ -117,10 +117,10 @@ Algorithm \ref{alg:kg} describes this process. For higher values of $t$, the lik
  \KwData{$names$: a list of recognised entities \\ 
  		\hspace{1.2cm}$t$: the acceptance threshold for results, default = 0.5}
  \KwResult{$K$: a set of disambiguation mappings for elements in $names$}
- $K \Leftarrow$ \{\}\;
- $T \Leftarrow 1\div{t}$\;
+ $K \gets$ \{\}\;
+ $T \gets 1\div{t}$\;
  \ForEach{$e \in names$}{
- 	$results \Leftarrow$ KnowledgeGraphResults($e$)\;
+ 	$results \gets$ KnowledgeGraphResults($e$)\;
  	\If{len($results$) $>$ 1}{
 	   \If{$results$[0].score $\div$ $results$[1].score $> T$}{
 	   		$K[e] = results[0].name$\;
@@ -261,38 +261,162 @@ The intermediate stage of the pipeline between graph building and map drawing is
 \clearpage
 \section{Map Drawing}
 
-In this section, we are no longer concerned with the contents of articles or the entities they reference. The map drawing context marks a shift in the terminology from the previous stages of the pipeline to the domain of graph drawing, but many terms have a one-to-one correspondence. A list of definitions is given below, and in addition we recall \citeauthor{GeneratingInformationMaps}'s formal definition of a metro map from Chapter \ref{c:litreview}, which ties the terms together:
+The metro map layout problem, that is, determining whether an optimal planar embedding exists for a map and a set of hard constraints which include drawing straight octilinear lines, was proven to be NP-Hard by \cite{AutomatedDrawingOfMetroMaps}. The authors present a mixed-integer program (MIP) approach to metro map layouts, which both guarantees an octilinear layout and avoids falling into local maxima (unlike \citeauthor{AutomaticMetroMapLayoutThesis}'s), but not in polynomial time.
+
+At the time of writing, there are no public domain algorithms or open-source libraries for generating automatic metro map layouts, in any language. Those which have been proposed in academia \citep{AutomaticMetroMapLayoutThesis, AutomatedDrawingOfMetroMaps} are too complex to implement given the current timescale, and all require NP-Hard optimisation techniques. To overcome this, a heuristic approach derived from the work of \citep{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout, WhichAesthetic} will be detailed.
+
+In this section of the pipeline, we are no longer concerned with the contents of articles or the entities they reference. The map drawing context marks a shift in the terminology from the previous stages of the pipeline to the domain of graph drawing, but many terms have a one-to-one correspondence. A list of definitions is given below, and in addition we recall \citeauthor{GeneratingInformationMaps}'s definition of a metro map from Chapter \ref{c:litreview}, which ties the terms together.
 
 \addtocounter{definition}{-1}
-\begin{definition}{Metro Map:}
+\begin{definition}{}
 A metro map $\mathcal{M}$ is a pair $(G, \Pi)$, where $G=(V, E)$ is a directed graph and $\Pi$ is a set of paths, or \textit{metro lines} in $G$. Each $e \in E$ must belong to at least one metro line.
 \end{definition}
-
-\begin{description}[leftmargin=7em,style=nextline]
-	\item [Station] A single article $v \in V$, represented by a node in the graph.
-	\item [Interchange] A station with more than two incident edges, i.e an article which spans more than one topic in the graph.
-	\item [Metro Line] A contiguous path $p \in \Pi$ which is incident to two or more nodes, represented by a line of single colour. The line, which represents a single topic theme, has an associated name. Metro lines are composed of \textit{links}.
-	\item [Link] A direct edge $e \in E$ between two nodes, which does not pass through any other node. In contrast to \citeauthor{GeneratingInformationMaps}'s definition, here, links must belong to \textit{exactly one} metro line. The case of two lines running side-by-side through the same two nodes is represented by two distinct links. This difference is due only to an implementation detail of the graphing library chosen.
-	\item [Terminus] A node with only one incident edge. This is not the definition of a terminus in the sense of the underlying metaphor, since by our definition a station which is the terminus for two lines (see Figure \ref{fig:mapdefinitions}.f) is no longer categorised as a terminus at all. Instead, the definition requires that the position of a terminus only determine the position of a single link in the graph.
-\end{description}
+\vspace{-0.5cm}
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{img/implementation/mapdefinitions.pdf}
-	\caption{Left-to-Right: A station (a), an interchange (b), a metro line (c), a link (d), a terminus (e) and a non-terminus station (f).}
+	\vspace{-0.5cm}\caption{Left-to-Right: A station (a), an interchange (b), a metro line (c), a link (d), a terminus (e) and a non-terminus station (f).}
 	\label{fig:mapdefinitions}
 \end{figure}
+\begin{description}[leftmargin=7em,style=nextline]
+	\item [Station] A single article $v \in V$, represented by a node in the graph. If $v$ has more than two incident edges, i.e an article which spans more than one topic in the graph, it is called an \textit{interchange}.
+	\item [Metro Line] A contiguous named path $p \in \Pi$ which is incident to two or more nodes, represented by a line of single colour. Metro lines are composed of \textit{links}.
+	\item [Link] A direct edge $e \in E$ between two nodes, which does not pass through any other node. In contrast to \citeauthor{GeneratingInformationMaps}'s definition, here, links must belong to \textit{exactly one} metro line. The case of two lines running side-by-side through the same two nodes is represented by two distinct links. This difference is due only to an implementation detail of the graphing library chosen.
+	\item [Terminus] A node with only one incident edge. This is not the definition of a terminus in the sense of the underlying metaphor, since by our definition, a station which is the terminus for two lines (see Figure \ref{fig:mapdefinitions}.f) is no longer categorised as a terminus at all. Instead, the definition requires that the position of a terminus only determine the position of a single link in the graph.
+\end{description}
 
-Returning to \possessivecite{AutomaticMetroMapLayoutThesis}
+We now turn our attention to transforming the metro map structure into a planar embedding of stations and the metro lines which connect them. As we have previously observed, not all graph layouts were created equal, and the aesthetic quality of a graph-based visualisations has a notable influence on their usability and ease of interpretation \citep{TheBasisForGraphDrawingAlgorithms, WhichAesthetic, AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}. 
 
-The metro map layout problem, that is, determining whether an optimal layout exists for a map and a set of hard constraints which include drawing straight octilinear lines and the map being planar, is proven to be NP-Hard by \cite{AutomatedDrawingOfMetroMaps}. The authors present a mixed-integer program (MIP) approach to metro map layouts, which both guarantees an octilinear layout and avoids falling into local maxima  -- unlike \citeauthor{AutomaticMetroMapLayoutThesis}'s, but not in polynomial time.
+In \citeauthor{AutomaticMetroMapLayoutThesis}'s words: ``[The] visualisation process is deeply rooted in the human interpretation of the graph as a structure and as such, the quality of the aesthetics of a particular drawing of a graph are very important.'' \citep[p.24]{AutomaticMetroMapLayoutThesis}
 
+We therefore devote a significant amount of thought to optimising the visual quality of the generated metro maps by revisiting \citeauthor{AutomaticMetroMapLayoutThesis}'s aesthetic criteria and rules for layouts, discussed in Chapter \ref{c:litreview}. We justify which of these apply to our visualisations, and for those which are, we detail the methodology used to implement them.
 
+\subsection{\citeauthor{AutomaticMetroMapLayoutThesis}'s Criteria and Rules for Metro Map layouts}
+
+The set of rules and criteria defined by \cite{AutomaticMetroMapLayoutThesis} form a complex multicriteria optimisation function. Starting with an initial layout, nodes are embedded on a square grid of finite size, and iteratively moved to maximise the node movement criteria, as long as movement does not violate one of the node movement rules.
+
+It should be noted that the function also applies to the positioning of labels and the maximum of a set of label movement criteria alongside the node movement criteria, but as visualisations are unlabelled, these will not be described.
+
+As previously discussed, there are six node movement criteria, which -- using the metro map-specific terms defined above -- are as follows:
+\begin{itemize}
+	\item\textbf{Angular Resolution}: Maximise the angle of incident links on the same metro line at each station. As \cite{WhichAesthetic} found satisfying this criteria had no statistical effect on task performance, this will not be a priority\footnote{However, as angular resolution comes as a natural consequence of maximising line straightness, it is not disregarded completely during implementation.}.
+	
+	\item\textbf{Edge Length}: Keep all links approximately the same length. This is a criterion which can be implemented by setting a soft constraint using the graphing library, but it will not be considered beyond this constraint.
+	
+	\item\textbf{Balanced Edge Length}: Keep links incident to a given station approximately the same length. While it would be possible to implement this as another soft constraint, there is no evidence that it would significantly improve usability, so this will not be considered.
+	
+	\item\textbf{Edge Crossings}: Minimise the number of link crossings. \citeauthor{WhichAesthetic} found this to be the most significant factor in determining task performance, therefore it will be considered.
+	
+	\item\textbf{Line Straightness}: Maximise the collinearity of links on the same metro line. \citeauthor{WhichAesthetic} found this criterion to be somewhat beneficial to task performance, so this is both a realistic and justified constraint which will be considered. 
+	
+	\item\textbf{Octilinearity}: Draw links at multiples of 45$^{\circ}$. Although \citeauthor{WhichAesthetic} found orthogonal graphs to be insignificant factors on task performance, there is a strong argument that the familiarity of the metro map metaphor hinges on certain similarities being preserved. Octilinearity is a noticeable design feature in the metro maps of the world, and therefore should be attempted in our visualisations.
+\end{itemize}
+
+We therefore consider minimising edge crossings to be the highest weighted criterion, followed jointly by maximising line straightness and octilinearity.
 
 \subsection{Initial Node Positioning}
+
+A major difference between the maps generated using this system and maps representing real transit networks is the lack of ``real'' starting positions we have for stations. While the freedom to move points around without having to preserve their relative positioning removes one layout constraint, finding a set of starting positions for the map layout which define a planar embedding with minimal line crossings is non-trivial. 
+
+As \citeauthor{AutomaticMetroMapLayoutThesis} notes, ``This [difficulty] is due to our method being based on optimising an existing layout: if the initial embedding is not adequate, then our method may struggle to produce an acceptable optimisation.''\cite[p.210]{AutomaticMetroMapLayoutThesis}.
+
+One solution, as suggested in \citeauthor{AutomaticMetroMapLayoutThesis}'s work, is to employ a force-directed layout algorithm to generate the initial positions. Force-directed algorithms simulate the forces of real physical motion in order to position nodes in a graph in such a way that edge crossings are minimised and edge lengths are kept as uniform as possible \citep{springembedders}. Both of these qualities are highly desirable in metro maps.
+
+The graphing library used to draw the maps (d3.js) includes an implementation of \possessivecite{forcedirected} force-directed layout algorithm, and provides several parameters which can be used to alter the forces applied to some or all of the nodes in the graph. The two forces we will adjust to optimise the force-direction for metro maps are as follows:
+
 \begin{itemize}
-	\item D3.js for force directed layout
-	\item Initial force parameters; adjusting based on \cite{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}
+\item\texttt{force.charge([charge])}\footnote{\url{https://github.com/d3/d3-3.x-api-reference/blob/master/Force-Layout.md\#charge}}\par
+	\textit{Charge} specifies the force of attraction between nodes, with negative values causing nodes to repel each other. In order to minimise crossings, this should be a large negative value, particularly for nodes which of higher degrees, which will be surrounded by more edges. We therefore set charge to -500 for nodes with weight $>$ 1, and -300 otherwise. 
+
+\item\texttt{force.alpha([alpha])}\footnote{\url{https://github.com/d3/d3-3.x-api-reference/blob/master/Force-Layout.md\#alpha}}\par
+	\textit{Alpha} is the graph's cooling parameter, decaying as the simulation converges on a stable layout. As the temperature falls, node movement slows down, and eventually alpha will drop below a threshold which pauses the simulation, preventing further movement. 
 \end{itemize}
+
+The parameter \texttt{force.alpha} is re-evaluated every time the simulation is advanced by a single step; approximately 60 times per second. Since the reasoning for using a force-directed algorithm is to generate an initial layout with minimal line crossings which will result in the best possible map, we can constantly vary the \texttt{force.alpha} parameter based on the quality of the map as its stations are repositioned. Therefore, if the stations settle into a map layout with desirably high octilinearity and good line straightness, the energy of the graph will be reduced such that it is impossible for the embedding to change. Likewise, if the stations start repelling each other in a way that worsens line straightness and octilinearity, the system will have its energy increased and will be more likely to move out of the undesirable state.
+
+The measure of quality that we use to adjust \texttt{force.alpha} is a weighted combination of the two remaining aesthetic criteria we chose to focus on; octilinearity and line straightness. The means by which these two properties are calculated are described in the following sections.
+
+\subsubsection{Octilinearity}
+
+Octilinearity (Equation \ref{eqn:octilinearity} \citep{AutomaticMetroMapLayoutThesis}) penalises lines which are not drawn at multiples of 45$^{\circ}$ angles; the further the gradient of a link in the graph is from a multiple of 45$^{\circ}$, the higher its octilinearity. Lower values are desirable, with zero indicating a graph is entirely octilinear. 
+
+\begin{equation}
+	\text{octilinearity}(G) = \sum_{u, v\in E}\bigg|sin\;4\,\bigg(tan^{-1}\frac{|u.y - v.y|}{|u.x - v.x|}\bigg)\bigg|
+\label{eqn:octilinearity}
+\end{equation}
+
+There is an exception to this formula which goes unmentioned by \citeauthor{AutomaticMetroMapLayoutThesis}, but which is necessary to make octilinearity correct for vertical lines; in the case where $u.x - v.x = 0$, we take octilinearity to be zero, as this implies a straight line parallel to the $y$ axis.\\
+
+\begin{figure}[h]
+\centering
+\hspace{-0.5cm}\begin{minipage}{.4\textwidth}
+  \includegraphics[width=\linewidth]{img/implementation/octilinearity.pdf}\caption{Octilinearity Calculation\label{fig:octilinearity}}
+  \end{minipage}\hspace{0.5cm}\begin{minipage}{.6\textwidth}
+We can calculate the octilinearity of the graph in Figure \ref{fig:octilinearity} (left) as follows, taking positions relative to $(0, 0)$ in the bottom left corner. Algorithm \ref{alg:octilinearity} describes this calculation.
+$$\begin{aligned}
+\text{octilinearity}(a, b) &= |sin\;4\,(tan^{-1}\frac{|1 - 1|}{|4 - 1|})| = 0 \\
+\text{octilinearity}(b, c) &= |sin\;4\,(tan^{-1}\frac{|4 - 1|}{|5 - 4|})| = 0.96 \\[0.1cm]
+\text{octilinearity}(a, b, c) &= 0 + 0.96 = 0.96
+\end{aligned}$$
+\end{minipage}
+\end{figure}
+
+\begin{algorithm}
+\label{alg:octilinearity}
+ \caption{Calculating Map Octilinearity}
+ \KwData{$\mathcal{M}$: a metro map $(G=(V, E), \Pi)$}
+ \KwResult{$oct \in \mathbb{Q}, 0 \leq oct \leq \frac{24}{25}|E|$: the octilinearity of $\mathcal{M}$}
+ $oct \gets 0$ \;
+ \ForEach{$e \in E$}{
+   $\delta_x \gets |e.source.x - e.target.x|$ \;
+   $\delta_y \gets |e.source.y - e.target.y|$ \;
+   
+   \uIf{$\delta_x = 0 \cup \delta_y = 0$}{
+   	 $slope \gets 0$ \tcc*[f]{This avoids a potential division by zero.}}
+   	 \Else{
+   	  $slope \gets \dfrac{\delta_y}{\delta_x}$ 
+    }
+   $\theta \gets |sin(4\times{} tan^{-1}(slope))|$ \;
+   $oct \gets oct + \theta$ \;
+}
+\end{algorithm}
+
+\subsubsection{Line Straightness}
+
+\begin{equation}
+	\text{lineStraigtness}(G) = \sum_{p\,\in{\Pi}}\sum_{u, v\in p} \theta(u, v)
+\label{eqn:linestraightness}
+\end{equation}
+
+\begin{figure}[h]
+\centering
+\hspace{-0.5cm}\begin{minipage}{.5\textwidth}
+  \centering\includegraphics[width=.8\linewidth]{img/implementation/linestraightness.pdf}\caption{Line Straightness Calculation\label{fig:linestraightness}}
+  \end{minipage}\hspace{0.5cm}\begin{minipage}{.5\textwidth}
+The line straightness of the graph in Figure \ref{fig:linestraightness} (left) is therefore $\alpha_1 + \alpha_2$, where the values of $\alpha_1$ and $\alpha_2$ can be found geometrically from the direction of the links (Algorithm \ref{alg:ls}).
+\end{minipage}
+\end{figure}
+
+\begin{algorithm}
+\label{alg:ls}
+ \caption{Calculating Map Line Straightness}
+ \KwData{$\mathcal{M}$: a metro map $(G=(V, E), \Pi)$}
+ \KwResult{$ls \in \mathbb{Q}, ls > 0$: the line straightness of $\mathcal{M}$}
+ $ls \gets 0$ \;
+ \ForEach{$p \in \Pi$}{
+ 	\tcc{Greedily iterate over all 3-tuples of adjacent stations on $p$}
+   \ForEach{$(a, b, c) \in p$}{
+   \vspace{0.15cm}
+   $v_1 \gets \dfrac{\overrightarrow{ab}}{|\overrightarrow{ab}|}$ ; $v_2 \gets \dfrac{\overrightarrow{bc}}{|\overrightarrow{bc}|}$ ;\tcc*[f]{Normalise the two vectors to unit length}
+   \vspace{0.15cm}
+   $\theta \gets cos^{-1}(v_1.x\times v_2.x + v_1.y\times v_2.y)$ ;\tcc*[f]{Find the angle between links}
+%   \If{$\theta > \frac{\pi}{2}$}{
+%   	$\theta \gets \pi - \theta$ \tcc*[f]{We want the complement of this angle}
+%   }
+   $ls \gets ls + \theta$ \;
+   }
+}
+\end{algorithm}
 
 \subsection{Heuristic Layout}
 \begin{itemize}
@@ -300,3 +424,5 @@ The metro map layout problem, that is, determining whether an optimal layout exi
 	\item Repeated averaging along lines for sensible octilinearity
 	\item Straightening the ends of lines
 \end{itemize}
+
+Unfortunately, the implementation of \texttt{d3.layout.force} lacks any explicit mechanism for reducing line crossings due to the computational expense of the best known algorithms (this subproblem is also NP-Hard). Even if line crossings could be detected, it is likely that the topology of certain graphs generated would make it impossible to find a planar embedding with no crossings; this is not a problem left unsolved at this stage, and it is the single weakness of separating the graph building and map drawing code to this extent. 
