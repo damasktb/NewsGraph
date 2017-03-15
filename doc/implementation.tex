@@ -221,7 +221,7 @@ The principle of topic connectivity was the basis for choosing the metro map vis
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=.4\textwidth]{img/implementation/lowaffinity.pdf}
+	\includegraphics[width=.5\textwidth]{img/implementation/lowaffinity.pdf}
 	\caption{An example of three metro lines, each with high affinity.}
 	\label{fig:lowaffinity}
 \end{figure}
@@ -232,16 +232,16 @@ We call this function of two lines their \textit{affinity}, and define the affin
 	Affinity(\mathcal{P}) = \frac{1}{|\mathcal{P}|} \sum_{p\,\in{\,\Pi}} 2^{|\{\,d\,|\,d\,\in\,{\mathcal{P}}\,\cap\,d\,\in\,{p},\,p\,\neq\,\mathcal{P}\}|}
 \end{equation}
 
-The affinity of two lines is defined as the number of articles they have in common, as a power of two. The effect of the power of two is illustrated in Figure \ref{fig:abcaffinity}. On the right, line $a$ (orange) which shares one article with line $b$ (green) and another with line $c$ (blue) does not indicate as strong a correlation as on the left, where $a$ shares two articles with $b$ and none with $c$. As with line coverage, we penalise shorter lines.
+The affinity of two lines is defined as the number of articles they have in common, raised as a power of two. The effect of the power is illustrated in Figure \ref{fig:abcaffinity}. On the right, line $a$ (orange) which shares one article with line $b$ (green) and another with line $c$ (blue) does not indicate as strong a correlation as on the left, where $a$ shares two articles with $b$ and none with $c$. As with line coverage, we penalise shorter lines.
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=.7\textwidth]{img/implementation/abcaffinity.pdf}
+	\includegraphics[width=\textwidth]{img/implementation/abcaffinity.pdf}
 	\caption{`Run-on' affinity (left) is penalised more heavily than `one-off' affinity (right).}
 	\label{fig:abcaffinity}
 \end{figure}
 
-Since we desire metro lines to have both high line coverage and low affinity, we can compute a score for every path by dividing the two composite measures (Equation \ref{eq:score}).
+Since metro lines should have both high line coverage and low affinity, we can compute a score for every path by dividing the two composite measures (Equation \ref{eq:score}).
 \begin{equation}
 	LineScore(\mathcal{P}) = \frac{Coverage(\mathcal{P})}{Affinity(\mathcal{P})}
 	\label{eq:score}
@@ -256,7 +256,9 @@ Given a large enough background corpus, it would be possible to link the day's s
 
 
 \subsection{Serialisation}
-The intermediate stage of the pipeline between graph building and map drawing is purely an issue of implementation, with few design choices to be made. Starting with the Python representation of the metro map, we group articles by metro line to be serialised, along with their metadata and summaries, to JSON. This JSON is then copied into a preexisting JavaScript file which is responsible for representing and drawing the graph using d3.js, and the contents of the JavaScript file are embedded as a script in an HTML file, which contains general template markup for the page. The advantage to this process is that it results in a single file, meaning the resultant visualisations are portable, shareable and platform independent, just like the news sources they were derived from.
+The intermediate stage of the pipeline between graph building and map drawing is purely an issue of implementation, with few design choices to be made. Starting with the Python representation of the metro map, we group articles by metro line to be serialised, along with their metadata and summaries, to JSON. This JSON is then copied into a preexisting JavaScript file which is responsible for representing and drawing the graph using D3.js, and the contents of the JavaScript file are embedded as a script in an HTML file, which contains general template markup for the page. 
+
+The main advantage to this process is that it results in a single file, meaning the resultant visualisations are as portable, shareable and platform independent as the news they were derived from. A secondary advantage is that the JSON accepted by D3 is standard and could easily be fed into a different JavaScript graphing library in the case of a more suitable alternative being written, with no change to the core Python software. The core software itself could also be hosted as a web app which serves the map HTML files, removing the need for client-side processing or installation.
 
 \clearpage
 \section{Map Drawing}
@@ -289,9 +291,9 @@ We now turn our attention to transforming the metro map structure into a planar 
 
 In \citeauthor{AutomaticMetroMapLayoutThesis}'s words: ``[The] visualisation process is deeply rooted in the human interpretation of the graph as a structure and as such, the quality of the aesthetics of a particular drawing of a graph are very important.'' \citep[p.24]{AutomaticMetroMapLayoutThesis}
 
-We therefore devote a significant amount of thought to optimising the visual quality of the generated metro maps by revisiting \citeauthor{AutomaticMetroMapLayoutThesis}'s aesthetic criteria and rules for layouts, discussed in Chapter \ref{c:litreview}. We justify which of these apply to our visualisations, and for those which are, we detail the methodology used to implement them.
+We therefore devote a significant amount of thought to optimising the visual quality of the generated metro maps by revisiting \citeauthor{AutomaticMetroMapLayoutThesis}'s aesthetic criteria for layouts, discussed in Chapter \ref{c:litreview}. We justify which of these apply to our visualisations, and for those which are, we detail the methodology used to implement them.
 
-\subsection{\citeauthor{AutomaticMetroMapLayoutThesis}'s Criteria and Rules for Metro Map layouts}
+\subsection{\citeauthor{AutomaticMetroMapLayoutThesis}'s Criteria Metro Map layouts}
 
 The set of rules and criteria defined by \cite{AutomaticMetroMapLayoutThesis} form a complex multicriteria optimisation function. Starting with an initial layout, nodes are embedded on a square grid of finite size, and iteratively moved to maximise the node movement criteria, as long as movement does not violate one of the node movement rules.
 
@@ -314,16 +316,13 @@ As previously discussed, there are six node movement criteria, which -- using th
 
 We therefore consider minimising edge crossings to be the highest weighted criterion, followed jointly by maximising line straightness and octilinearity.
 
-\subsection{Initial Node Positioning}
+\subsection{Initial Force-Directed Positioning}
 
 A major difference between the maps generated using this system and maps representing real transit networks is the lack of ``real'' starting positions we have for stations. While the freedom to move points around without having to preserve their relative positioning removes one layout constraint, finding a set of starting positions for the map layout which define a planar embedding with minimal line crossings is non-trivial. 
 
-As \citeauthor{AutomaticMetroMapLayoutThesis} notes, ``This [difficulty] is due to our method being based on optimising an existing layout: if the initial embedding is not adequate, then our method may struggle to produce an acceptable optimisation.''\cite[p.210]{AutomaticMetroMapLayoutThesis}.
+As \citeauthor{AutomaticMetroMapLayoutThesis} notes, ``This [difficulty] is due to our method being based on optimising an existing layout: if the initial embedding is not adequate, then our method may struggle to produce an acceptable optimisation.''\cite[p.210]{AutomaticMetroMapLayoutThesis}. One solution he suggests is to generate positions using a force-directed algorithm; a class of algorithms which simulate the forces of real physical motion to position nodes in a graph, with minimal edge crossings and approximately uniform edge lengths \citep{springembedders}. The downside to using a force-directed approach is that initial positioning and therefore the final map layout becomes nondeterministic. 
 
-One solution, as suggested in \citeauthor{AutomaticMetroMapLayoutThesis}'s work, is to employ a force-directed layout algorithm to generate the initial positions. Force-directed algorithms simulate the forces of real physical motion in order to position nodes in a graph in such a way that edge crossings are minimised and edge lengths are kept as uniform as possible \citep{springembedders}. Both of these qualities are highly desirable in metro maps.
-
-The graphing library used to draw the maps (d3.js) includes an implementation of \possessivecite{forcedirected} force-directed layout algorithm, and provides several parameters which can be used to alter the forces applied to some or all of the nodes in the graph. The two forces we will adjust to optimise the force-direction for metro maps are as follows:
-
+D3.js includes an optimised implementation of \possessivecite{forcedirected} force-directed layout algorithm, and provides several parameters which can be used to alter the forces applied to some or all of the nodes in the graph. The two forces we will adjust to optimise the force-direction for metro maps are as follows:
 \begin{itemize}
 \item\texttt{force.charge([charge])}\footnote{\url{https://github.com/d3/d3-3.x-api-reference/blob/master/Force-Layout.md\#charge}}\par
 	\textit{Charge} specifies the force of attraction between nodes, with negative values causing nodes to repel each other. In order to minimise crossings, this should be a large negative value, particularly for nodes which of higher degrees, which will be surrounded by more edges. We therefore set charge to -500 for nodes with weight $>$ 1, and -300 otherwise. 
@@ -332,9 +331,11 @@ The graphing library used to draw the maps (d3.js) includes an implementation of
 	\textit{Alpha} is the graph's cooling parameter, decaying as the simulation converges on a stable layout. As the temperature falls, node movement slows down, and eventually alpha will drop below a threshold which pauses the simulation, preventing further movement. 
 \end{itemize}
 
-The parameter \texttt{force.alpha} is re-evaluated every time the simulation is advanced by a single step; approximately 60 times per second. Since the reasoning for using a force-directed algorithm is to generate an initial layout with minimal line crossings which will result in the best possible map, we can constantly vary the \texttt{force.alpha} parameter based on the quality of the map as its stations are repositioned. Therefore, if the stations settle into a map layout with desirably high octilinearity and good line straightness, the energy of the graph will be reduced such that it is impossible for the embedding to change. Likewise, if the stations start repelling each other in a way that worsens line straightness and octilinearity, the system will have its energy increased and will be more likely to move out of the undesirable state.
+Unfortunately, the implementation of \texttt{d3.layout.force} lacks any further mechanism for detecting or reducing line crossings due to the computational expense of the best known algorithms (this subproblem is also NP-Hard). Even if line crossings could be detected, it is likely that the topology of certain graphs generated would make it impossible to find a planar embedding with no crossings.
 
-The measure of quality that we use to adjust \texttt{force.alpha} is a weighted combination of the two remaining aesthetic criteria we chose to focus on; octilinearity and line straightness. The means by which these two properties are calculated are described in the following sections.
+The parameter \texttt{force.alpha} is re-evaluated every time the simulation is advanced by a single step, which happens approximately 60 times per second. Since our aim is to generate an initial layout with minimal line crossings which will result in the best possible map, we can constantly vary \texttt{force.alpha} based on the quality of the map as its stations are repositioned. Therefore, if the stations settle into a map layout with desirably high octilinearity and good line straightness, the energy of the graph will be reduced such that it is impossible for the embedding to change. Likewise, if the stations start repelling each other in a way that worsens line straightness and octilinearity, the system will have its energy increased and will be more likely to move out of the undesirable state.
+
+The measure of quality that we use to adjust \texttt{force.alpha} is function of the two remaining chosen aesthetic criteria; octilinearity and line straightness. The means by which these two properties are calculated are described in the following sections.
 
 \subsubsection{Octilinearity}
 
@@ -345,13 +346,11 @@ Octilinearity (Equation \ref{eqn:octilinearity} \citep{AutomaticMetroMapLayoutTh
 \label{eqn:octilinearity}
 \end{equation}
 
-There is an exception to this formula which goes unmentioned by \citeauthor{AutomaticMetroMapLayoutThesis}, but which is necessary to make octilinearity correct for vertical lines; in the case where $u.x - v.x = 0$, we take octilinearity to be zero, as this implies a straight line parallel to the $y$ axis.\\
-
 \begin{figure}[h]
 \centering
-\hspace{-0.5cm}\begin{minipage}{.4\textwidth}
-  \includegraphics[width=\linewidth]{img/implementation/octilinearity.pdf}\caption{Octilinearity Calculation\label{fig:octilinearity}}
-  \end{minipage}\hspace{0.5cm}\begin{minipage}{.6\textwidth}
+\begin{minipage}{.4\textwidth}
+  \includegraphics[width=.9\linewidth]{img/implementation/octilinearity.pdf}\caption{Octilinearity Calculation\label{fig:octilinearity}}
+  \end{minipage}\hspace{0.5cm}\begin{minipage}{.55\textwidth}
 We can calculate the octilinearity of the graph in Figure \ref{fig:octilinearity} (left) as follows, taking positions relative to $(0, 0)$ in the bottom left corner. Algorithm \ref{alg:octilinearity} describes this calculation.
 $$\begin{aligned}
 \text{octilinearity}(a, b) &= |sin\;4\,(tan^{-1}\frac{|1 - 1|}{|4 - 1|})| = 0 \\
@@ -361,6 +360,7 @@ $$\begin{aligned}
 \end{minipage}
 \end{figure}
 
+There is a caveat to this formula which goes unmentioned by \citeauthor{AutomaticMetroMapLayoutThesis}, but which is necessary to emphasise as a detail of implementation. In the case where $u.x - v.x = 0$, we take octilinearity to be zero, as this value indicates a straight vertical line. Otherwise, attempting to calculate the inverse tangent of a fraction whose denominator is zero (this is mathematically valid, as the principle value of $\tan^{-1}\infty$ is $\frac{\pi}{2}$), which would result in undefined behaviour.\\
 \begin{algorithm}
 \label{alg:octilinearity}
  \caption{Calculating Map Octilinearity}
@@ -382,6 +382,8 @@ $$\begin{aligned}
 \end{algorithm}
 
 \subsubsection{Line Straightness}
+
+The line straightness (Equation \ref{eqn:linestraightness} \citep{AutomaticMetroMapLayoutThesis}) criterion is defined as the sum of every `turn' a metro line makes between its first and last stations, where a turn is measured as the angle between the new link direction and the continuation of the previous direction. The global line straightness is simply the sum of the straightness of every metro line in the map, and as with octilinearity, lower values are preferred.
 
 \begin{equation}
 	\text{lineStraigtness}(G) = \sum_{p\,\in{\Pi}}\sum_{u, v\in p} \theta(u, v)
@@ -410,19 +412,54 @@ The line straightness of the graph in Figure \ref{fig:linestraightness} (left) i
    $v_1 \gets \dfrac{\overrightarrow{ab}}{|\overrightarrow{ab}|}$ ; $v_2 \gets \dfrac{\overrightarrow{bc}}{|\overrightarrow{bc}|}$ ;\tcc*[f]{Normalise the two vectors to unit length}
    \vspace{0.15cm}
    $\theta \gets cos^{-1}(v_1.x\times v_2.x + v_1.y\times v_2.y)$ ;\tcc*[f]{Find the angle between links}
-%   \If{$\theta > \frac{\pi}{2}$}{
-%   	$\theta \gets \pi - \theta$ \tcc*[f]{We want the complement of this angle}
-%   }
    $ls \gets ls + \theta$ \;
    }
 }
 \end{algorithm}
 
-\subsection{Heuristic Layout}
-\begin{itemize}
-	\item \cite{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout} for snap()
-	\item Repeated averaging along lines for sensible octilinearity
-	\item Straightening the ends of lines
-\end{itemize}
+Empirically, we found the best results came from weighting octilinearity and line straightness equally when using them to set \texttt{force.alpha}, but this could be refined through further investigation. We take the sum of the natural log of both values, to ensure that small improvements to already low values for either criterion are rewarded.
 
-Unfortunately, the implementation of \texttt{d3.layout.force} lacks any explicit mechanism for reducing line crossings due to the computational expense of the best known algorithms (this subproblem is also NP-Hard). Even if line crossings could be detected, it is likely that the topology of certain graphs generated would make it impossible to find a planar embedding with no crossings; this is not a problem left unsolved at this stage, and it is the single weakness of separating the graph building and map drawing code to this extent. 
+\subsection{Heuristic Refinement}
+
+Once all stations have been assigned their starting positions, we can start incrementally moving them to improve the quality of the map. The first step is to discretise the search space for station positions, by \textit{snapping} stations to intersections on a large grid. We found the optimal size for this grid to be $\frac{n}{4}\times\frac{n}{4}$ for a map containing $n$ stations. 
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.9\textwidth]{img/implementation/snap.pdf}
+	\caption{An example demonstrating the \textit{snap-to-grid} process}
+	\label{fig:snap}
+\end{figure}
+
+Figure \ref{fig:snap} shows the \textit{snap-to-grid} process applied to a small example. We snap stations in order of descending weight (number of incident edges), as typically the more edges a node is connected to, the more difficult it is to place. In the example, this means station $c$ (with weight 3) is moved first. There is contention for the second move, as both stations $a$ and $b$ have weight two, so we make an arbitrary decision as to which we move first, and the two moves are shown as one step. The final station to move is station $d$, after which we can mark all stations as successfully placed. 
+
+Stations whose nearest intersections are already occupied are left unplaced. This implementation contrasts slightly with \citeauthor{AutomaticMetroMapLayoutThesis}'s approach, where stations are snapped \textit{in order} of Euclidian distance to their nearest intersection, and snapped to the next-nearest if the closest intersection is already occupied. We found this implementation performed poorly for maps with several highly connected nodes, which is a common due to news providers publishing review articles covering many of the lines on the map.
+
+To determine the final station positions, our approach now diverges from \citeauthor{AutomaticMetroMapLayoutThesis}'s into a heuristic method which has been refined for metro maps comprising between 10 and 50 stations. It is vital that metro lines with high affinity have been removed before this stage, or the following process will result in a map where nodes with high weights are occluded.
+
+Although by definition the \textit{snap-to-grid} gives a map near-perfect octilinearity, it can significantly worsen line-straightness, as shown in Figure \ref{fig:aoct}. It would be preferable to have the circled station repositioned as the transformation shows, even though this sacrifices the uniform edge length of the map. We therefore make several passes over each metro line, moving stations to the midpoint of the line between the previous and next neighbouring stations if that line is octilinear.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.7\textwidth]{img/implementation/averagingoctilinear.pdf}
+	\caption{An octilinear move which compromises the edge-length criterion}
+	\label{fig:aoct}
+\end{figure}
+
+In addition, a final pass checks for stations which are still unplaced at this point and performs the same midpoint movement regardless of whether the line between the next and previous points is octilinear. This is simply to try and ensure the unplaced point obscures and crosses as few other links as possible in what is most likely a densely packed area of the map. An example of this process is shown in Figure \ref{fig:nonoct}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.7\textwidth]{img/implementation/averagingnonoctilinear.pdf}
+	\caption{A non-octilinear move of an unplaced station}
+	\label{fig:nonoct}
+\end{figure}
+
+After the final pass, we recompute octilinearity and line-straightness, and count how many points were left unplaced; i.e. drawn directly on top of another point. If any of the numbers are unsatisfyingly high, the process can be restarted and the randomness of the initial force-direction will result in a different initial embedding.
+
+\section{Summary}
+
+We have given a detailed description of the system's pipeline and the novel transformation of news data from XML elements in an RSS feed to raw text, to parsed keywords, to recognised entities, to elements in a directed graph, to stations on a formatted metro map.
+
+Several unexpected difficulties arose during implementation, in particularly the tradeoffs involved with entity disambiguation in the context of what makes a ``useful'' metro line, and the process of deciding which lines to select between two or more with high affinity. 
+
+However, the most significant challenge of implementation was undoubtedly the process of drawing usable metro maps. The conflict between edge crossings, line-straightness and octilinearity was omnipresent, and the final algorithm still falls into local minima as it is unable to detect the edge crossings. This section of the pipeline would benefit greatly from further work, as it is a significant area of active research in its own right. As the expected datasets for the map are typically small (under 50 stations),  a non-polynomial time algorithm for refining station positions would be feasible in terms of running time, and would doubtless improve the quality of the maps generated.
+
+The results obtained by using the system to generate metro maps for various news corpora are discussed in the next chapter.
+
