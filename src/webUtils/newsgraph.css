@@ -1,10 +1,14 @@
 body {
-    overflow:hidden;
+	overflow: none;
 }
 
 .header {
  padding: 5px;
  font-size: 2em;
+}
+
+h4 {
+	font-size: 1.5em !important;
 }
 
 .nav-wrapper {
@@ -34,6 +38,20 @@ body {
   stroke-width: 7px;
 }
 
+.search {
+	position: absolute;
+	top: 150px;
+	text-align: middle;
+}
+
+#searchbox {
+	display: inline-block;
+}
+
+#searchbutton {
+	display: inline-block;
+}
+
 .card {
 	margin: 10px;
 }
@@ -55,6 +73,7 @@ body {
 #graph {
 	margin: 0px;
 	border: 0px;
+	overflow: none;
 }
 
 #article-container {
@@ -75,7 +94,6 @@ body {
 }
 
 #article-container img {
-	width: 100%;
 	overflow: none;
 }
 
@@ -87,4 +105,10 @@ body {
 #article-container h2 {
 	font-size: 1.2em;
 	font-style: italic;
+}
+
+img.js-image-replace {
+	height: inherit !important;
+	width: inherit !important;
+
 }

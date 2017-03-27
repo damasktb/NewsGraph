@@ -1,6 +1,8 @@
 import json
 import urllib
 
+from collections import Counter
+
 from itertools import combinations
 from sys import maxint
 
@@ -23,10 +25,8 @@ class NewsGraphResult:
 				desc,
 				response['resultScore'],
 			))
-		if len(candidates) == 0:
+		if len(candidates) < 2:
 			self.certainty = 0
-		elif len(candidates) == 1:
-			self.certainty = maxint
 		else:
 			self.certainty = candidates[0]['resultScore']/candidates[1]['resultScore']
 	
@@ -44,20 +44,15 @@ class NewsGraphResult:
 
 
 class NewsGraphKnowledge:
-	LOG = True
-	IGNORE = [u"AP", u"Getty Images", u"Getty", u"Photograph", u"Photo", u"Facebook Twitter Pinterest"]
+	LOG = False
+	IGNORE = [u"AP", u"Caption", u"Getty Images Image", u"Getty Images", u"Getty", u"Photograph", u"Photo", u"Facebook Twitter Pinterest"]
 	API_KEY = 'keywordUtils/.api_key'
 
 	def __init__(self):
 		self.api_key = open(NewsGraphKnowledge.API_KEY).read()
 		self.service_url = 'https://kgsearch.googleapis.com/v1/entities:search'
 
-	def query(self, queryText, limit=4):
-		if isinstance(queryText, unicode):
-			queryText = queryText.encode('utf-8')
-		elif isinstance(queryText, str):
-			queryText.decode('utf-8')
-
+	def query(self, queryText, limit=3):
 		params = {
 			'query': queryText,
 			'limit': limit,
@@ -65,13 +60,14 @@ class NewsGraphKnowledge:
 			'key': self.api_key,
 		}
 		url = self.service_url + '?' + urllib.urlencode(params)
-		response = json.loads(urllib.urlopen(url).read().decode('utf-8'))
+		response = json.loads(urllib.urlopen(url).read())
+
 		if 'itemListElement' in response:
 			return NewsGraphResult(queryText, response['itemListElement'])
 		else:
 			return None
 
-	def aliasEntities(self, entities, certainty=2):
+	def aliasEntities(self, entities, certainty=3):
 		uncertain = []
 		mapping = {}
 		people = {}
@@ -88,7 +84,6 @@ class NewsGraphKnowledge:
 				e2 = tmp
 			if e1 in e2:
 				if e1 in mapping:
-					print "Ambigious match;", e1, str(strength[e1]), "matches both", mapping[e1], str(strength[mapping[e1]]), "and", e2
 					del mapping[e1]
 					out.remove(e1)
 				else:
@@ -97,21 +92,28 @@ class NewsGraphKnowledge:
 
 		popular_entities = [e for e in popular_entities if e not in out]
 
-		entities = list(set(entities))
-		entities.sort(key=lambda e:len(e), reverse=True)
+		entity_set = list(set(entities))
+		entity_set.sort(key=lambda e:len(e), reverse=True)
 
-		for queryText in entities:
+		for queryText in entity_set:
+			if isinstance(queryText, unicode):
+				queryText = queryText.encode('utf-8')
+			elif isinstance(queryText, str):
+				queryText.decode('utf-8')
 			result = self.query(queryText)
-			if result == None:
+
+			if result==None or result.top()==None:
 				continue
 
-			if result.certainty > certainty or e in popular_entities:
+			if result.certainty > certainty or result.top()[NewsGraphResult.NAME] in popular_entities:
 				if NewsGraphKnowledge.LOG:
-					print "Certain: %s => %s (%s)" % (
-						queryText, 
-						result.top()[NewsGraphResult.NAME],
-						result.top()[NewsGraphResult.DESCR]
-					)
+					n = result.top()[NewsGraphResult.NAME]
+					if isinstance(n, unicode):
+						n = n.encode('utf-8')
+					elif isinstance(n, str):
+						n.decode('utf-8')
+					print "Certain: %s => %s" % (queryText, n)
+				
 				name = result.top()[NewsGraphResult.NAME]
 				if name in people:
 					mapping[queryText] = people[name]
@@ -121,8 +123,7 @@ class NewsGraphKnowledge:
 						for word in name.split(" "):
 							if word in people and people[word] != name:
 								if NewsGraphKnowledge.LOG:
-									print "Ambigiuty, can't alias", word, "to both", name,  "and", names[word]
-								del people[word]
+									print "Ambigiuty, ignoring", name
 							else:
 								people[word] = name
 			else:
@@ -131,4 +132,6 @@ class NewsGraphKnowledge:
 				else:
 					mapping[queryText] = queryText
 
-		return dict((entity, alias) for entity, alias in mapping.iteritems() if entity!=alias)
+		aliases = dict((entity, alias) for entity, alias in mapping.iteritems() if entity!=alias)
+		freqs = Counter([aliases.get(e, e) for e in entities])
+		return aliases, freqs

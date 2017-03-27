@@ -1,14 +1,18 @@
 import nltk
-import numpy as np
 import string
 import unicodedata
+
+from lxml import etree
 
 from cStringIO import StringIO
 from stop_words import get_stop_words
 from sys import maxunicode
 from unidecode import unidecode
+from goose import Goose
 
 from graphKnowledge import NewsGraphKnowledge
+
+gooseExtractor = Goose()
 
 def tokenize(doc, knowledge=True, ltze=True):
 	wnl = nltk.WordNetLemmatizer()
@@ -34,7 +38,6 @@ def tokenize(doc, knowledge=True, ltze=True):
 			else:
 				if prevTree:
 					tokens.append(prevTree.strip())
-					#if t not in entities: #No point querying KnowledgeGraph multiple times
 					entities.append(prevTree.strip())
 					prevTree = ""
 				t = chunk[0].lower()
@@ -44,9 +47,13 @@ def tokenize(doc, knowledge=True, ltze=True):
 					t = string.strip(t, string.punctuation)
 					tokens.append(t)
 	
-	aliases = knowledge.aliasEntities(entities)
+	aliases, freqs = knowledge.aliasEntities(entities)
 	entities = [aliases.get(e, e) for e in entities]
-	return tokens, entities
+	return tokens, entities, freqs
+
+def parseHTML(article):
+	article = gooseExtractor.extract(url=article.url)
+	return article.cleaned_text, article.meta_description
 
 def preprocess(doc):
 	sentences = nltk.sent_tokenize(doc)

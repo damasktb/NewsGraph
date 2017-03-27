@@ -1,7 +1,9 @@
+# -*- coding: latin-1 -*-
 from json import dumps
 from lxml import etree
 from lxml.builder import E
-from time import strftime
+from time import mktime, strftime
+from datetime import datetime
 from xml.sax.saxutils import escape
 
 def CLASS(*args):
@@ -10,8 +12,6 @@ def CLASS(*args):
 def buildCards(articles):
 	cards = []
 	for article in articles:
-		title = article.title
-		text = article.text
 		card = E.div(
 			CLASS("card horizontal", *[l.replace(" ","-") for l in article.metro_lines]),
 			E.div(
@@ -22,14 +22,16 @@ def buildCards(articles):
 				CLASS("card-stacked"),
 				E.div(
 					CLASS("card-content"),
-					title,
-					E("i","more_vert", CLASS("material-icons right"))
+					E.h4(article.title),
+					E.p(article.summary)
 				),
 				E.div(
 					CLASS("card-action"),
+					strftime("%c", article.publish_date),
+					" - ",
 					E.a(
 						"Read more at "+ article.feed_name,
-						href=article.url
+						href="/#"#article.url
 					)
 				)
 			)
@@ -64,6 +66,7 @@ def writePage(nodes, links, articles, metro_lines):
 				),
 				E("script", "", src="http://d3js.org/d3.v2.min.js?2.9.6"),
 				E("script", "", src="https://code.jquery.com/jquery-3.1.1.min.js"),
+				E("script", "", src="http://code.jquery.com/ui/1.11.0/jquery-ui.min.js"),
 				E.style(default_css)
 			),
 			E.body(
@@ -89,4 +92,4 @@ def writePage(nodes, links, articles, metro_lines):
 	)
 
 	with open("ng.html", "w") as ng:
-		ng.write(etree.tostring(page, pretty_print=True, encoding="UTF-8", doctype="<!DOCTYPE html>").replace("NG-JS", default_js))
+		ng.write(etree.tostring(page, pretty_print=True, encoding="ISO-8859-1", doctype="<!DOCTYPE html>").replace("NG-JS", default_js))
