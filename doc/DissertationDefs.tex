@@ -11,6 +11,7 @@
 \usepackage{color}
 \usepackage{listings}   % Provides styled code listings
 
+
 % AS IF LISTINGS DOESN'T SUPPORT JAVASCRIPT OR HTML
 \definecolor{darkgray}{rgb}{.4,.4,.4}
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
@@ -96,6 +97,9 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage{appendix}
 \usepackage{todonotes}
+
+\newtheorem{hyp}{Hypothesis}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
 \newcommand\requirement[2]{
   {#1} %\textbf{Priority: {#2}.}

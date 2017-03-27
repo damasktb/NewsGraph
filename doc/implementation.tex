@@ -221,7 +221,7 @@ The principle of topic connectivity was the basis for choosing the metro map vis
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=.5\textwidth]{img/implementation/lowaffinity.pdf}
+	\includegraphics[width=.4\textwidth]{img/implementation/lowaffinity.pdf}
 	\caption{An example of three metro lines, each with high affinity.}
 	\label{fig:lowaffinity}
 \end{figure}
@@ -236,7 +236,7 @@ The affinity of two lines is defined as the number of articles they have in comm
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=\textwidth]{img/implementation/abcaffinity.pdf}
+	\includegraphics[width=.8\textwidth]{img/implementation/abcaffinity.pdf}
 	\caption{`Run-on' affinity (left) is penalised more heavily than `one-off' affinity (right).}
 	\label{fig:abcaffinity}
 \end{figure}
@@ -363,7 +363,7 @@ $$\begin{aligned}
 There is a caveat to this formula which goes unmentioned by \citeauthor{AutomaticMetroMapLayoutThesis}, but which is necessary to emphasise as a detail of implementation. In the case where $u.x - v.x = 0$, we take octilinearity to be zero, as this value indicates a straight vertical line. Otherwise, attempting to calculate the inverse tangent of a fraction whose denominator is zero (this is mathematically valid, as the principle value of $\tan^{-1}\infty$ is $\frac{\pi}{2}$), which would result in undefined behaviour.\\
 \begin{algorithm}
 \label{alg:octilinearity}
- \caption{Calculating Map Octilinearity}
+ \caption{Calculating map octilinearity}
  \KwData{$\mathcal{M}$: a metro map $(G=(V, E), \Pi)$}
  \KwResult{$oct \in \mathbb{Q}, 0 \leq oct \leq \frac{24}{25}|E|$: the octilinearity of $\mathcal{M}$}
  $oct \gets 0$ \;
@@ -401,7 +401,7 @@ The line straightness of the graph in Figure \ref{fig:linestraightness} (left) i
 
 \begin{algorithm}
 \label{alg:ls}
- \caption{Calculating Map Line Straightness}
+ \caption{Calculating map line straightness}
  \KwData{$\mathcal{M}$: a metro map $(G=(V, E), \Pi)$}
  \KwResult{$ls \in \mathbb{Q}, ls > 0$: the line straightness of $\mathcal{M}$}
  $ls \gets 0$ \;
