@@ -1,16 +1,53 @@
+The following chapter outlines the contributions of this work and the limitations of both our system and evaluation. It also describes extensions which could be developed given additional time, and areas which would benefit from further research.
+
 \section{Summary of Contributions}
+
+This dissertation introduced the first application of the metro map metaphor \citep{GeneratingInformationMaps} to news corpora extracted from user-specified RSS feeds, in order to automatically generate structured topic maps based on current events news. These metro maps serve as an effective comprehension aid to young people in our current digital landscape of news overload; a claim which we are the first to evaluate via direct comparison or our system with a typical RSS feed reader.
+
+Our implementation includes a novel keyword extraction algorithm which performs keyword boosting using a knowledge base for entity disambiguation, and is tuned specifically for extracting entities from current events news. In the subdomain of metro map topology, our method also formalises \textit{Line Coverage} and \textit{Affinity} as an extension to the characteristics defined by \cite{GeneratingInformationMaps}, which can be used to compare the quality of candidate lines during the selection and pruning processes.
+
+Due to the lack of any existing library for positioning or drawing metro maps, further contributions made include recommendations on tuning specific D3.js parameters within a force-directed layout to generate viable starting positions for stations on a metro map, and notes on the implementation of functions to calculate \possessivecite{AutomaticMetroMapLayoutThesis} line straightness and octilinearity criteria in JavaScript. To the best of our knowledge, this is the first application of \citeauthor{AutomaticMetroMapLayoutThesis}'s aesthetic criteria for metro map layout optimisation to non-geospatial maps.
+
+The final contribution of this work is an empirical evaluation of the task performance of young adults using the system. The results of our experiments support our hypothesis that users recall more news topics from a news corpus using our metro maps than after using an unstructured RSS feed reader, and therefore substantiate our recommendations that future efforts to support the contextual linking of news articles should look to visualisation and cartography for direction.
 
 \section{Limitations}
 
+The main limitation of this work is the lack of a formal deterministic algorithm for drawing metro maps, using D3 or otherwise. The approach presented in Section \ref{sec:drawing} is nondeterministic by necessity in order to generate initial starting positions which result in few or no edge crossings, but this process is non-convergent and often results in suboptimal embeddings, the worst cases of which are unusable. 
+
+As a result of this limitation, a significant effort was made to decouple the map drawing process from the other components of the system, such that it could be improved or replaced in future with the only changes required being to the interface at the serialisation stage. While the problem of generating planar embeddings for metro maps is known to be NP-hard, the maps drawn by our system are typically significantly smaller than metro maps which represent real existing transit networks, meaning it would not be unrealistic to use a non-polynomial time algorithm.
+
+A second important limitation of the system is the inability of the graph formation logic to recognised an overly sparse, overly connected, or overly populated map. All three of these properties are easily addressed in theory; an overly sparse graph should trigger a repeat of the keyword extraction process with a larger keyword vector per article, an overly connected graph should trigger a repeat of the same process with a smaller keyword vector per article, and an overly populated map should use both a smaller keyword vector and have its lowest ranking metro lines removed. However, in the given time, it was not possible to implement this logic in the system, resulting in a need to manually tune parameters such as the above during its operation.
+
+In terms of experimental design, the the weaknesses of this work lie in its limited scope. While our user study managed to capture a wide range of news consumption behaviours and attitudes among participants, all participants were students aged 20-23 who were technically proficient. 15 out of the 16 were Computer Science undergraduates, who are typically more familiar with graph theory and therefore more confident interpreting representations of abstract graphs than the general young adult population. This is a limitation which could be addressed by further experiments, as although the system was conceptualised for use by young adults as a result of The \possessivecite{anewmodelfornews} findings, it would have strengthened our conclusions to have evaluated the system in a larger study of both adults adults over the age of 25, and teenagers, especially those from a non-scientific background.
+
+In addition to the lack of participant academic diversity, the scope of our measurement of task performance could also have been extended. The study we conducted was focussed exclusively on recall, but this recall is only one of the six factors identified by \cite{VisuelleKommunikation} as being strengthened by the use of visual metaphors, the others being motivation, the formation of new perspectives, support for learning, focusing of attention, and structuring of communication. It could be argued that the act of creating a topic index also evaluated the structure of participants' communication, but this still leaves four factors remaining.  
+
+A more long-term study could have evaluated whether the daily use of metro maps supported participants' learning and/or increased their motivation to read the news, as these were the two factors identified in Chapter \ref{c:litreview} as the most critical influencers of news fatigue.
+
+
 \section{Directions for Future Research}
 
+This section outlines areas we consider to be of interest for future work on the basis of this dissertation.
 
-\subsubsection{Sophisticated Entity Disambiguation}
+\subsection{Real-Time News Tracking for Automated Collation}
 
-\subsection{Alternative Keyword Extraction}
+If the system were developed to a stage where no manual tuning was required to prune the candidate metro lines to a level which struck a balance between useful and usable, article collation would a simple process to automate, meaning maps could be automatically generated on a periodic basis with no need for user input.
 
-\subsubsection{Automated Retrieval}
+Web services such as News API \footnote{\url{https://newsapi.org}}, which publish a continual stream of JSON metadata containing live headlines from 72 major worldwide news publishers, are gaining traction as the demand for immediate information increases. Although metro maps have not been designed with live updating in mind, the use of services such as News API could serve as a replacement for specific RSS feeds, removing the major initial parameter of the system.
+
+The key questions posed by the concept of real-time metro maps of news are related to the mechanics of updating, and how stateful the updates should be. Should the publishing of ten new headlines trigger a complete regeneration of the map (which would potentially result in a new set of metro lines) or should metro lines be fixed over a specific period of time? Would users want to be able to `pin' metro lines to indicate that the system should consider this an ongoing topic of interest and always choose it as a candidate?
+
+We suspect that there is a limitation on the usefulness of metro maps when their data is continually updating in real-time due to the structural changes which could occur within the maps, but the core idea of dispensing with specific RSS feeds and simply watching major news outlets for trends is an interesting one. While users may find it beneficial to combatting news fatigue to specify exactly where they want their news to originate from or which topics they want to read about, real-time headlines also take the effort out of specifying feeds for users who are indifferent about the sources of the news they consume.
+
 
 \subsubsection{Social Media Trending Topics}
 
-\subsection{Summary-Level Article View}
+In the current information landscape, it is impossible to discuss real-time news publishing without touching on social networks. The evolution of social media websites -- in particular, Twitter -- has been instrumental in the erosion of the dichotomy between news media and social networking websites. The majority of people receive personalised news recommendations every time we open Facebook or Twitter, sometimes without realising that their personal data and browsing histories are being used to construct these recommendations.
+
+
+
+
+\subsection{Verification of News}
+
+
+

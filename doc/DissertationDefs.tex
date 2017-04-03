@@ -11,8 +11,9 @@
 \usepackage{color}
 \usepackage{listings}   % Provides styled code listings
 
+\setcounter{secnumdepth}{5}
+\usepackage{multirow}
 
-% AS IF LISTINGS DOESN'T SUPPORT JAVASCRIPT OR HTML
 \definecolor{darkgray}{rgb}{.4,.4,.4}
 \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
 \definecolor{editorLightGray}{cmyk}{0.05, 0.05, 0.05, 0.1}
@@ -116,7 +117,7 @@
 \newcommand{\possessivecite}[1]{\citeauthor{#1}'s [\citeyear{#1}]}
 
 \titleformat{\chapter}[display]
-{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{0pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{10pt}{40pt}
   
 %%
@@ -126,7 +127,7 @@
 \setlength{\parskip}{7pt}
 \setlength{\parindent}{0pt}
 \addtolength{\hoffset}{0.5cm}
-\addtolength{\textwidth}{0.9cm}
+\addtolength{\textwidth}{0.6cm}
 %\titleformat{\chapter}[display]{\vspace{-1cm}\normalfont\bfseries}{}{0pt}{\huge}
 
 %%

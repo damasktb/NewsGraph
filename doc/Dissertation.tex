@@ -26,14 +26,14 @@
 \newpage
 \listoffigures
 \addcontentsline{toc}{chapter}{List of Figures}
+\newpage
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
 \listofalgorithms
 \addtocontents{loa}{\def\string\figurename{Algorithm}}
-%\newpage
-%\listoftables
-%\addcontentsline{toc}{chapter}{List of Tables}
-%\newpage
-%\chapter*{Acknowledgements}
-%\addcontentsline{toc}{chapter}{Acknowledgements}
+\chapter*{Acknowledgements}
+%\input{acknowledgements.tex}
+\addcontentsline{toc}{chapter}{Acknowledgements}
 \newpage
 
 \setcounter{page}{1}
@@ -43,7 +43,7 @@
 \addcontentsline{toc}{chapter}{Introduction}
 \input{introduction.tex}
 
-\chapter{Literature and Technology Review}
+\chapter{Literature Review}
 \label{c:litreview}
 \input{litsurvey.tex}
 
@@ -76,7 +76,7 @@
 \chapter{Implementation Raw Data}
 \input{implementation-data.tex}
 
-\chapter{User Study}
+\chapter{Empirical Evaluation Data}
 \input{study.tex}
 	
 \end{appendices}

@@ -1,4 +1,3 @@
-\section{Introduction}
 During the requirements gathering process, four distinct components of the system were identified which form a pipeline of execution; \textit{Article Retrieval}, \textit{Keyword Extraction}, \textit{Graph Building} and \textit{Map Drawing}. Crucially, each is specified as being modular, allowing both for flexible extensibility and for alternative implementations to be tested directly against each other without requiring changes to the other components.
 
 This chapter further decomposes these components to provide a detailed overview of the methodology used to implement them, followed by a discussion of the significant challenges and successes which arose during development.
@@ -21,7 +20,7 @@ The first stage of article retrieval is the parsing of RSS feeds, in order for a
 
 Once the feed data has been extracted, it is used to construct an instance of \texttt{ArticleCollection}, which acts a wrapper around the contents of one or more feeds and provides the mechanism necessary to perform corpus-wide queries. The \texttt{Article} class encapsulates the functions for computing article-specific terms such as term-frequency for tf-idf, and the term-weighting component of tf-pdf. The result of this pre-processing stage is an \texttt{ArticleCollection} containing one or more serialisable \texttt{Article}s from one or more RSS feeds, where each \texttt{Article} contains extracted but unparsed data and associated metadata.
 
-\section{Keyword Extraction}
+\section{Keyword Extraction} \label{sec:keys}
 
 The keyword extraction stage begins with the process of tokenising the body text of every article. Tokenisation here has three substages, all of which were implemented using NLTK (The Natural Language Toolkit for Python), and which are as follows:
 \begin{enumerate}
@@ -51,7 +50,7 @@ During this stage of disambiguation, we only consider entities with more than on
 
 Let $P$ denote the set of entities with more than one occurrence in the source article; $S$:
 \begin{align*}
-P &= \{e\;|\;\text{occurences}(e, S) > 1\}.
+P &= \{e\;|\;\text{occurences}(e, S) > 1\}
 \intertext{$\forall (e_1, e_2) \in \{P\times{P}\;|\;$length$(e_1)\;<\;$length$(e_2)\}, $ if $e_1 $ is a substring of $e_2$, we call $e_1$ an \textit{alias} of $e_2$. Let $A$ be the set of alias pairs in $S$;} 
 A &= \{(a, e) \;|\;a \text{ is an alias of } e\}
 \intertext{We require the first term of every pair in $A$ to be unique, but there is no such constraint for the second term ($e$); this allows multiple aliases to map to the same entity. For example,} 
@@ -87,7 +86,7 @@ We have a reasonable degree of confidence that for every alias-entity pair $(a, 
 \end{algorithm}
 
 
-\subsubsection{Entity Disambiguation with Knowledge Graph}
+\subsubsection{Entity Disambiguation with Knowledge Graph} \label{sec:gkg}
 
 The process described above is a simplistic approach which only addresses the matching of partial to full name mentions. In comparison, entity disambiguation describes the process of determining the identity of entities in a body of text. Performing this process on the sentence `The UK has voted to leave the EU,' should identify `UK' as 'The United Kingdom' and `EU' as 'The European Union'. As advanced methods for entity disambiguation are both complex and computationally expensive, I did not attempt to implement a formal method for this. 
 
@@ -148,25 +147,11 @@ There is a clear trade-off between the accuracy of the disambiguation and the nu
 
 \subsection{Choosing a Term-Weighting Metric for Keyword Ranking}
 
-Given a set of disambiguated entities for every article, the union of which forms a set of candidates keywords or \textit{metro lines} for the collection, we must now determine which keywords are the most relevant. To do this, the two term-weighting methods described in Chapter \ref{c:litreview} will be revisited; tf-idf \citep{tfidf} and tf-pdf \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}. Both were implemented in the system so they could be compared directly against each another.
+Given a set of disambiguated entities for every article, the union of which forms a set of candidates keywords or \textit{metro lines} for the collection, we must now determine which keywords are the most relevant. To do this, the two term-weighting methods described in Chapter \ref{c:litreview} will be revisited; tf-idf \citep{tfidf} and tf-pdf \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}. Both were implemented in the system so they could be compared.
 
-From an implementation perspective, the main difference between these two algorithms are the level at which they operate. tf-idf ranks keywords on a per-article basis, returning a vector of an article's keywords and their corresponding score against the background corpus. In contrast, tf-pdf is specified at corpus level and only returns a single metric for a given word; the sum of its significance across the whole corpus. In tf-pdf, corpuses have one or more \textit{channels}, which contain articles. In our case, channels can be conveniently defined as RSS feeds from different publishers. 
+From an implementation perspective, the main difference between these two algorithms are the level at which they operate. tf-idf ranks keywords on a per-article basis, returning a vector of an article's keywords and their corresponding score against the background corpus. In contrast, tf-pdf is specified at corpus level and only returns a single metric for a given word; the sum of its significance across the whole corpus. In tf-pdf, corpora have one or more \textit{channels}, which contain articles. In our case, channels can be conveniently defined as RSS feeds from different publishers. 
 
 \citeauthor{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm} argue that tf-pdf is a more suitable metric for news corpora, because it discriminates between articles which originated from the same channel and articles in different channels, allowing keywords which are highly (and uniformly) frequent in one channel to be identified as significant in documents from a different channel. Similarly to tf-idf however, this process can be used to produce a vector of pairs of an article's highest ranked keywords. The actual scores attributed to keywords by either algorithm are not of direct importance, since it is only relative scores we use to construct the keyword vectors.
-
-%\subsubsection{Implementation of tf-pdf Vectorisation}
-%
-%\begin{itemize}[noitemsep]
-%	\item $D$ = The number of channels in the corpus;
-%	\item $K_c$ = The total number of terms in channel $c$;
-%	\item $F_{tc}$ = Frequency of term $t$ in channel $c$;
-%	\item $n_{tc}$ = The number of articles in channel $c$ where term $t$ occurs;
-%	\item $N_c$ = The total number of articles in channel $c$.
-%\end{itemize}
-%\begin{equation}
-%	\text{tf-pdf}(t) = \sum_{c=1}^{c=D}\frac{F_{tc}}{\sqrt{\;\sum\limits_{k=1}^{k={K_c}}{F_{kc}}^2}}\times\text{exp}{\bigg(\frac{n_{tc}}{Nc}\bigg)}
-%\tag{\ref{eqn:tfpdf}}
-%\end{equation}
 
 Regardless of which algorithm is used, the advantage to restricting the set of candidates to named entities becomes quickly apparent. Figure \ref{fig:tokensentities} shows the number of tokens against the percentage of extracted entities for 40 articles from the BBC's Politics RSS Feed.\footnote{http://feeds.bbci.co.uk/news/politics/rss.xml (Accessed: 27/02/2017, Full data in Appendix \ref{tab:entitiestokens})} The interquartile range shows 50\% of articles had entities comprising 5.4\%-8.2\% of their tokens after stop-word removal. With the mean equal to 6.65\%, the implications of this are a search space which can be reduced by a factor of more than ten. Although performance optimisation was not specified in the aims of the project, gains of this nature are still significant.
 
@@ -181,17 +166,17 @@ At this point, given optional user-specified lists of keywords to either \textit
 
 The function of the \textit{ignore} set is not to blacklist certain topics, as it will have no effect on articles which contain ignored keywords being placed on other metro lines. Instead, it performs domain specific stop-word removal for metro line candidates, preventing non-useful keywords with inevitably high scores (such as `United Kingdom' for a metro map based on a UK news corpus) from being selected. During implementation, it was found to be useful to automatically append the names of every news publisher (e.g. `The Guardian') in the feeds to the \textit{ignore} set, as well as the names of the feeds themselves. This forces the system to select more specific candidates, even though their scores may be significantly lower.
 
-While implementing the \textit{ignore} functionality that the differing results of using tf-idf and tf-pdf on the same corpus became obvious. Because tf-idf penalises words which appear with low but constant frequency across a number of documents, keywords we intuitively would wish to ignore such as `United Kingdom' are not scored as highly as they would be with tf-pdf. This is in line with the findings of \citeauthor{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}; tf-pdf does do a better job at detecting low-frequency keywords which are consistent across many documents. However, this behaviour is exactly the opposite of what we desire from our metro lines; those low-frequency keywords are most likely already known or could be easily inferred by a user reading the map. Therefore, it is my recommendation that tf-idf be given preference in any implementations of this or similar systems, where the names of more specific low-level themes are being sought.
+While implementing the \textit{ignore} functionality the differing results of using tf-idf and tf-pdf on the same corpus became obvious. Because tf-idf penalises words which appear with low but constant frequency across a number of documents, keywords we intuitively would wish to ignore such as `United Kingdom' are not scored as highly as they would be with tf-pdf. This is in line with the findings of \citeauthor{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}; tf-pdf does do a better job at detecting low-frequency keywords which are consistent across many documents. However, this behaviour is exactly the opposite of what we desire from our metro lines; those low-frequency keywords are most likely already known or could be easily inferred by a user reading the map. Therefore, we recommend tf-idf be given preference in any implementations of metro map systems, where the names of more specific low-level themes are being sought.
 
 \clearpage
 
-\section{Graph Building}
+\section{Graph Building} 
 
 The key challenge in graph building is generalising the characteristics of a good overview, from both news consumer and metro map user perspectives. It is at this point that a significant difference between this system and the work of \cite{MetroMapsOfScience, GeneratingInformationMaps, InformationCartographyPre} becomes apparent. 
 
 \citeauthor{GeneratingInformationMaps} generated maps in response to a query (such as the name of an event or time) period, meaning the entire map would then be oriented around that query. In contrast, in our system the only query is an implied one; ``What's going on today?" which offers no starting point for choosing metro lines. Instead of a query-based search problem, we have a multi-document summarisation problem. While they were choosing a set of lines to fit a given query, we are concerned with choosing a set of lines which best cover an entire corpus.
 
-\subsection{Extending the Definition of Coverage to Paths}
+\subsection{Extending the Definition of Coverage to Paths}\label{sec:linecoverage}
 
 Our starting point is a corpus of articles and their associated keyword vectors, which form a metro map by \citeauthor{GeneratingInformationMaps}'s definition, but one with too many edges and paths (metro lines) to be readable in practice. Therefore, in order to intelligently prune the number of paths to some fixed upper bound, we need a metric for comparing the relative importance of paths within a corpus.
 
@@ -215,9 +200,9 @@ It is important to note that although with the final multiplication we show pref
 
 %This means tf-idf is preferable to tf-pdf, because while tf-idf is really good at identifying high-level topics which cover a lot of articles, it can cover those articles very poorly and generate a) too few lines, which; b) all run adjacent to each other anyway (see the next section).
 
-\subsection{Penalising Affinity}
+\subsection{Penalising Affinity} \label{sec:affinity}
 
-The principle of topic connectivity was the basis for choosing the metro map visualisation. Without it, we have simply generated a set of two-dimensional timelines with no contextual links. However, maps which are overly connected will quickly become unusable. In particular, maps where multiple lines runs adjacently through more than two nodes (see figure \ref{fig:lowaffinity}) a sign of poor line choice. This is not simply hyper-connectivity, but correlation between two or more lines, often resulting from keywords which are semantically close.
+The principle of topic connectivity was the basis for choosing the metro map visualisation. Without it, we have simply generated a set of two-dimensional timelines with no contextual links. However, maps which are overly connected will quickly become unusable. In particular, maps where multiple lines runs adjacently through more than two nodes (see figure \ref{fig:lowaffinity}) are a sign of poor line choice. This is not simply hyper-connectivity, but correlation between two or more lines, often resulting from keywords which are semantically close.
 
 \begin{figure}[htbp!]
 	\centering
@@ -261,7 +246,7 @@ The intermediate stage of the pipeline between graph building and map drawing is
 The main advantage to this process is that it results in a single file, meaning the resultant visualisations are as portable, shareable and platform independent as the news they were derived from. A secondary advantage is that the JSON accepted by D3 is standard and could easily be fed into a different JavaScript graphing library in the case of a more suitable alternative being written, with no change to the core Python software. The core software itself could also be hosted as a web app which serves the map HTML files, removing the need for client-side processing or installation.
 
 \clearpage
-\section{Map Drawing}
+\section{Map Drawing} \label{sec:drawing}
 
 The metro map layout problem, that is, determining whether an optimal planar embedding exists for a map and a set of hard constraints which include drawing straight octilinear lines, was proven to be NP-Hard by \cite{AutomatedDrawingOfMetroMaps}. The authors present a mixed-integer program (MIP) approach to metro map layouts, which both guarantees an octilinear layout and avoids falling into local maxima (unlike \citeauthor{AutomaticMetroMapLayoutThesis}'s), but not in polynomial time.
 
@@ -293,7 +278,7 @@ In \citeauthor{AutomaticMetroMapLayoutThesis}'s words: ``[The] visualisation pro
 
 We therefore devote a significant amount of thought to optimising the visual quality of the generated metro maps by revisiting \citeauthor{AutomaticMetroMapLayoutThesis}'s aesthetic criteria for layouts, discussed in Chapter \ref{c:litreview}. We justify which of these apply to our visualisations, and for those which are, we detail the methodology used to implement them.
 
-\subsection{\citeauthor{AutomaticMetroMapLayoutThesis}'s Criteria Metro Map layouts}
+\subsection{\citeauthor{AutomaticMetroMapLayoutThesis}'s Criteria Metro Map layouts} \label{sec:stottapplication}
 
 The set of rules and criteria defined by \cite{AutomaticMetroMapLayoutThesis} form a complex multicriteria optimisation function. Starting with an initial layout, nodes are embedded on a square grid of finite size, and iteratively moved to maximise the node movement criteria, as long as movement does not violate one of the node movement rules.
 
@@ -316,7 +301,7 @@ As previously discussed, there are six node movement criteria, which -- using th
 
 We therefore consider minimising edge crossings to be the highest weighted criterion, followed jointly by maximising line straightness and octilinearity.
 
-\subsection{Initial Force-Directed Positioning}
+\subsection{Initial Force-Directed Positioning} \label{sec:fdp}
 
 A major difference between the maps generated using this system and maps representing real transit networks is the lack of ``real'' starting positions we have for stations. While the freedom to move points around without having to preserve their relative positioning removes one layout constraint, finding a set of starting positions for the map layout which define a planar embedding with minimal line crossings is non-trivial. 
 

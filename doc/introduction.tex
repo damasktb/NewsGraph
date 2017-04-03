@@ -1,19 +1,40 @@
-\vspace{-1cm}
+\vspace{-0.5cm}
 \epigraph{``The Press, Watson, is a most valuable institution, if you only know how to use it."}{--- \textup{Sherlock Holmes}, The Adventure of the Six Napoleons\\[0.2cm] \textup{Sir Arthur Conan Doyle}}
 
-\section*{Aims}
-The aim of this project is the development of a tool which generates interactive metro maps of news from RSS feeds, with individual articles transformed into stations and common themes transformed into \textit{metro lines}. Our goal is to reduce the information overload experienced by news consumers by providing contextual links between articles and topics on the map.
+\section*{Why don't we Understand the News?}
 
-The resultant system is a news feed aggregator with graphically structured output, and to the best of our knowledge is first of its kind.
+The day the result of the 2016 United Kingdom EU Membership Referendum was announced, the \citeauthor{googletrends} reported a 250\% increase in searches for ``What happens if we leave the EU?'' Much like the case of David Leonhardt's 2008 article in the New York Times in which began, ``Raise your hand if you don't quite understand this whole financial crisis,'' national news commentary had focused on little else in the preceding months.
+
+Some months after Leonhardt's article was published, Journalism Professor Jay Rosen voiced his agreement with its premise in a blog post on the failure of journalism during the financial crisis; ``there are certain very important stories -- and the mortgage crisis is a good example -- where until I grasp the whole I am unable to make sense of any part.''\citep{NationalExplainer}
+
+Studies have found that the general public use news media to make important life decisions, for entertainment and discussion, as a requirement of their jobs, and out of perceived civic obligation \citep{InformationCartography,UnderstandingTheParticipatoryNewsConsumer}. As a result of the ongoing shift towards online multimedia journalism, there has been an explosion of globally accessible knowledge which is expanding at an unprecedented rate as the internet grows. 
+
+Although ubiquitous news media has resulted in more immediate and diverse coverage of current events, the volume of content available online has made the process of understanding it both daunting and off-putting to young adults \citep{anewmodelfornews}. Additionally, while news aggregators and RSS readers make it faster for users to access the news they care about, they do not aid comprehension. In spite of these facts, little attention has been given to addressing the problem that understanding news articles individually is inherently reliant on understanding news articles as a collection. 
+
+Existing information infrastructure has been criticised both for not supporting the cross-correlation between collections of related news articles \citep{GalaxyOfNews}, and for attempting fit complex narratives into reductive and misleading visualisations \citep{InformationCartography}. Research into how humans' spatio-cognitive abilities can be applied to more abstract visual metaphors \citep{FromMetaphorToMethod} suggests the strength of visual metaphors lies in their familiarity. We therefore build on the work of \cite{GeneratingInformationMaps} to integrate the Metro Map metaphor into the news aggregation process.
+
+\section*{Key Aims and Contributions}
+The primary aim of this project is the development of a tool which generates interactive metro maps of news from RSS feeds, with individual articles transformed into stations and common themes transformed into \textit{metro lines}. Our goal is to reduce the information overload experienced by news consumers by providing contextual links between articles and topics on the map.
+
+The resultant system is a news feed aggregator with graphically structured output, and to the best of our knowledge is first of its kind. Contributions of this dissertation include:\vspace{-0.3cm}
+\begin{itemize}[itemsep=0.1em]
+	\item Implementation of efficient keyword extraction using tf-idf \citep{tfidf} on a reduced keyword space of named entities (Section \ref{sec:keys}).
+	\item A novel and lightweight method for performing entity disambiguation on current events articles using Google's Knowledge Graph API (Section \ref{sec:gkg}).
+	\item Formalisation of the metrics \textit{Line Coverage} and \textit{Affinity} as criteria for evaluating and ranking candidate metro lines (Sections \ref{sec:linecoverage} and \ref{sec:affinity}).
+	\item Recommendations for how D3.js parameters can be manually tuned to generate initial force-directed station positions for planar embeddings of metro maps (Section \ref{sec:fdp}).
+	\item The first application of \citeauthor{AutomaticMetroMapLayoutThesis}'s [\citeyear{AutomaticMetroMapLayoutThesis, AutomaticMetroMapLayout}] aesthetic criteria for metro maps to maps drawn from news corpora (Section \ref{sec:stottapplication}).
+	\item An empirical evaluation which provides statistical evidence to support the hypothesis that users recall more topics after using our metro maps than after reading news structured as a chronological list (Chapter \ref{c:conclusions}). 
+\end{itemize}
+ 
 
 \section*{Outline}
-The structure of this dissertation is as follows:
-\begin{description}[leftmargin=5.6em,style=nextline]
+The structure of this dissertation is as follows: \vspace{-0.1cm}
+\begin{description}[leftmargin=5.58em,style=nextline]
 	\item [Chapter \ref{c:litreview}] provides an overview of the background literature upon which this project relies, including an introduction to information overload and sensemaking, and a justification of appropriate visualisations for news corpora.
 	\item [Chapter \ref{c:reqs}] describes the scoping of the system, the informal requirements gathering process undertaken, and the rationale behind the significant design decisions made.
 	\item [Chapter \ref{c:implementation}] describes the algorithms and techniques chosen to transform the data from feed to visualisation and discusses how they were implemented in the system along with the trade-offs which were encountered.
 	\item [Chapter \ref{c:results}] provides a set of example results generated by the system from different RSS feeds and analyses them from the perspectives of content, layout, and context.
-	\item [Chapter \ref{c:evaluation}] describes the process by which we evaluated the system in a user study and discusses the results of our experiments.
+	\item [Chapter \ref{c:evaluation}] describes the process by which we evaluated the system in a two-part user study and discusses the results and implications of our experiments.
 	\item [Chapter \ref{c:conclusions}] summarises both the contributions and limitations of this work, and provides a discussion on future research directions.
 \end{description}
 

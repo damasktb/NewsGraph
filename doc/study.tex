@@ -58,26 +58,109 @@ Before the study, all participants were asked to read and sign the following con
 
 \item I understand that data will be stored securely and anonymously, where only myself and my supervisor have access to it.
 
-\item I understand that I may contact the researcher or supervisor if I have any further questions or if I wish to make a complaint relating to my involvement in the research.\\[1cm]
+\item I understand that I may contact the researcher or supervisor if I have any further questions or if I wish to make a complaint relating to my involvement in the research.\\[0.5cm]
 \end{enumerate}
 
 Participant Name: \dotfill \\[1cm]
 Signed: \dotfill \hspace{0.5cm} Date: \dotfill 
 
 \vfill
-\section{User Study Metro Maps}
+\section{User Study Metro Maps} \label{sec:evalmaps}
 Both evaluation corpora were extracted from The Guardian's US News RSS Feed in March 2017. The station labelled $(a)$ in each map is the article expanded in the right hand pane.
 
+\begin{landscape}
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[angle=90, width=.8\textwidth]{img/evaluation/map1.pdf}
+	\includegraphics[width=1.3\textwidth]{img/evaluation/map1.pdf}
 	\caption{User Study Data: Map A}
 	\label{fig:map1}
 \end{figure}
-
+\end{landscape}
+\begin{landscape}
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[angle=90, width=.8\textwidth]{img/evaluation/map2.pdf}
+	\includegraphics[width=1.3\textwidth]{img/evaluation/map2.pdf}
 	\caption{User Study Data: Map B}
 	\label{fig:map2}
 \end{figure}  
+\end{landscape}
+\clearpage
+
+\begin{landscape}
+\section{Evaluation Results} \label{sec:evalresults}
+
+\begin{table}[hbtp!]
+\centering
+\caption{Results of paired $t$-test comparing means of \textit{Map Estimate} and \textit{List Estimate}}\vspace{0.3cm}
+\label{res:estimate}
+\begin{tabular}{|m{3cm}|l|l|l|l|l|l|l|l|}
+\hline
+& Mean & Std. Deviation & Std. Error Mean & 95\% CI (Lower) & 95\% CI (Upper) & t & df & $p$ (2-tailed) \\ \hline\hline
+Map Estimate - \newline List Estimate & -1.125 & 8.936          & 2.234           & -5.887                         & 3.637                         & -0.504 & 15 & 0.622           \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[hbtp!]
+\centering
+\caption{Results of paired $t$-test comparing means of \textit{Map Total/Primary Topics, Depth} and \textit{List Total/Primary Topics, Depth}}\vspace{0.3cm}
+\label{res:index}
+\begin{tabular}{|m{3cm}|l|l|l|l|l|l|l|l|}
+\hline
+& Mean & Std. Deviation & Std. Error Mean & 95\% CI (Lower) & 95\% CI (Upper) & t & df & $p$ (2-tailed) \\ \hline\hline
+Map Total - List Total & 2.063  & 3.660 & 0.915 & 0.112  & 4.013 & 2.254  & 15 & 0.040 \\ \hline
+Map Primary - List Primary & 0.938  & 1.879 & 0.470 & -0.064 & 1.939 & 1.996  & 15 & 0.064 \\ \hline
+Map Depth - List Depth & -0.063 & 0.680 & 0.170 & -0.425 & 0.300 & -0.368 & 15 & 0.718 \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[hbtp!]
+\centering
+\caption{Results of paired $t$-test comparing means of \textit{Map Self Assessment Manikin} and \textit{List Self Assessment Manikin}}\vspace{0.3cm}
+\label{res:sam}
+\begin{tabular}{|m{3cm}|l|l|l|l|l|l|l|l|}
+\hline
+& Mean & Std. Deviation & Std. Error Mean & 95\% CI (Lower) & 95\% CI (Upper) & t & df & $p$ (2-tailed) \\ \hline\hline
+Map Pleasure - ~ List Pleasure & 0.500  & 2.191 & 0.548 & -0.667 & 1.667 & 0.913  & 15 & 0.376 \\ \hline
+Map Arousal - ~ List Arousal & -0.125 & 1.784 & 0.446 & -1.076 & 0.826 & -0.280 & 15 & 0.783 \\\hline
+Map Dominance - ~ List Dominance & 0.250  & 2.620 & 0.655 & -1.146 & 1.646 & 0.382  & 15 & 0.708 \\ \hline
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{table}[hbtp!]
+\centering
+\caption{Pearson's correlation coefficients between \textit{Weekly News Consumption (Hours)} and \textit{Total/Primary Topics, Depth}}
+\label{res:hourscorrelation}\vspace{0.3cm}
+\begin{tabular}{|l|l|lllllll|}
+\hline
+                    &                     & Avg. Hours & Map Total & Map Primary & Map Depth & List Total & List Primary & List Depth \\ \hline
+Avg. Hours & Pearson Correlation & 1                   & .541*     & -0.091      & .606*     & .573*      & 0.293        & 0.397      \\
+                    & Sig. (2-tailed)     &                     & 0.031     & 0.737       & 0.013     & 0.020      & 0.271        & 0.127      \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+Map Total           & Pearson Correlation & .541*               & 1         & 0.419       & .691**    & .556*      & 0.233        & 0.159      \\
+                    & Sig. (2-tailed)     & 0.031               &           & 0.106       & 0.003     & 0.025      & 0.386        & 0.556      \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+Map Primary         & Pearson Correlation & -0.091              & 0.419     & 1           & -0.054    & -0.186     & 0.083        & -0.272     \\
+                    & Sig. (2-tailed)     & 0.737               & 0.106     &             & 0.842     & 0.491      & 0.759        & 0.307      \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+Map Depth           & Pearson Correlation & .606*               & .691**    & -0.054      & 1         & .616*      & 0.103        & 0.336      \\
+                    & Sig. (2-tailed)     & 0.013               & 0.003     & 0.842       &           & 0.011      & 0.705        & 0.204      \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+List Total          & Pearson Correlation & .573*               & .556*     & -0.186      & .616*     & 1          & 0.069        & .546*      \\
+                    & Sig. (2-tailed)     & 0.020               & 0.025     & 0.491       & 0.011     &            & 0.800        & 0.029      \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+List Primary        & Pearson Correlation & 0.293               & 0.233     & 0.083       & 0.103     & 0.069      & 1            & -0.320     \\
+                    & Sig. (2-tailed)     & 0.271               & 0.386     & 0.759       & 0.705     & 0.800      &              & 0.227      \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+List Depth          & Pearson Correlation & 0.397               & 0.159     & -0.272      & 0.336     & .546*      & -0.320       & 1          \\
+                    & Sig. (2-tailed)     & 0.127               & 0.556     & 0.307       & 0.204     & 0.029      & 0.227        &            \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16 \\\hline 
+\end{tabular}
+\end{table}
+*. Correlation is significant at the 0.05 level (2-tailed). \\	
+**. Correlation is significant at the 0.01 level (2-tailed).	
+
+\end{landscape}

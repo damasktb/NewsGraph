@@ -1,0 +1,14 @@
+\def \figurename {Algorithm}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {algocf}{\numberline {1}{\ignorespaces Finding unambiguous alias-entity pairs}}{29}{algocf.1}
+\contentsline {algocf}{\numberline {2}{\ignorespaces Entity disambiguation with Knowledge Graph}}{31}{algocf.2}
+\contentsline {algocf}{\numberline {3}{\ignorespaces Calculating map octilinearity}}{41}{algocf.3}
+\contentsline {algocf}{\numberline {4}{\ignorespaces Calculating map line straightness}}{42}{algocf.4}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
