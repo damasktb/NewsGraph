@@ -86,14 +86,64 @@ Both evaluation corpora were extracted from The Guardian's US News RSS Feed in M
 \end{landscape}
 \clearpage
 
-\begin{landscape}
+
 \section{Evaluation Results} \label{sec:evalresults}
 
 \begin{table}[hbtp!]
 \centering
-\caption{Results of paired $t$-test comparing means of \textit{Map Estimate} and \textit{List Estimate}}\vspace{0.3cm}
+\caption{Means of \textit{Map Estimate} and \textit{List Estimate}} \vspace{0.3cm}
+\label{res:estimatepre}
+\begin{tabular}{|l|l|llll|}
+\hline
+\multicolumn{2}{|c|}{}  & Mean  & N  & Std. Deviation & Std. Error Mean \\ \hline\hline
+\multirow{2}{*}{Pair 1} & Map Estimate  & 24.75 & 16 & 7.188          & 1.797           \\ \cline{2-6}
+                        & List Estimate & 25.88 & 16 & 6.820          & 1.705
+                        \\ \hline          
+\end{tabular}
+\end{table}
+
+\begin{table}[hbtp!]
+\centering
+\caption{Means of \textit{Map Total Topics, Primary Topics, Depth} and \textit{List Total Topics, Primary Topics, Depth}} \vspace{0.3cm}
+\label{res:indexpre}
+\begin{tabular}{|l|l|llll|}
+\hline
+\multicolumn{2}{|c|}{}  & Mean  & N  & Std. Deviation & Std. Error Mean \\ \hline\hline
+\multirow{2}{*}{Pair 1} & Map Total  & 10.94 & 16 & 4.389 & 1.097 \\ \cline{2-6}
+                        & List Total & 8.88  & 16 & 2.156 & .539  \\ \hline
+\multirow{2}{*}{Pair 2} & Map Primary  & 4.19  & 16 & 1.601 & .400  \\ \cline{2-6}
+                        & List Primary & 3.25  & 16 & 1.125 & .281  \\ \hline
+\multirow{2}{*}{Pair 3} & Map Depth  & 2.25  & 16 & .577  & .144  \\ \cline{2-6}
+                        & List Depth & 2.31  & 16 & .602  & .151  \\
+\hline          
+\end{tabular}
+\end{table}
+
+\begin{table}[hbtp!]
+\centering
+\caption{Means of \textit{Map Self Assessment Manikin} and \textit{List Self Assessment Manikin}} \vspace{0.3cm}
+\label{res:sampre}
+\begin{tabular}{|l|l|llll|}
+\hline
+\multicolumn{2}{|c|}{}  & Mean  & N  & Std. Deviation & Std. Error Mean \\ \hline\hline
+\multirow{2}{*}{Pair 1} & Map Pleasure  & 5.50 & 16 & 1.751 & .438 \\ \cline{2-6}
+                        & List Pleasure & 5.00 & 16 & 1.317 & .329 \\ \hline
+\multirow{2}{*}{Pair 2} & Map Arousal  & 4.19 & 16 & 2.287 & .572 \\ \cline{2-6}
+                        & List Arousal & 4.31 & 16 & 1.852 & .463 \\ \hline
+\multirow{2}{*}{Pair 3} & Map Dominance  & 5.88 & 16 & 1.821 & .455 \\ \cline{2-6}
+                        & List Dominance & 5.63 & 16 & 2.217 & .554  \\
+\hline          
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{landscape}
+\begin{table}[hbtp!]
+\centering
+\caption{Results of paired $t$-test comparing means of Table \ref{res:estimatepre}}\vspace{0.3cm}
 \label{res:estimate}
-\begin{tabular}{|m{3cm}|l|l|l|l|l|l|l|l|}
+\begin{tabular}{|m{3cm}|llllllll|}
 \hline
 & Mean & Std. Deviation & Std. Error Mean & 95\% CI (Lower) & 95\% CI (Upper) & t & df & $p$ (2-tailed) \\ \hline\hline
 Map Estimate - \newline List Estimate & -1.125 & 8.936          & 2.234           & -5.887                         & 3.637                         & -0.504 & 15 & 0.622           \\ \hline
@@ -103,9 +153,9 @@ Map Estimate - \newline List Estimate & -1.125 & 8.936          & 2.234         
 
 \begin{table}[hbtp!]
 \centering
-\caption{Results of paired $t$-test comparing means of \textit{Map Total/Primary Topics, Depth} and \textit{List Total/Primary Topics, Depth}}\vspace{0.3cm}
+\caption{Results of paired $t$-test comparing means of Table \ref{res:indexpre}}\vspace{0.3cm}
 \label{res:index}
-\begin{tabular}{|m{3cm}|l|l|l|l|l|l|l|l|}
+\begin{tabular}{|m{3cm}|llllllll|}
 \hline
 & Mean & Std. Deviation & Std. Error Mean & 95\% CI (Lower) & 95\% CI (Upper) & t & df & $p$ (2-tailed) \\ \hline\hline
 Map Total - List Total & 2.063  & 3.660 & 0.915 & 0.112  & 4.013 & 2.254  & 15 & 0.040 \\ \hline
@@ -117,9 +167,9 @@ Map Depth - List Depth & -0.063 & 0.680 & 0.170 & -0.425 & 0.300 & -0.368 & 15 &
 
 \begin{table}[hbtp!]
 \centering
-\caption{Results of paired $t$-test comparing means of \textit{Map Self Assessment Manikin} and \textit{List Self Assessment Manikin}}\vspace{0.3cm}
+\caption{Results of paired $t$-test comparing means of Table \ref{res:sampre}}\vspace{0.3cm}
 \label{res:sam}
-\begin{tabular}{|m{3cm}|l|l|l|l|l|l|l|l|}
+\begin{tabular}{|m{3cm}|llllllll|}
 \hline
 & Mean & Std. Deviation & Std. Error Mean & 95\% CI (Lower) & 95\% CI (Upper) & t & df & $p$ (2-tailed) \\ \hline\hline
 Map Pleasure - ~ List Pleasure & 0.500  & 2.191 & 0.548 & -0.667 & 1.667 & 0.913  & 15 & 0.376 \\ \hline
@@ -161,6 +211,185 @@ List Depth          & Pearson Correlation & 0.397               & 0.159     & -0
 \end{tabular}
 \end{table}
 *. Correlation is significant at the 0.05 level (2-tailed). \\	
-**. Correlation is significant at the 0.01 level (2-tailed).	
+**. Correlation is significant at the 0.01 level (2-tailed).
+\clearpage
+
+\begin{table}[hbtp!]
+\centering
+\caption{Pearson's correlation coefficients between \textit{Weekly News Consumption (Hours)} and Self-Assessment Manikin Scores}
+\label{res:samcorrelation}\vspace{0.3cm}
+\begin{tabular}{|l|l|l m{1.5cm} m{1.5cm} m{2cm} m{1.5cm} m{1.5cm} m{2cm}|}
+\hline
+                    &                     & Avg. Hours & Map Pleasure & Map Arousal & Map ~ ~  Dominance & List Pleasure & List Arousal & List ~ ~ Dominance \\ \hline
+Avg. Hours 			& Pearson Correlation & 1      & 0.329  & 0.060  & 0.364  & 0.367  & -0.031 & .508*  \\
+                    & Sig. (2-tailed)     &        & 0.214  & 0.826  & 0.166  & 0.162  & 0.909  & 0.044  \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+Map Pleasure           & Pearson Correlation & 0.329  & 1      & 0.108  & .773** & 0.000  & 0.113  & 0.172  \\
+                    & Sig. (2-tailed)     & 0.214  &        & 0.690  & 0.000  & 1.000  & 0.677  & 0.525  \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+Map Arousal         & Pearson Correlation & 0.060  & 0.108  & 1      & 0.182  & -0.089 & .646** & 0.159  \\
+                    & Sig. (2-tailed)     & 0.826  & 0.690  &        & 0.500  & 0.744  & 0.007  & 0.555  \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+Map Dominance           & Pearson Correlation & 0.364  & .773** & 0.182  & 1      & -0.306 & 0.269  & 0.169  \\
+                    & Sig. (2-tailed)     & 0.166  & 0.000  & 0.500  &        & 0.249  & 0.313  & 0.531  \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+List Pleasure          & Pearson Correlation & 0.367  & 0.000  & -0.089 & -0.306 & 1      & -0.328 & .685** \\
+                    & Sig. (2-tailed)     & 0.162  & 1.000  & 0.744  & 0.249  &        & 0.215  & 0.003  \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+List Arousal        & Pearson Correlation & -0.031 & 0.113  & .646** & 0.269  & -0.328 & 1      & -0.164 \\
+                    & Sig. (2-tailed)     & 0.909  & 0.677  & 0.007  & 0.313  & 0.215  &        & 0.543  \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16         \\
+List Dominance          & Pearson Correlation & .508*  & 0.172  & 0.159  & 0.169  & .685** & -0.164 & 1      \\
+                    & Sig. (2-tailed)     & 0.044  & 0.525  & 0.555  & 0.531  & 0.003  & 0.543  &        \\
+                    & N                   & 16                  & 16        & 16          & 16        & 16         & 16           & 16 \\\hline 
+\end{tabular}
+\end{table}
+*. Correlation is significant at the 0.05 level (2-tailed). \\	
+**. Correlation is significant at the 0.01 level (2-tailed).
+\clearpage
+
+\begin{table}[hbtp!]
+\centering
+\caption{Pearson's correlation coefficients between \textit{Exuberance, Relaxation} and \textit{Total Topics}}
+\label{res:samcomposites}\vspace{0.3cm}
+\begin{tabular}{|l|l|m{1.8cm}p{2.5cm}p{2cm}m{1.8cm}p{2.5cm}p{2cm}|}
+\hline
+  &                     & Map Total  & Map \newline Exuberance & Map  ~  ~  ~  ~  Relaxation & List Total & List \newline Exuberance & List   ~  ~  ~  ~  Relaxation \\ \hline
+Map Total                                            & Pearson Correlation & 1                & .753**         & .279           & .556*             & .469            & -.036           \\
+                                                            & Sig. (2-tailed)     &                  & .001           & .295           & .025              & .067            & .896            \\
+                                                            & N                   & 16               & 16             & 16             & 16                & 16              & 16              \\
+Map Exuberance                                              & Pearson Correlation & .753**           & 1              & .372           & .399              & .356            & -.159           \\
+                                                            & Sig. (2-tailed)     & .001             &                & .156           & .126              & .176            & .556            \\
+                                                            & N                   & 16               & 16             & 16             & 16                & 16              & 16              \\
+Map Relaxation                                              & Pearson Correlation & .279             & .372           & 1              & .619*             & -.111           & .099            \\
+                                                            & Sig. (2-tailed)     & .295             & .156           &                & .011              & .684            & .715            \\
+                                                            & N                   & 16               & 16             & 16             & 16                & 16              & 16              \\
+List Total                                           & Pearson Correlation & .556*            & .399           & .619*          & 1                 & .258            & .274            \\
+                                                            & Sig. (2-tailed)     & .025             & .126           & .011           &                   & .334            & .304            \\
+                                                            & N                   & 16               & 16             & 16             & 16                & 16              & 16              \\
+List Exuberance                                             & Pearson Correlation & .469             & .356           & -.111          & .258              & 1               & .525*           \\
+                                                            & Sig. (2-tailed)     & .067             & .176           & .684           & .334              &                 & .037            \\
+                                                            & N                   & 16               & 16             & 16             & 16                & 16              & 16              \\
+List Relaxation                                             & Pearson Correlation & -.036            & -.159          & .099           & .274              & .525*           & 1               \\
+                                                            & Sig. (2-tailed)     & .896             & .556           & .715           & .304              & .037            &                 \\
+                                                            & N                   & 16               & 16             & 16             & 16                & 16              & 16              \\ \hline            
+\end{tabular}\end{table}
+*. Correlation is significant at the 0.05 level (2-tailed). \\	
+**. Correlation is significant at the 0.01 level (2-tailed).
+\clearpage
 
 \end{landscape}
+
+
+\begin{table}[htbp!]
+\centering
+\caption{Results of the Shapiro-Wilk test for Normality}\vspace{0.3cm}
+\label{res:sw}
+\begin{tabular}{|llll|}
+\hline
+Variable                             & W    & df & Sig. \\ \hline\hline
+Map Estimate                         & .881 & 16 & .080 \\
+List Estimate                        & .954 & 16 & .559 \\
+Map Total Topics                     & .958 & 16 & .633 \\
+Map Primary Topics                   & .932 & 16 & .260 \\
+Map Index Depth                      & .746 & 16 & .001 \\
+List Total Topics                    & .917 & 16 & .152 \\
+List Primary Topics                  & .828 & 16 & .007 \\
+List Index Depth                     & .587 & 16 & .000 \\
+Map Pleasure (SAM)                   & .883 & 16 & .043 \\
+Map Arousal (SAM)                    & .925 & 16 & .201 \\
+List Pleasure (SAM)                  & .913 & 16 & .131 \\
+List Arousal (SAM)                   & .973 & 16 & .878 \\
+List Dominance (SAM)                 & .916 & 16 & .146 \\
+\hline
+\end{tabular}
+\end{table}
+\vspace{1cm}
+
+\section{Raw Participant Data} \label{sec:evalraw}
+
+\begin{table}[hbtp!]
+\centering
+\caption{Participant Background and News Habits} \vspace{0.3cm}
+\label{tab:participants}
+\begin{tabular}{|llllll|}
+\hline
+Subject & Group & Gender & Education Level & Weekly News (hours) & RSS Reader \\ \hline\hline
+1       & 1     & Female & Undergraduate   & 10                  & Currently  \\ 
+2       & 2     & Male   & Undergraduate   & 7                   & Previously \\  
+3       & 3     & Male   & Undergraduate   & 3                   & Never      \\  
+4       & 4     & Male   & Undergraduate   & 15                  & Previously \\  
+5       & 1     & Male   & Undergraduate   & 4                   & Previously \\  
+6       & 2     & Female & Undergraduate   & 1                   & Never      \\  
+7       & 3     & Female & Undergraduate   & 5                   & Previously \\  
+8       & 4     & Male   & Undergraduate   & 2                   & Previously \\  
+9       & 1     & Male   & Undergraduate   & 8                   & Never      \\  
+10      & 2     & Male   & Undergraduate   & 40                  & Previously \\ 
+11      & 3     & Male   & Undergraduate   & 15                  & Previously \\ 
+12      & 4     & Female & Undergraduate   & 1                   & Never      \\ 
+13      & 1     & Male   & Undergraduate   & 14                  & Never      \\
+14      & 2     & Male   & Undergraduate   & 10                  & Never      \\ 
+15      & 3     & Male   & Undergraduate   & 10                  & Never      \\
+16      & 4     & Male   & Undergraduate   & 0                   & Never\\ \hline     
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{table}[hbtp!]
+\centering
+\caption{Task Performance Data: \textit{Map}} \vspace{0.3cm}
+\label{tab:map}
+\begin{tabular}{|llllllll|}
+\hline
+\multirow{2}{*}{Subject} & \multirow{2}{*}{Estimate} & \multicolumn{3}{|c|}{Index Task} & \multicolumn{3}{c|}{Self-Assessment Manikin} \\ \cline{3-8}
+                         &                           & \multicolumn{1}{|l}{Primary}  & \multicolumn{1}{l}{Total} & \multicolumn{1}{l|}{Depth}   & Pleasure      & Arousal     & Dominance     \\ \hline\hline
+1                        & 20                        & 2        & 11        & 3       & 7             & 2           & 6             \\
+2                        & 40                        & 3        & 9         & 2       & 6             & 5           & 5             \\
+3                        & 25                        & 4        & 10        & 2       & 7             & 7           & 6             \\
+4                        & 17                        & 5        & 12        & 2       & 6             & 7           & 8             \\
+5                        & 18                        & 5        & 8         & 2       & 3             & 3           & 6             \\
+6                        & 23                        & 3        & 9         & 2       & 2             & 5           & 3             \\
+7                        & 28                        & 4        & 8         & 2       & 6             & 4           & 6             \\
+8                        & 30                        & 4        & 4         & 1       & 3             & 3           & 4             \\
+9                        & 40                        & 8        & 19        & 2       & 7             & 8           & 8             \\
+10                       & 25                        & 3        & 14        & 3       & 6             & 3           & 6             \\
+11                       & 20                        & 5        & 17        & 3       & 8             & 6           & 9             \\
+12                       & 15                        & 2        & 7         & 2       & 6             & 1           & 5             \\
+13                       & 25                        & 4        & 16        & 3       & 4             & 7           & 4             \\
+14                       & 20                        & 3        & 10        & 2       & 6             & 1           & 7             \\
+15                       & 25                        & 6        & 16        & 3       & 7             & 2           & 8             \\
+16                       & 25                        & 5        & 5         & 2       & 4             & 3           & 3             \\ \hline\hline
+Average                  & 24.75000                  & 4.12500  & 10.93750  & 2.25000 & 5.50000       & 4.18750     & 5.87500 \\ \hline     
+\end{tabular}
+\end{table}
+
+
+\begin{table}[hbtp!]
+\centering
+\caption{Task Performance Data: \textit{List}} \vspace{0.3cm}
+\label{tab:list}
+\begin{tabular}{|llllllll|}
+\hline
+\multirow{2}{*}{Subject} & \multirow{2}{*}{Estimate} & \multicolumn{3}{|c|}{Index Task} & \multicolumn{3}{c|}{Self-Assessment Manikin} \\ \cline{3-8}
+                         &                           & \multicolumn{1}{|l}{Primary}  & \multicolumn{1}{l}{Total} & \multicolumn{1}{l|}{Depth}   & Pleasure      & Arousal     & Dominance     \\ \hline\hline
+1       & 25       & 2       & 11      & 3       & 4       & 2       & 4       \\
+2       & 25       & 2       & 6       & 2       & 5       & 5       & 4       \\
+3       & 16       & 4       & 9       & 2       & 6       & 3       & 8       \\
+4       & 20       & 4       & 10      & 2       & 4       & 5       & 7       \\
+5       & 20       & 4       & 6       & 2       & 3       & 4       & 3       \\
+6       & 30       & 5       & 8       & 2       & 5       & 6       & 5       \\
+7       & 23       & 2       & 10      & 2       & 5       & 6       & 4       \\
+8       & 30       & 2       & 6       & 2       & 4       & 3       & 5       \\
+9       & 30       & 4       & 9       & 2       & 3       & 7       & 2       \\
+10      & 30       & 5       & 12      & 3       & 7       & 3       & 8       \\
+11      & 30       & 4       & 9       & 2       & 5       & 8       & 8       \\
+12      & 20       & 4       & 10      & 2       & 5       & 4       & 3       \\
+13      & 40       & 3       & 9       & 2       & 7       & 5       & 9       \\
+14      & 35       & 2       & 10      & 4       & 7       & 1       & 8       \\
+15      & 25       & 2       & 12      & 3       & 4       & 4       & 7       \\
+16      & 15       & 3       & 5       & 2       & 6       & 3       & 5       \\ \hline\hline    
+Average & 25.87500 & 3.25000 & 8.87500 & 2.31250 & 5.00000 & 4.31250 & 5.62500 \\ \hline     
+\end{tabular}
+\end{table}
+

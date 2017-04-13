@@ -29,17 +29,22 @@
 \newpage
 \listoftables
 \addcontentsline{toc}{chapter}{List of Tables}
+\newpage
 \listofalgorithms
-\addtocontents{loa}{\def\string\figurename{Algorithm}}
+\addcontentsline{toc}{chapter}{List of Algorithms}
+\newpage
+\lstlistoflistings
+\addcontentsline{toc}{chapter}{\lstlistlistingname}
+\newpage
 \chapter*{Acknowledgements}
-%\input{acknowledgements.tex}
+\input{acknowledgements.tex}
 \addcontentsline{toc}{chapter}{Acknowledgements}
 \newpage
 
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
-\chapter*{Introduction}
+\chapter*{Introduction}\markboth{INTRODUCTION}{INTRODUCTION}
 \addcontentsline{toc}{chapter}{Introduction}
 \input{introduction.tex}
 

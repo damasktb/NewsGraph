@@ -5,7 +5,8 @@ It has become apparent that prolific coverage alone is not enough to engage and 
 The term \textit{ambient news} was coined by \citet{newnewsoldnews} to describe the ubiquity of news in the current information landscape. Others journalists have commented on the issue in a more critical light, describing the proliferation of competing news media as ``as pervasive--and in some ways as invasive--as advertising.'' \citep[p.2]{overloadjournalismsbattle}
 
 In \citeyear{anewmodelfornews}, The Associated Press conducted an extensive field study  into the news consumption habits of young adults. Among their key findings were three points which acutely summarise the news overload problem;
-\begin{itemize}
+
+\begin{itemize}[itemsep=0.9em]
 	\item \textbf{``Consumers are experiencing news fatigue.''} \par
 	The study found participants were debilitated and overwhelmed, and that their levels of dissatisfaction lead to a decrease in the effort they put into news acquisition. This is consistent with multiple other studies \citep{newsandtheoverloadedcustomer, UnderstandingTheParticipatoryNewsConsumer, InformationAccessinComplexPoorlyStructuredInformationSpaces} which found participants across every demographic were overwhelmed by the amount of news content available to them and agreed that it prevented them exploring news on less familiar topics.\\ 
 	
@@ -18,7 +19,7 @@ In \citeyear{anewmodelfornews}, The Associated Press conducted an extensive fiel
 
 Initially, the third point seems to be a direct contradiction to the first; we are overwhelmed by the volume of news we are exposed to, but we also crave more detail from the news we do consume. However, it brings to light the issue of information \textit{quality} as a requirement of news consumers.
 
- Journalism, and therefore its quality, can be viewed along a spectrum between two models; a model for the communication of facts, and a model for entertainment and storytelling. From the three points above, it is apparent that quality at both ends of the spectrum is being sought, since the desire for quality below-the-fold content is covered by the first model, and the desire for quality story resolution by the second.
+ Journalism, and therefore journalistic quality, can be viewed along a spectrum between two models; a model for the communication of facts, and a model for entertainment and storytelling. From the three points above, it is apparent that quality at both ends of the spectrum is being sought, since the desire for quality below-the-fold content is covered by the first model, and the desire for quality story resolution by the second.
 
 \subsection{Information Overload \label{sec:information-overload}}
 
@@ -33,14 +34,14 @@ News fatigue is a domain-specific type of information overload, a phenomenon for
 
 These factors correspond directly to the three points previously identified from the \citeauthor{anewmodelfornews} study. High information quantity leads to news fatigue, information format determines the level of possible story resolution, and information quality determines how much depth a reader can gain from the news they consume. The authors did not find a single solution which could address all three factors, but they did identify information quantity as the most significant contributor to overload.
 
-\citet{GuestEditorsIntroductionInformationOverload} further decompose information quantity into spatial and temporal dimensions in the specific context of news articles. Spatial quantity refers to articles which are near-identical in terms of facts presented being published by different media outlets, and temporal quantity refers to articles on a single topic being published in quick succession over a short period of time. 
+\citet{GuestEditorsIntroductionInformationOverload} further decompose information quantity into spatial and temporal dimensions in the context of news articles specifically. Spatial quantity refers to articles which are near-identical in terms of facts presented being published by different media outlets, and temporal quantity refers to articles on a single topic being published in quick succession over a short period of time. 
 
 Intuitively, the terms spatial and temporal quality seem illogically named, as a set of articles with high spatial quantity would cover a smaller area of information space and vice versa. High spatial quantity will therefore be referred to as \textit{redundancy}, and high temporal quantity as \textit{fragmentation}, since a sudden burst of articles published on the same topic suggests a currently unfolding story being told in parts.
 
 To adequately determine the contributory factors relating to news fatigue, all four dimensions of information overload should be considered, and will therefore be explored in more detail in the following sections.
 
 \subsubsection{Information Quality}
-In the context of factual data rather than news specifically, \citet{DataQualityInContext} defined information quality in terms of four components; intrinsic quality, accessibility quality, contextual quality and representational quality. If news can be rationalised to its core function as an interpretation of facts and other raw data such as images, then this same framework can be experimentally applied to news journalism in order to determine which factors could influence its quality.
+In the context of factual data rather than news specifically, \citet{DataQualityInContext} defined information quality in terms of four components; intrinsic quality, accessibility quality, contextual quality and representational quality. If the news can be reduced to its core function as an interpretation of facts and other raw data such as images, then this same framework can be experimentally applied to news journalism in order to determine which factors could influence its quality.
 
 Intrinsic quality is a measure of the accuracy, objectivity, believability and reputation of data. In the context of news, the first three factors would typically be true for all major news sources, and the reputation would be dependent on whether the article originated from a trusted source or not. Accessibility quality is less relevant to online news media, as it is concerned with data access and security. Contextual quality is the most relevant category in respect to news, concerning timeliness, amount of data, and value-added. In the news domain, this would mean an article's quality is dependent on its performance against a background of other articles; whether or not it contributes anything recent or previously unknown. Finally, representational quality is concerned with ease of understanding and interpretability, which are easily translatable concepts.
 
@@ -55,7 +56,7 @@ It logically follows from the fragmented nature of real-time news journalism tha
 \citet{BreakingNewsDetectionAndTrackingInTwitter} developed a methodology to collect and group Tweets on breaking news topics, using hashtags for topic identification or \textit{story-finding}, and grouping similar messages together to form a single news story. Their algorithm for similarity is a function of the tf-idf \citep{TermWeightingApproachesInAutomaticTextRetrieval} of the two messages and the number of named entities they have in common.
 
 \subsubsection{Redundancy (Spatial Quantity)}
-It is in the nature of news that newsworthy stories get repeated across multiple sources. When consumers read news on a particular from more than once source, it is likely that they will read variations on the same facts in multiple articles.
+It is in the nature of news that newsworthy stories get repeated across multiple sources. When consumers read news on a particular event from more than one source, it is likely that they will read variations on the same facts in multiple articles.
 
 Attempts such as \citep{InformationFusionInTheContextOfMultiDocumentSummarization} have been made to synthesise summaries of collections of similar online documents, a practice here termed \textit{information fusion}, with news articles from different sources being given as a specific use-case. However, the process of extracting common sentences between documents was in order to reformulate them into a single summary, rather than to determine the level of similarity between the documents.
 
@@ -72,13 +73,13 @@ Viewing the other dimensions of overload from a news domain perspective, it is c
 
 Sensemaking is the basis for forming contextual knowledge; the process by which we incorporate new information into our existing cognitive frameworks, and how we go from reading something to understanding it \citep{FromInformationToKnowing}. In broader terms, \citeauthor{OrganizingAndTheProcessOfSensemaking} describe sensemaking as ``[being] about the question: What does an event mean? In the context of everyday life, when people confront something unintelligible and ask, `What's the story here?'{}'' \citep[p.85]{OrganizingAndTheProcessOfSensemaking} 
 
-This definition relates directly to the news overload problem because one component of sensemaking is the contextual story resolution The \citet{anewmodelfornews} study identified news consumers are craving. It has also been observed that often readers are not interested in specific articles on a subject, and only the thematic content of the topic they belong to \citep{AnalysingUserAccessToAnOnlineNewspaper}. How then, do readers make sense of a collection of articles surrounding a particular topic?
+This definition relates directly to the news overload problem because one component of sensemaking is the contextual story resolution that The \citet{anewmodelfornews} study identified news consumers are craving. It has also been observed that often readers are not interested in specific articles on a subject, and only the thematic content of the topic they belong to \citep{AnalysingUserAccessToAnOnlineNewspaper}. How then, do readers make sense of a collection of articles surrounding a particular topic?
 
 When presented with a large document collection, \citet{BeingLiteratreWithLargeDocumentCollections} found all of their subjects began by clustering the contents into groups which formed a heuristic representation or mental model, used to provide an overview. However, current information infrastructure has been criticised for not supporting the cross-correlation between connected news articles \citep{GalaxyOfNews}.
 
 Writing for the Columbia Journalism review in 2008, \citeauthor{overloadjournalismsbattle} outlined a suggestion for the new roles of journalism in the information era; ``By linking stories to one another and to background information and analysis, news organizations help news consumers find their way through a flood of information that without such mediation could be overwhelming and nearly meaningless''\citep[p.10]{overloadjournalismsbattle}. 
 
-Similarly, \citet{FromInformationToKnowing} make the recommendation in the context of contemporary media consumption that news providers should adapt to an environment of news overload by adding facilities enabling readers to categorise, sort and search news collections. Additional findings of this study suggested that the contextual background provided by having more detailed coverage aids the sensemaking process, as it helps users form links between new information and their existing frameworks, but this presents an interesting conflict with the goal of reducing information overload when considering large collections of documents.
+Similarly, \citet{FromInformationToKnowing} recommend in the context of contemporary media consumption that news providers should adapt to an environment of news overload by adding facilities enabling readers to categorise, sort and search news collections. Additional findings of this study suggested that the contextual background provided by having more detailed coverage aids the sensemaking process, as it helps users form links between new information and their existing frameworks, but this presents an interesting conflict with the goal of reducing information overload when considering large collections of documents.
 
 It is apparent that many recommendations have been made from within the field of journalism that at the point of delivery, news content should incorporate contextual links between related articles. This is important both from a sensemaking perspective to emphasise connections, and from an information overload perspective to help users find meaning in an inundated news landscape.
 
@@ -97,7 +98,7 @@ In his seminal paper on information visualisation, \citeauthor{TheEyesHaveIt} pr
 	\item [1-dimensional] Linear data, where each datum is a string of characters.
 	\item[2-dimensional] Planar data, e.g. layout diagrams, or clustered document collections.
 	\item[3-dimensional] Physical objects or models of real-world entities, e.g. computer aided designs or medical imaging data.
-	\item[Multi-dimensional] Any data where items with n attributes can be represented in n-dimensional space, e.g. relational databases, or feature vectors for classification.
+	\item[Multi-dimensional] Any data where items with $n$ attributes can be represented in $n$-dimensional space, e.g. relational databases, or feature vectors for classification.
 	\item[Temporal] Data following a timeline, which is a subset of 1-dimensional data but was deemed important enough to warrant its own category. E.g. Project management data, or multimedia content timelines.
 	\item[Tree] Hierarchical data where each datum has exactly one parent and zero or many children, e.g. document or directory structures.
 	\item[Network] Related data, where each datum can have an arbitrary number of links to other data.
@@ -107,7 +108,7 @@ Because of the non-spatial nature of textual data, any visualisation of such dat
 
 This ambiguity is not a failure of the taxonomy; \citeauthor{TheEyesHaveIt} stresses that composite categories are equally valid. However, the implications of this are that the most appropriate visualisation for a news corpus may itself be a composite of visualisations for any of its type abstractions, leaving an unfeasible number of possibilities to consider. 
 
-To reduce the scope of suitable visualisations, we return to the original problem of information overload. This time however, the aim is to minimise the overload from interpreting the model, rather than the overload from interpreting the data. Complex visualisations which require a considerable amount of effort to understand in their own right should be avoided where possible when reducing overload is the goal.
+To reduce the scope of suitable visualisations, we return to the original problem of information overload. This time however, the aim is to minimise the overload from interpreting the model, rather than the overload from interpreting the data. Complex visualisations which require a considerable amount of effort to understand in their own right should be avoided when reducing overload is the goal.
 
 \subsection{Infovis for Sensemaking}
 
@@ -121,7 +122,7 @@ In addition to the insight that visualisation may be able to provide, there is e
 	\item[Filter] Nondestructively remove uninteresting data points or groups from the view.
 	\item[Details-on-Demand] Gain additional insight into one or more data points by selecting particular elements.
 	\item[Relate] View and explore relationships between elements.
-	\item[History] If necessary, undo previous actions to return to the a view of the data.
+	\item[History] If necessary, undo actions to return to a previous view of the data.
 	\item[Extract] Export selected data, preserving the format, for uses such as ``sending by email, printing, graphing, or insertion into a statistical or presentation package'' \citep[p.5]{TheEyesHaveIt}.
 \end{description}
 
@@ -141,7 +142,7 @@ From these two models, it is apparent that certain views and functions are cruci
 
 The use of preexisting visual metaphors--specifically those with which a large number of people will already be familiar--has been shown to support readers' comprehension, as it requires both significant time and effort for a reader to interpret visual metaphors which are new to them \citep{PreconceptionsVisualMetaphors}.
 
-In a previous paper, \citeauthor{VisuelleKommunikation} also describes six advantages of visual metaphors specifically for the transfer of knowledge: ``(1) to motivate people; (2) to present new perspectives; (3) to increase remembrance; (4) to support the process of learning; (5) to focus the attention of the viewer and (6) to structure and coordinate communication.'' \citep[p.2, citing \citep{VisuelleKommunikation}]{LearningFromArchitects}. These are all desirable attributes, but motivation and support in the learning process are particularly relevant in addressing news fatigue.
+In a previous paper, \citeauthor{VisuelleKommunikation} also described six advantages of visual metaphors specifically for the transfer of knowledge: ``(1) to motivate people; (2) to present new perspectives; (3) to increase remembrance; (4) to support the process of learning; (5) to focus the attention of the viewer and (6) to structure and coordinate communication.'' \citep[p.2, citing \citep{VisuelleKommunikation}]{LearningFromArchitects}. These are all desirable attributes, but motivation and support in the learning process are particularly relevant in addressing news fatigue.
 
 Examples of visual metaphors commonly used to represent collections of data include calendars, bookshelves, timelines, maps and other schematics. Metaphors based on physical objects do not have to be visually skeuomorphic to be effective, but to avoid misinterpretation, there should be a match between the underlying structure of the metaphor and the underlying structure of the data. Two common and highly structured visual metaphors will be explored in the following sections in the context of potential for news representation; timelines and schematic maps.
 
@@ -171,7 +172,7 @@ The colouring technique used to distinguish sets of related events within a sing
   \label{fig:themeriver-tiara}
 \end{figure}
 
-Both ESTHETE \citep{ESTHETE} and nReader \citep{Nreader} present timeline-centric views for collections of news articles based on underlying graphs of relationships between the articles. However, in both cases, the graph structure was not part of the final visualisation, so connections between entities were displayed in purely textual forms. In contrast, ThemeRiver \citep{ThemeRiver} introduces a novel view on topic frequency along the time axis to show thematic change over time within a collection of documents, similar to a smoothed histogram. This view, while useful for large document collections which span weeks or months, would be less suited to displaying emerging news trends over shorter periods.
+Both ESTHETE \citep{ESTHETE} and nReader \citep{nreader} present timeline-centric views for collections of news articles based on underlying graphs of relationships between the articles. However, in both cases, the graph structure was not part of the final visualisation, so connections between entities were displayed in purely textual forms. In contrast, ThemeRiver \citep{ThemeRiver} introduces a novel view on topic frequency along the time axis to show thematic change over time within a collection of documents, similar to a smoothed histogram. This view, while useful for large document collections which span weeks or months, would be less suited to displaying emerging news trends over shorter periods.
 
 TIARA \citep{InteractiveTopicBasedVisualTextSummarizationAndAnalysis} whose authors cite ThemeRiver as an influencing design (see figure \ref{fig:themeriver-tiara}), displays a similar shaped graphical output but performs more detailed textual analysis, and displays related keywords in the output. Both visualisations support simple zooming and panning, but suffer from the same limitations on visualising topic connectivity as \citep{TimeSets}.
 
@@ -394,7 +395,7 @@ The evaluation of TIARA \citep{InteractiveTopicBasedVisualTextSummarizationAndAn
 
 To recap, this review began with an exploration of the problem of news overload using the findings of The \cite{anewmodelfornews}, a field study conducted into the news consumption habits of young people. The findings of the study were then discussed, firstly in the context of four dimensions of information overload \citep{TowardsAnOptimalResolutionToInformationOverload, GuestEditorsIntroductionInformationOverload} and secondly in terms of how they relate to sensemaking; the cognitive process this project aims to support.
 
-Information visualisation was identified as one common approach to both support sensemaking and reduce information overload, therefore we provided a high level overview of various methods for visualising text-based documents. Visualisations for news articles specifically \citep{ESTHETE, ThemeRiver, InteractiveTopicBasedVisualTextSummarizationAndAnalysis, ExploringLongRunningNewsStoriesUsingWikipedia, Nreader} were presented and compared, in addition to a more in-depth exploration of visual metaphors -- in particular timelines -- and schematic map visualisations. This section also featured the introduction of the metro map in its original usage context, before moving on to its use as a metaphor for visualisation in various domains.
+Information visualisation was identified as one common approach to both support sensemaking and reduce information overload, therefore we provided a high level overview of various methods for visualising text-based documents. Visualisations for news articles specifically \citep{ESTHETE, ThemeRiver, InteractiveTopicBasedVisualTextSummarizationAndAnalysis, ExploringLongRunningNewsStoriesUsingWikipedia, nreader} were presented and compared, in addition to a more in-depth exploration of visual metaphors -- in particular timelines -- and schematic map visualisations. This section also featured the introduction of the metro map in its original usage context, before moving on to its use as a metaphor for visualisation in various domains.
 
 Centrally, the work of Shahaf et al. \citep{ConnectingTheDots, GeneratingInformationMaps, MetroMapsOfScience, InformationCartographyPre} which is particularly relevant to the aims and objectives of this project was discussed in detail, with an explanation of key metrics (\textit{coherence}, \textit{coverage} and \textit{complexity}) defined in \citep{GeneratingInformationMaps} which are applicable to all graph-based representations of document collections. My main critiques of this body of work were the fixed background corpus and the physical layouts of the drawn maps when evaluated against the criteria defined in \citep{TheBasisForGraphDrawingAlgorithms, AutomaticMetroMapLayout}.
 

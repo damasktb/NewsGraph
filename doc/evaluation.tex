@@ -1,6 +1,6 @@
 This chapter describes the process by which we designed and conducted a user study to evaluate our metro maps against unstructured RSS feed readers. Results and implications of this study are discussed, with full data available in Appendix \ref{sec:evalresults}. The two metro maps used for the study have been included in Appendix  \ref{sec:evalmaps}.
 
-\section{Scoping the Evaluation}
+\section{Scoping the Experiments}
 
 Typically, information retrieval tools can be evaluated in terms of  accuracy and other quantifiable metrics against a canonical labelled dataset. Our system is less amenable to such evaluation due to the lack of existing datasets. The extensive user study conducted by \cite{GeneratingInformationMaps} evaluated four distinct aspects of their metro map system; (1) accuracy of the algorithm's document selection in respect to a query; (2) user fact retrieval time; (3) user understanding at a macro level; and (4) task performance of users with a Metro Map versus an unstructured list.
 
@@ -70,13 +70,13 @@ No participants were excluded on the basis of how much or how little news they c
 
 \subsection{Estimate Task} \label{task:est}
 
-The first experiment was designed to test Hypothesis \ref{hyp:estimation}. Participants were exposed to both modalities for 60 seconds (order dependent on their assigned group), after which they estimated the number of articles represented in each. To prevent conscious or subconscious counting by participants during the second condition, subject were exposed to both datasets, one immediately after another. Only after exposure to the second set were they were asked to estimate the number of articles in each.
+The first experiment was designed to test Hypothesis \ref{hyp:estimation}. Participants were exposed to both modalities for 60 seconds (order dependent on their assigned group), after which they estimated the number of articles they had been looking at. To prevent conscious or subconscious counting by participants during the second condition, it was only after exposure to the second set that subjects were asked to estimate the number of articles in each.
 
 \subsection{Index Task}
 
-The second experiment, which was designed to test Hypothesis \ref{hyp:index}, placed significantly more cognitive load on the participants. The task is the same as \possessivecite{scattergather} evaluation of the Scatter/Gather Browser, which required participants to draw a topic index, or \textit{tree}, representing their understanding of topic structure within a corpus.
+The second experiment, which was designed to test Hypothesis \ref{hyp:index}, placed significantly more cognitive load on the participants. This task is based on the evaluation of the Scatter/Gather Browser by \cite{scattergather}, which required participants to draw a topic index, or \textit{tree}, representing their understanding of topic structure within a corpus.
 
-For each of the two conditions, our participants first spent three minutes reading and exploring the news represented.\footnote{As this task was completed after the Estimate Task (\ref{task:est}), the total time spent interacting with the data was actually four minutes.} After the three minutes, the modality was minimised and the participants were given two minutes to write a topic index based on the news they had just read. An example topic index based on news in a different domain was shown before this task began to ensure participants knew what they were supposed to produce. Both datasets (and therefore all four conditions) contained 31 articles.
+For each of the two conditions, participants first spent three minutes reading and exploring the news represented.\footnote{As this task was completed after the Estimate Task (\ref{task:est}), the total time spent interacting with the data was actually four minutes.} After the three minutes, the modality was minimised and the participants were given two minutes to write a topic index based on the news they had just read. An example topic index based on news in a different domain was shown before this task began to ensure participants knew what they were supposed to produce. Both datasets (and therefore all four conditions) contained 31 articles.
 
 Finally, participants were asked to complete a Self-Assessment Manikin \citep{measuringemotion} to rate the pleasure (labelled from `unhappy' to 'happy'), arousal (`calm' to `excited') and dominance (`not in control' to `in control') they felt as a result of completing the index task. This process was then repeated with the second modality and data set, according to the participant's grouping.
 
@@ -105,48 +105,137 @@ The independent variable in both experiments was the display modality; a nominal
 \end{itemize}
 
 \subsubsection{Control Variables}
-There were a number of participant characteristics and other covariates which could confound the results of one or both experiments. The majority of these are controlled for due to all subjects participating in both conditions, or due to our participant selection process, but for completeness they are all listed below.
+The following are the participant characteristics which were identified as potential covariates and where possible, were controlled during the design of the experiments. Weekly news consumption, which could not be controlled through participant selection, was later examined as a influencing factor on performance.
 
 \begin{itemize}
 	\item\textbf{Level of formal education} \par
 		It was expected that differing levels of formal education would impact the relative performance of participants, however all participants were undertaking the final year of an undergraduate degree, so we did not account for this as a covariate.
 	\item\textbf{Weekly news consumption time} \par
 		It was expected that participants who consume more news on average would perform uniformly better across both conditions, but as subjects participated in both conditions, we do not expect to need to account for this as a covariate. This variable was measured on a discrete scale of hours per week.
-	\item\textbf{Past or present use of an RSS feed reader} \par
-		It was expected that participants who used or had previously used an RSS reeder may perform disproportionally better with the \textit{list} condition than with the \textit{map}. This variable was measured on an ordinal scale of ``Current Usage", ``Previous usage", or ``No usage." This factor was examined as a possible covariate.
 	\item\textbf{Topic Familiarity} \par
-		Since all subjects participated in both conditions, each subject completed the \textit{metro map} condition with one set of articles and the \textit{list} condition with the other set. The two corpora (A and B) were extracted from the same RSS Feed\footnote{The Guardian, US News, week commencing 20/03/2017.} within the same week, to ensure background knowledge wouldn't confound performance between A and B.
+		Since all subjects participated in both conditions, each subject completed the \textit{metro map} condition with one set of articles and the \textit{list} condition with the other set. The two corpora (A and B) were extracted from the same RSS feed\footnote{The Guardian, US News, week commencing 20/03/2017.} within the same week, to ensure background knowledge wouldn't confound performance between A and B.
 \end{itemize}
 
 \section{Results and Discussion}
 
+A complete set of results for the following tests is available in Appendix \ref{sec:evalresults} (Hypothesis \ref{hyp:estimation}: Table \ref{res:estimate}, Hypothesis \ref{hyp:index}: Table \ref{res:index}, tests for normality: Table \ref{res:sw}, correlations: Tables \ref{res:hourscorrelation} -  \ref{res:samcomposites}), with raw data in Section \ref{sec:evalraw}.
+
 \subsection{Testing Hypothesis \ref{hyp:estimation}: Estimate Task}
 
-Our first hypothesis predicted that users' estimates for the number of articles represented on a map would be lower than their estimates of the same number of articles shown in the form of a list.
+Our first hypothesis predicted that users' estimates for the number of articles represented on a map would be lower than their estimates of the same number of articles shown in the form of a list. A paired-samples $t$-test was conducted to compare estimates for the \textit{map} and \textit{list} conditions. Data was screened for violation of the following assumptions before the test was performed:
+\vspace{-0.2cm}
+\begin{itemize}[label={},itemsep=0.05em]
+	\item \textbf{Continuous Measurement}: Both estimates were measured on a continuous scale.
+	\item \textbf{Independence}: Participants' estimates were independent of each other.
+	\item \textbf{Outliers}: There were no outliers in either of the estimates.
+	\item \textbf{Normality}: The normality assumption was tested with the Shapiro-Wilk test on \textit{map estimate} (W=0.881, df=16, $p$=0.080) and \textit{list estimate}  (W=0.954, df=16, $p$=0.559). These results suggest normality is a reasonable assumption for the data.
+\end{itemize}
 
+Figure \ref{fig:estimate} shows the means for each condition split by corpus. Although the mean estimates for Corpus A were lower, this difference was not significant.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/evaluation/estimate.pdf}
+	\caption{Comparison of \textit{Map} and \textit{List} estimates between the two corpora}
+	\label{fig:estimate}
+\end{figure}
+
+The results of the $t$-test suggest there was no significant difference in estimates between the map (M=24.75, SD=7.188) and list (M=25.88, SD=6.820) conditions; $t$(15)=-0.504, $p$=0.311 (one-tailed, $\alpha=0.05$), providing insufficient evidence to reject $H_0$. We conclude that there is no significant difference between participants' perceptions of information quantity on the basis of modality alone.
 
 \subsection{Testing Hypothesis \ref{hyp:index}: Index Task}
 
-Because both experiments were conducted within-groups and every participant was therefore observed twice, observations are not independent, so we use a paired t-test to test the significance of our findings.
+Our second hypothesis predicted that users would identify more topics in their index after using the map than after using the list. A second paired-samples $t$-test was conducted to compare the number of topics produced during the \textit{map} and \textit{list} conditions.
 
-\begin{itemize}
-	\item Testing \ref{hyp:estimation} - No significant difference
-	\item Testing \ref{hyp:index} - Enough evidence to reject $H_0$, and this is due to more primary topics rather than more depth, as expected.
-	\item Significant effect of news consumption on list primary topics
-	\item Effect of modality on primary topics which were metro lines
-	\item Effect of modality on SAM Score
-	\item Correlation of pleasure and dominance within SAM Scores
-	\item Negative correlation between arousal for map/list
-\end{itemize}
+As in the previous test, there was no missing data, and data was screened for violation of measurement level, independence, outliers and normality (\textit{map topics}: W=0.958, df=16, $p$=0.633,  \textit{list topics}: W=0.917, df=16, $p$=0.152) as before. Figure \ref{fig:index} verifies that there was no significant difference in index topics between corpora A and B.
 
-\subsection{Qualitative Analysis}
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/evaluation/index.pdf}
+	\caption{Comparison of \textit{Map} and \textit{List} total topics between the two corpora}
+	\label{fig:index}
+\end{figure}
 
-One participant, during the index task for the list condition, asked whether topics could be repeated, ``Because this one relates to both of those [parent topics]''. He then remarked, ``This really does suit being on a graph, doesn't it.''
+The results of the test showed a significant difference in total topics produced in the map (M=10.94, SD=4.389) and list (M=8.88, SD=2.156) conditions; $t$(15)=2.254, $p$=0.020 (one-tailed, $\alpha=0.05$), providing sufficient evidence to reject $H_0$.
 
-Two participants added a category labelled `miscellaneous' or 'other' to their topic indexes, one during the map condition and the other during the list condition, but both on dataset B, suggesting the topics in that set may have been more disparate.
+Since these results supported our hypothesis, we conducted a second round of tests in an attempt to determine whether the additional topics produced by users with metro maps was due to additional breadth or depth of their news recall. The additional dependent variables measured in the index task were \textit{primary topics} (topics at the highest level of the index, analogous to breadth of recall) and \textit{topic depth} (the maximum nested depth reached in an index). Two further paired-samples $t$-tests were therefore conducted to compare the respective breadths and depths of participants' indexes between the two conditions.
 
-One participant, despite identifying more topics (both primary and total) using a metro map, reported lower happiness and feeling less in control with the map, stating that ``The list was easier. I could link the topics myself in a way that felt more natural. Using the map I didn't always agree with the categorisation."
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[height=.49\linewidth]{img/evaluation/primary.pdf}
+  \end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[height=.49\linewidth]{img/evaluation/depth}
+\end{minipage}
+	\caption{Comparison of \textit{Map} and \textit{List} topic breadth and depth between the two corpora}
+  \label{fig:depthbreadth}
+\end{figure}
 
-A different participant whose scores were similar for both conditions said ``It was easier to find stuff I cared about [using the map] with nothing in the way.''
+These tests showed no significant difference between map index depth (M=2.25, SD=0.577) and list index depth (M=2.31, SD=0.602); $t$(15)=-0.368, $p$=0.359 (one-tailed, $\alpha=0.05$), however, they did show a significant difference between map primary topics (M=4.19, SD=1.607) and list primary topics (M=3.25, SD=1.125) conditions; $t$(15)=1.996, $p$=0.032, at the same significance level.
+
+The implication of this second result is that the additional topics participants were able to recall in the \textit{map} condition were due to increased recall of the breadth of the news they had read, rather than increased in-depth recall of any particular topics.
+
+\subsection{The Effects of Weekly News Consumption}
+
+The average weekly news consumption of participants (self-reported, in hours) was a factor we identified as a potential influencer of task performance. Although our within-subjects design would have controlled any confounding effects, we analysed the Pearson correlation of this variable with several of our dependent variables to identify any unexpected correlations.
+
+There was no significant correlation between average weekly news consumption time and participants' estimates of the number of articles on the map or in the list.
+
+In the index task, news consumption was similarly correlated with total index topics for both the \textit{map} ($r$=0.541, $p$=0.031) and \textit{list} ($r$=0.573, $p$=0.020) conditions. As expected, high news consumption positively influenced performance. The strongest correlation with news consumption however, was with the index depth in the \textit{map} condition ($r$=0.606, $p$=0.013). This, in contrast to the lack of any significant correlation in the \textit{list} condition suggests that in drawing the users' focus to a wider breadth of topics, metro maps may sacrifice their understanding of topic depth.
+
+The three dimensions of affect measured by the Self-Assessment Manikin \citep{measuringemotion} are pleasure (P), arousal (A), and dominance (D). \cite{emotionbasedtheory} classified every combination of high and low scores for each dimension, resulting in the following octants:
+
+\begin{table}[htbp!]
+\centering
+\begin{tabular}{lllll}
+\textit{Exuberant} & (+P, +A, +D) & vs. & \textit{Bored} & ($-$P, $-$A, $-$D) \\
+\textit{Relaxed} & (+P, $-$A, +D) & vs. & \textit{Anxious} & ($-$P, +A, $-$D) \\
+\textit{Hostile} & ($-$P, +A, +D) & vs. & \textit{Docile} & (+P, $-$A, $-$D) \\
+\textit{Distainful} & ($-$P, $-$A, +D) & vs. & \textit{Dependent} & (+P, +A, $-$D)
+\end{tabular}
+\end{table}
+
+Although these were proposed as a taxonomy for human personality and temperaments, we expect the labels to generalise to emotional responses composed of the same three dimensions of affect, as measured using SAM scores.
+
+In our analysis of the correlations between the three SAM dimensions, we found participants' pleasure to be to highly correlated to the levels of dominance they felt using the modality (\textit{Map}: $r$=0.773, $p<$0.001; \textit{List}: $r$=0.685, $p$=0.003) but uncorrelated with the level of arousal they reported. This suggests that enjoyment of both modalities is based on whether or not the participants felt in control while using them.
+
+There was no correlation between the two modalities in terms of pleasure or dominance, but there was a correlation between \textit{map} arousal and \textit{list} arousal ($r$=0.646, $p$=0.007), which suggests that arousal may be a function of enjoyment of news content itself and unrelated to the specific modality.
+
+Due to the the strong positive correlations between pleasure and dominance observed in SAM scores for both conditions, four of \citeauthor{emotionbasedtheory}'s octants are less relevant to our results. We can therefore restrict the set of typical emotional responses to the \textit{map} and \textit{list} conditions to tuples where sign(P) = sign(D):
+
+\begin{table}[htbp!]
+\centering
+\begin{tabular}{lllll}
+\textit{Exuberant} & (+P, +A, +D) & vs. & \textit{Bored} & ($-$P, $-$A, $-$D) \\
+\textit{Relaxed} & (+P, $-$A, +D) & vs. & \textit{Anxious} & ($-$P, +A, $-$D) \\
+\end{tabular}
+\end{table}
+
+When pleasure and dominance are both high, it is not immediately obvious which emotional response is more desirable between exuberance and relaxation. However, taking each participant's exuberance as (P+A+D) and their relaxation as (P$-$A+D) and correlating these composite variables with the results of the index task, a strong link emerges between exuberance and total topics produced in the \textit{map} condition ($r$=0.753, $p$=0.001). No such correlation exists with relaxation in the \textit{map} condition, or with either of these two variables in the \textit{list} condition.
+
+From the above results, it is apparent that the strength of the metro maps at at affective interaction level when both pleasure and dominance are held constant, is that participants are more excited to use them, rather than more relaxed in doing so.
+
+
+\subsection{Participant Feedback}
+
+Participants' feedback on the metro maps was mixed, but with the majority of comments being positive. One participant, despite identifying more topics (both primary and total) using a metro map, reported lower happiness and feeling less in control with the map, stating ``The list was easier. I could link the topics myself in a way that felt more natural. Using the map I didn't always agree with the categorisation."
+
+In contrast to this, a different participant (whose scores were similar to the participant above during both conditions) said ``It was easier to find stuff I cared about [using the map] with nothing in the way.'' This comment was in reference to the fact that if users wished to, they could choose to follow the stories along a single metro line and ignore everything else on the map, whereas with the list there was no filtering mechanism.
+
+During the index task for the list condition, another participant asked whether topics could be repeated, ``Because this one relates to both of those [parent topics]''. He then remarked, ``This really does suit being on a graph, doesn't it.'' This was a direct reflection of the demographic of our participants; 15 out of the 16 were Computer Science students, who are required to study elementary graph theory as part of their course.
+
+The differences between these comments show the wide variation in responses to the system, even among the 16 students who participated in the experiments. Without conducting a larger survey into usability among a wider demographic of participants, it would be impossible to formulate a representative opinion on the system or its applications.
 
 \section{Summary}
+
+This chapter documented the evaluation the metro maps produced by the system in terms of how they affected users' perceptions of information quality, and to what degree they aided users in understanding the context of the news they read.
+
+We found no significant evidence to support our first hypothesis; that users would estimate metro maps contained fewer articles than equivalent list views with the same number of articles. However, we did find evidence which supported our second hypothesis; that users recall a higher number of topics after using the metro maps than after using the list representation. Recall was measured by asking participants to produce a topic index, in the same style as the evaluation of the Scatter/Gather browser by \cite{scattergather}.
+
+Further examining the topic indexes produced by participants lead to the conclusion that metro map usage resulted in larger indexes due to participants recalling a greater breadth of topics, rather than recalling topics to a more granular level of detail.
+
+A detailed discussion of the emotional responses to both modalities followed, generalising \possessivecite{emotionbasedtheory} temperament octants to affective interactions and using these to examine the correlations within participants' Self-Assessment Manikins \citep{measuringemotion}. From this, we conclude that the level pleasure participants experience using either modality is highly correlated with whether or not they perceived themselves as being in control. Arousal was identified as an independent factor in both modalities and is correlated between the two, as it appears to be influenced by factors beyond the scope of our experiments.
+
+The chapter concluded by discussing some of the informal feedback participants gave during and after the study, illustrating somewhat polarised opinions on the utility of the maps.
