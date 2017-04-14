@@ -1,0 +1,70 @@
+\section{Project Structure}
+
+The structure of the project is as follows, with source files available in the following sections.
+
+\dirtree{%
+.2 \textcolor{purple}{{requirements.txt}}.
+.2 {\ref{sec:newsgraph.py}: newsgraph.py}.
+.2 \textcolor{blue}{{newsUtils/}}\DTcomment{Classes encapsulating feeds, articles and corpora}.
+.3 {\ref{sec:newsfeeds.py}: newsfeeds.py}.
+.2 \textcolor{blue}{{keywordUtils/}}\DTcomment{Keyword extraction and entity disambiguation}.
+.3 {\ref{sec:corpusUtilities.py}: corpusUtilities.py}.
+.3 {\ref{sec:graphKnowledge.py}: graphKnowledge.py}.
+.2 \textcolor{blue}{{ioUtils/}}\DTcomment{Intermediate cache seralisation}.
+.3 {\ref{sec:newsSerialiser.py}: newsSerialiser.py}.
+.2 \textcolor{blue}{{mapEngine/}}\DTcomment{Boundary between \textit{Build Graph} and \textit{Draw Map}}.
+.3 {\ref{sec:graphObjects.py}: graphObjects.py}.
+.2 \textcolor{blue}{{webUtils/}}\DTcomment{HTML generation and core JavaScript}.
+.3 {\ref{sec:html.py}: html.py}.
+.3 {\ref{sec:newsgraph.js}: newsgraph.js}.
+.3 {\ref{sec:newsgraph.css}: newsgraph.css}.
+}
+
+\subsection{Installation}
+
+To install the project's dependencies, navigate to the \texttt{src} directory and optionally, activate a \texttt{virtualenv}. Install with:
+
+\hspace{1cm}\mintinline{bash}{$ pip install -r requirements.txt}
+
+\subsection{Running}
+
+Specify one or more newsfeeds in \texttt{newsgraph.py:36}. Optionally, specify the lists \textit{interests} and \textit{ignore}. Run NewsGraph with:
+
+\hspace{1cm}\mintinline{bash}{$ python newsgraph.py}
+
+When the script terminates, the self-contained file \texttt{ng.html} in the \texttt{src} directory will contain the metro map and all its associated data.
+
+\begin{landscape}
+
+\hspace{-3.5cm}\begin{multicols}{2}
+
+\section{File: \texttt{src/newsgraph.py}} \label{sec:newsgraph.py}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{Python}{../src/newsgraph.py}
+
+\section{File: \texttt{src/newsUtils/newsfeeds.py}} \label{sec:newsfeeds.py}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{Python}{../src/newsUtils/newsfeeds.py}
+
+\section{File: \texttt{src/keywordUtils/corpusUtilities.py}} \label{sec:corpusUtilities.py}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{Python}{../src/keywordUtils/corpusUtilities.py}
+
+\section{File: \texttt{src/keywordUtils/graphKnowledge.py}} \label{sec:graphKnowledge.py}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{Python}{../src/keywordUtils/graphKnowledge.py}
+
+\section{File: \texttt{src/ioUtils/newsSerialiser.py}} \label{sec:newsSerialiser.py}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{Python}{../src/ioUtils/newsSerialiser.py}
+
+\section{File: \texttt{src/mapEngine/graphObjects.py}} \label{sec:graphObjects.py}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{Python}{../src/mapEngine/graphObjects.py}
+
+\section{File: \texttt{src/webUtils/html.py}} \label{sec:html.py}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{Python}{../src/webUtils/html.py}
+
+\section{File: \texttt{src/webUtils/newsgraph.js}} \label{sec:newsgraph.js}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{js}{../src/webUtils/newsgraph.js}
+
+\section{File: \texttt{src/webUtils/newsgraph.css}} \label{sec:newsgraph.css}
+\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt]{css}{../src/webUtils/newsgraph.css}
+
+
+\end{multicols}
+\end{landscape}

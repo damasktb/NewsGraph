@@ -15,9 +15,10 @@ var iso_toggle = 0;
 // Realistically more colours than we will ever need
 var color = color = d3.scale.ordinal()
   .domain(50)
-  .range(["#1596ff", "#ff6401", "#fef302", "#03aa4a", "#38d8ce", "#c38ce2",
-          "#fd85b0", "#a78f7b", "#d8d8d8", "#374a91", "#48e268", "#ffa103", 
-          "#ff576d", "#66c1fe", "#97f1a0", "#3fc104", "#febbc0", "#8494ad"]);
+  .range(["#1596ff", "#ff6401", "#fef302", "#03aa4a", "#38d8ce", 
+          "#c38ce2", "#fd85b0", "#a78f7b", "#d8d8d8", "#374a91", 
+          "#48e268", "#ffa103", "#ff576d", "#66c1fe", "#97f1a0", 
+          "#3fc104", "#febbc0", "#8494ad"]);
 var radius = d3.scale.sqrt().range([0, 6]);
 
 var svg = d3.select("body")
@@ -70,7 +71,7 @@ for (var l of graph.links) {
             graph.nodes[l.target]]]||1);
 }
 
-// Helper functions for general station movement, calculation and manipulation
+// Helper functions for station movement, calculation and manipulation
 function isInterchange(d) { return d.lines.length > 1; }
 function linelength(p1, p2){ 
   return Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2)); 
@@ -97,9 +98,11 @@ var drawGraph = function (graph) {
   force.nodes(graph.nodes)
     .links(graph.links)
     .on("tick", function() {
-        // Every tick, change the energy map's energy relative to how "good"
-        // its layout is. Bad graph => high energy to reposition, & vice versa.
-        energy = Math.log(octilinearity())/10 + Math.log(lineStraightness())/10;
+        // Every tick, change the energy map's energy according to 
+        // how "good" its layout is. Bad graph => high energy to 
+        // reposition in future tick()s, & vice versa.
+        energy = Math.log(octilinearity())/10 + 
+                 Math.log(lineStraightness())/10;
         force.alpha(energy);
         tick();
     })
@@ -129,7 +132,7 @@ var drawGraph = function (graph) {
       var nodes = d3.selectAll(".node");
       nodes.each(function(d) { 
         d3.select(this).select("circle").transition().duration(250)
-          .style("fill", isInterchange(d) ? "white" : color(d.lines[0]))
+          .style("fill", isInterchange(d)? "white" :color(d.lines[0]))
         });
         d3.select(this).select("circle").transition().duration(250)
         .style("fill", "black")
@@ -154,10 +157,10 @@ var drawGraph = function (graph) {
       return isInterchange(d) ? "white" : color(d.lines[0]);
   });
 
-  // Animate.. lots
+  // Animate
   function tick() {
 
-    // Function from http://webiks.com/d3-js-force-layout-straight-parallel-links
+    //http://webiks.com/d3-js-force-layout-straight-parallel-links
     function multiTranslate(targetDistance, point0, point1) {
       var x1_x0 = point1.x - point0.x,
           y1_y0 = point1.y - point0.y,
@@ -187,10 +190,10 @@ var drawGraph = function (graph) {
           x2 += offset.dx;
           y1 += offset.dy;
           y2 += offset.dy;
-      return "M"+ x1 +","+ y1 +"A"+ dr +","+ dr +" 0 0,1" + x2 +","+ y2; 
+      return "M"+x1+","+y1+"A"+dr+","+dr+" 0 0,1"+x2+","+y2; 
     });
 
-    // Change nodes' positions as they move, don't let them go off canvas
+    // Change node positions as they move, don't let them go off canvas
     node.attr("transform", function (d) { 
       return "translate(" + d.x + "," + d.y + ")"; 
     });
@@ -206,7 +209,9 @@ var drawGraph = function (graph) {
     .data(color.domain())
     .enter().append("g")
     .attr("class", "key")
-    .attr("transform", function(d, i) {return "translate(0," + i * 25 + ")";});
+    .attr("transform", function(d, i) {
+      return "translate(0,"+i*25+")";}
+    );
   key.append("rect")
     .attr("x", 20)
     .attr("y", 20)
@@ -223,11 +228,11 @@ var drawGraph = function (graph) {
   }
 }
 
-// Toggle the isolation of a single metro line when it's clicked in the key
+// Toggle the isolation of a single metro line when clicked in the key
 function isolateLine(d) {
   var node = d3.selectAll(".node");
   var link = d3.selectAll(".link");
-  // If no line is selected, isolate the line that was just clicked (d)
+  // If no line is selected, isolate the line that was just clicked
   if (iso_toggle==0) {
     var edges = metro_lines[d];
     node.transition().style("fill-opacity", function (o) {
@@ -254,8 +259,8 @@ function isolateLine(d) {
 // Let the nodes move around a bit and then forceably pause them.
 
 // To-do: polling until octilinearity/LS are suitably low, then doing 
-// force.alpha(0) breaks ALL THE THINGS. but until then we have to have a hard
-// time limit which performs badly sometimes.
+// force.alpha(0) breaks ALL THE THINGS. but until then we have to
+// have a hard time limit which often performs badly.
 function move(time) {
   for (var n=0; n<graph.nodes.length; n++) {
     graph.nodes[n].fixed = false;
@@ -277,17 +282,25 @@ function getMetrics(graph, spacing) {
                   x_avg: 0, y_avg: 0,
                   v_scale: 0, h_scale: 0 };
 
-  metrics.x_min = Math.min.apply(null,graph.nodes.map(function(d){return d.px;}));
-  metrics.y_min = Math.min.apply(null,graph.nodes.map(function(d){return d.py;}));
-  metrics.x_max = Math.max.apply(null,graph.nodes.map(function(d){return d.px;}));
-  metrics.y_max = Math.max.apply(null,graph.nodes.map(function(d){return d.py;}));
+  metrics.x_min = Math.min.apply(
+    null,graph.nodes.map(function(d){return d.px;}));
+  metrics.y_min = Math.min.apply(
+    null,graph.nodes.map(function(d){return d.py;}));
+  metrics.x_max = Math.max.apply(
+    null,graph.nodes.map(function(d){return d.px;}));
+  metrics.y_max = Math.max.apply(
+    null,graph.nodes.map(function(d){return d.py;}));
 
   metrics.x_avg = (metrics.x_min+metrics.x_max)/2.0;
   metrics.y_avg = (metrics.y_min+metrics.y_max)/2.0;
 
-  metrics.v_scale = Math.abs(metrics.y_max - metrics.y_min)/(height-2*spacing);
+  metrics.v_scale = Math.abs(
+    metrics.y_max-metrics.y_min)/(height-2*spacing
+  );
   // Deliberately same denominator for v/h scales
-  metrics.h_scale = Math.abs(metrics.x_max - metrics.x_min)/(height-2*spacing); 
+  metrics.h_scale = Math.abs(
+    metrics.x_max - metrics.x_min)/(height-2*spacing
+  ); 
   metrics.x_move = (metrics.x_min*metrics.v_scale)/2.0;
   metrics.y_move = (metrics.y_min*metrics.h_scale)/2.0;
 
@@ -304,8 +317,10 @@ function exportPositions() {
 
 function importPositions(positions) {
   for (var n=0; n<graph.nodes.length; n++) {
-    graph.nodes[n].x = positions[n].x; graph.nodes[n].px = positions[n].x;
-    graph.nodes[n].y = positions[n].y+10; graph.nodes[n].py = positions[n].y+10;
+    graph.nodes[n].x = positions[n].x; 
+    graph.nodes[n].px = positions[n].x;
+    graph.nodes[n].y = positions[n].y+10; 
+    graph.nodes[n].py = positions[n].y+10;
   }
   force.start();
   force.tick();
@@ -318,13 +333,13 @@ function octilineariseLine(li, begin, end, dir) {
   let theta = Math.atan(line.y/line.x);
   let nearest = Math.ceil(theta/(Math.PI/4)) * (Math.PI/4);
   if (dir == 1) { // line coming inwards, move 'begin'
-    if (Math.round(Math.abs(nearest), 2) == 2 || nan(Math.tan(nearest))) {
+    if (Math.round(Math.abs(nearest),2)==2||nan(Math.tan(nearest))) {
       begin.py += linelength(begin, end);
     } else {
       begin.py += line.x * (Math.tan(nearest) - Math.tan(theta));
     }
   } else { // line going outwards, move 'end'
-    if (Math.round(Math.abs(nearest), 2) == 2 || nan(Math.tan(nearest))) {
+    if (Math.round(Math.abs(nearest),2)==2||nan(Math.tan(nearest))) {
       end.py += linelength(begin, end);
     } else {
       end.py += line.x * (Math.tan(nearest) - Math.tan(theta));
@@ -340,7 +355,9 @@ function spaceAlongLine(l, start, stop, dir) {
     graph.nodes[n].py = graph.nodes[n].y;
   }
   var line = metro_lines[l];
-  let real_begin = start==0?graph.nodes[line[0][0]]:graph.nodes[line[start-1][1]];
+  let real_begin = start==0?
+    graph.nodes[line[0][0]]:
+      graph.nodes[line[start-1][1]];
   let real_end = graph.nodes[line[stop-1][1]];
   oct = octilineariseLine(l, real_begin, real_end, dir);
   let begin = oct.b;
@@ -357,7 +374,9 @@ function spaceAlongLine(l, start, stop, dir) {
       delta.y/1.5 : delta.y;
 
   for (var s=start; s<=stop; s++) {
-    let station = s==0? graph.nodes[line[0][0]]: graph.nodes[line[s-1][1]];
+    let station = s==0? 
+      graph.nodes[line[0][0]]: 
+        graph.nodes[line[s-1][1]];
     station.x = begin.px + (s-start)*delta.x;
     station.y = begin.py + (s-start)*delta.y;
     station.px = station.x;
@@ -365,14 +384,15 @@ function spaceAlongLine(l, start, stop, dir) {
   }
 }
 
-// Snap nodes to the grid so that hopefully most of them are drawn octilinearly
-// in a discrete point space then do some line straightening and hope
+// Snap nodes to the grid so that hopefully most of them are drawn
+// octilinearly in a discrete point space, then do some basic line
+// straightening along edges.
 function snap(){
   force.stop();
   var metrics = getMetrics(graph, spacing);
 
-  // This is the snap to grid part, we don't care about collisions yet so
-  // don't mark anything as placed or unplaced
+  // This is the snap to grid part, we don't care about collisions
+  // yet so don't mark anything as placed or unplaced
   for (var n=0; n<graph.nodes.length; n++) {
     let node = graph.nodes[n];
     node.x = (node.x/metrics.h_scale);
@@ -385,13 +405,13 @@ function snap(){
 
   metrics = getMetrics(graph, spacing);
 
-  // We want to place stations in order of descending weight to keep busy 
-  // sections of the map as clean as possible
+  // We want to place stations in order of descending weight to keep 
+  // busy sections of the map as clean as possible
   var st = Object.keys(graph.nodes).sort(function(a,b){
     return graph.nodes[b].weight-graph.nodes[a].weight
   });
-  // Try and place nodes if they can be snapped, otherwise nodes can bump 
-  // each other off if they are closer to the intersection
+  // Try and place nodes if they can be snapped, otherwise nodes can 
+  // bump each other off if they are closer to the intersection
   for (var n of st) {
     let node = graph.nodes[n];
     node.x = (node.x) * (1.0/metrics.h_scale) - metrics.x_move;
@@ -415,7 +435,7 @@ function snap(){
     }
   }
 
-  // If we have: (a)  x  (c) [where ac is octilinear, and b has no other links]
+  // If we have: (a)  x  (c) [ac is octilinear, b has no other links]
   //               \     /
   //                \   /
   //                 (b) 
@@ -429,7 +449,8 @@ function snap(){
       let c=graph.nodes[line[s][1]];
       let candidate = {x:(a.px+c.px)/2.0, y:(a.py+c.py)/2.0};
 
-      if (octilinear(a, c) && b.weight <= 2 && !taken[coordinates(candidate)]){
+      if (octilinear(a, c) && 
+        b.weight <= 2 && !taken[coordinates(candidate)]){
         taken[coordinates(b)] = false;
         taken[coordinates(candidate)] = b;
         b.x, b.px = candidate.x, candidate.x;
@@ -438,13 +459,13 @@ function snap(){
       }
     }
   }
-  // I'm not even sure why this is needed but like, it really is.
+
   for (var n=0; n<graph.nodes.length; n++) {
     graph.nodes[n].px = graph.nodes[n].x;
     graph.nodes[n].py = graph.nodes[n].y;
   }
 
-  // If we have: (a)  x  (c) [where ac is octilinear, and b has no other links]
+  // If we have: (a)  x  (c) [ac is octilinear, b has no other links]
   //               \     /
   //                \   /
   //                 (b) 
@@ -469,7 +490,7 @@ function snap(){
     }
   }
 
-  // If we have: (a)          [where b has not been placed]
+  // If we have: (a)          [b has not been placed]
   //               \     
   //                \   
   //                 (b)--(c) 
@@ -502,7 +523,9 @@ function snap(){
   }
 
   var metrics = getMetrics(graph, spacing);
-  // We've moved around a lot so the map probably needs rescaling & recentering
+  // We've moved the stations around a lot so the map probably needs 
+  // rescaling & recentering.
+  // To-do, this suffers from the x/px problem, and NaNs sometimes.
   for (var n=0; n<graph.nodes.length; n++) {
     let node = graph.nodes[n];
     node.x = (node.px) * (1.0/metrics.h_scale);
@@ -525,7 +548,7 @@ function snap(){
   console.debug("lineStraightness:", lineStraightness());
 }
 
-// This will fail if any link has the same source and target co-ordinates
+// This fails if a link has the same source and target co-ordinates
 var octilinearity = function(){
   var total = 0;
   for (var n=0; n<graph.links.length; n++) {
@@ -537,7 +560,7 @@ var octilinearity = function(){
   return total;
 }
 
-// This will fail if basically any points are drawn on top of each other
+// This fails if basically any points are drawn on top of each other
 var lineStraightness = function(){
   var total = 0;
   for (var line in metro_lines) {
@@ -585,7 +608,8 @@ function timeSince(date) {
 
 function showArticle(data) {
   $('#article-container').get(0).innerHTML = 
-  "<h1>"+data.title+"</h1>"+"<h2>"+timeSince(data.date)+" ago</h2>"+ data.html;
+  "<h1>"+data.title+"</h1>"+
+  "<h2>"+timeSince(data.date)+" ago</h2>"+ data.html;
 }
 
 $('#graphPane').click(function() {

@@ -468,7 +468,6 @@ In addition, a final pass checks for stations which are still unplaced at this p
 
 After the final pass, octilinearity and line-straightness are recomputed, and the number of points left unplaced (i.e. drawn directly on top of another point) are counted. If any of the numbers are high, the process can be restarted and the randomness of the initial force-direction will result in a different initial embedding. The exact value of `high' is a dependent on the number of articles on the map, as perfect octilinearity and line-straightness is typically only possible for small or sparse metro maps, and the more stations a map contains, the more likely it is that an article will be left unplaced.
 
-
 \section{Summary}
 
 We have given a detailed description of the system's pipeline, covering transformation of news data from XML elements in an RSS feed to raw text, to parsed keywords, to recognised entities, to nodes in a directed graph, to stations on a formatted metro map.

@@ -11,6 +11,8 @@
 *.loa
 *.toc
 *.pyc
+*minted*
+*.sty
 doc/.texpadtmp/*
 /doc/example/*
 *.DS_Store
