@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import feedparser
 import newspaper
@@ -12,29 +11,37 @@ from ioUtils.newsSerialiser import *
 from mapEngine.graphObjects import *
 
 class Params:
+	# Too many stations? Reduce this.
 	RSS_LIMIT = 50
-	TFIDF_VEC_LEN = 7
-	CORPUS_KEYWORDS = 25
-	METRO_LINES = 10
-	MIN_LINE_LENGTH = 3
 
+	# Stations too highly connected? Reduce this. (Vice versa for too sparse)
+	TFIDF_VEC_LEN = 7 
+	# Metro lines too vague? Increase this.
+	CORPUS_KEYWORDS = 25 
+	
+	#Too many metro lines? Reduce this.
+	METRO_LINES = 10 # 
+	# Too few metro lines? Reduce this.
+	MIN_LINE_LENGTH = 4 
+	# Map empty due to too few common keywords? Invert this.
+	TFIDF = True 
+	TFPDF = not TFIDF
 
 read_cache = True
-write_cache = False
+read_cache_name = None # eg. old-cache.ng in the cwd
 
+write_cache = False
+write_cache_name = None # eg. my-cache.ng
+
+feeds = [] # eg. ['https://www.theguardian.com/us-news/rss', ...]
 interests = []
 ignore = []
 
-tfidf = True
-tfpdf = not tfidf
-
 cln = None
 if read_cache:
-	rd = CacheReader()
+	rd = CacheReader(read_cache_name)
 	cln = rd.read()
 else:
-	feeds = ['https://www.theguardian.com/us-news/rss']
-	
 	urls = []
 	print "Fetching RSS Feed(s)"
 	for feed in feeds:
@@ -49,11 +56,11 @@ else:
 	cln = NewsCollection(urls)
 
 if write_cache:
-	wr = CacheWriter()
+	wr = CacheWriter(write_cache_name)
 	wr.write(cln)
 
 top_keywords = None
-if tfidf:
+if Params.TFIDF:
 	e_map = cln.top_article_keywords(
 		Params.TFIDF_VEC_LEN, include=interests, exclude=ignore
 	)
@@ -111,10 +118,10 @@ nodes = []
 metro_lines = {}
 node_lookup = {}
 multiedge_counts = {}
-articles = set()
+stations = set()
 termini = set()
 
-for i, (e, articles) in enumerate(top_keywords.iteritems()):
+for i, (e, articles) in enumerate(top_keywords):
 	if len(articles) >= Params.MIN_LINE_LENGTH:
 		ordered_line = sorted(articles, key=lambda a:a.publish_date)
 		print e
@@ -127,7 +134,7 @@ for i, (e, articles) in enumerate(top_keywords.iteritems()):
 		for n, a in enumerate(ordered_line):
 			node_lookup[a] = node_lookup.get(a, len(node_lookup.keys()))
 			a.metro_lines.append(e)
-			articles.add(a)
+			stations.add(a)
 
 		metro_lines[e] = []
 		termini.add(node_lookup[ordered_line[0]])
@@ -152,7 +159,4 @@ for i, node in enumerate(nodes):
 	node["terminus"] = (i in termini)
 
 # Generate the graph
-ng = NewsGraph(nodes, links, articles, metro_lines, node_lookup)
-
-
-
+ng = NewsGraph(nodes, links, stations, metro_lines, node_lookup)

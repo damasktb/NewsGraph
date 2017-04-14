@@ -241,5 +241,10 @@ class NewsCollection:
 			tfpdf = self.tf_pdf(entity)
 			if entity in include:
 				tfpdf *= boost
-		 	ret[entity] = (tfpdf, [a for a in self.collection_by_id.values() if entity in a.entities])
-		return dict((k, v[1]) for (k, v) in sorted(ret.iteritems(), key=operator.itemgetter(1), reverse=True)[:top_n])
+		 	ret[entity] = (tfpdf, 
+		 		[a for a in self.collection_by_id.values() 
+		 		if entity in a.entities]
+		 	)
+		return dict((k, v[1]) for (k, v) in sorted(
+			ret.iteritems(), key=operator.itemgetter(1), reverse=True)[:top_n]
+		)

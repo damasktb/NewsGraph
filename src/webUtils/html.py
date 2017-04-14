@@ -6,6 +6,16 @@ from time import mktime, strftime
 from datetime import datetime
 from xml.sax.saxutils import escape
 
+class Libraries:
+	MATERIALIZE = \
+	"https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css"
+	MATERIAL_ICONS = \
+	"https://fonts.googleapis.com/icon?family=Material+Icons"
+	
+	D3 = "http://d3js.org/d3.v2.min.js?2.9.6"
+	JQUERY = "https://code.jquery.com/jquery-3.1.1.min.js"
+	JQUERY_UI = "http://code.jquery.com/ui/1.11.0/jquery-ui.min.js"
+
 def CLASS(*args):
 	return {"class":' '.join(args)}
 
@@ -13,7 +23,9 @@ def buildCards(articles):
 	cards = []
 	for article in articles:
 		card = E.div(
-			CLASS("card horizontal", *[l.replace(" ","-") for l in article.metro_lines]),
+			CLASS("card horizontal", 
+				*[l.replace(" ","-") for l in article.metro_lines]
+			),
 			E.div(
 				CLASS("card-image"),
 				E.img(src=article.img)
@@ -55,18 +67,18 @@ def writePage(nodes, links, articles, metro_lines):
 			E.head(
 				E.title("NewsGraph"),
 				E.link(
-					href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css",
+					href=Libraries.MATERIALIZE,
 					rel="stylesheet",
 					type="text/css"
 				),
 				E.link(
-					href="https://fonts.googleapis.com/icon?family=Material+Icons",
+					href=Libraries.MATERIAL_ICONS,
 					rel="stylesheet",
 					type="text/css"
 				),
-				E("script", "", src="http://d3js.org/d3.v2.min.js?2.9.6"),
-				E("script", "", src="https://code.jquery.com/jquery-3.1.1.min.js"),
-				E("script", "", src="http://code.jquery.com/ui/1.11.0/jquery-ui.min.js"),
+				E("script", "", src=Libraries.D3),
+				E("script", "", src=Libraries.JQUERY),
+				E("script", "", src=Libraries.JQUERY_UI),
 				E.style(default_css)
 			),
 			E.body(
@@ -76,7 +88,9 @@ def writePage(nodes, links, articles, metro_lines):
 						E.span(CLASS("brand-logo center"), "NewsGraph"),
 						E.ul(
 							CLASS("right hide-on-med-and-down"),
-							E.li(E.a("Graph", href="#"), CLASS("active"), id="graphPane"),
+							E.li(E.a("Graph", href="#"), 
+								CLASS("active"), id="graphPane"
+							),
 							E.li(E.a("Feed", href="#"), id="feedPane"),
 							id="nav-mobile"
 						)
@@ -92,4 +106,9 @@ def writePage(nodes, links, articles, metro_lines):
 	)
 
 	with open("ng.html", "w") as ng:
-		ng.write(etree.tostring(page, pretty_print=True, encoding="ISO-8859-1", doctype="<!DOCTYPE html>").replace("NG-JS", default_js))
+		ng.write(etree.tostring(
+			page, 
+			pretty_print=True, 
+			encoding="ISO-8859-1", 
+			doctype="<!DOCTYPE html>").replace("NG-JS", default_js
+		))

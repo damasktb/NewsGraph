@@ -14,17 +14,16 @@ from graphKnowledge import NewsGraphKnowledge
 
 gooseExtractor = Goose()
 
-def tokenize(doc, knowledge=True, ltze=True):
+def tokenize(doc, knowledge=True, ltze=False):
 	wnl = nltk.WordNetLemmatizer()
 	knowledge = NewsGraphKnowledge()
 	tokens = []
 	entities = []
-	# Don't transform letter case until after entity recognition, or it will fail.
+	# Don't transform letter case until after entity recognition
 	punctuation = [i for i in xrange(maxunicode)
 		if unicodedata.category(unichr(i)).startswith('P')]
 
 	stopWords = set(get_stop_words("en"))
-
 	prevTree = ""
 	for sentence in preprocess(doc):
 		if prevTree:
@@ -36,6 +35,8 @@ def tokenize(doc, knowledge=True, ltze=True):
 				t = " ".join(ent[0] for ent in chunk.leaves()).strip()
 				prevTree += t+" "
 			else:
+				# Keep accumalating named entity chunks and appending, until
+				# we reach a non-NE chunk which signals the end of the previous.
 				if prevTree:
 					tokens.append(prevTree.strip())
 					entities.append(prevTree.strip())

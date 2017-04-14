@@ -12,11 +12,12 @@ var spacing = height/8.0;
 // Has a metro line on the key been clicked?
 var iso_toggle = 0;
 
-// Realistically more colours than we will ever need but I'm hesitant to go for a hard limit
+// Realistically more colours than we will ever need
 var color = color = d3.scale.ordinal()
   .domain(50)
-  .range(["#1596ff", "#ff6401", "#fef302", "#03aa4a", "#38d8ce", "#c38ce2", "#fd85b0", "#a78f7b", "#d8d8d8", "#374a91", "#48e268", "#ffa103", "#ff576d", "#66c1fe", "#97f1a0", "#3fc104", "#febbc0", "#8494ad", "#a1fe04", "#e0bb10"]);
-
+  .range(["#1596ff", "#ff6401", "#fef302", "#03aa4a", "#38d8ce", "#c38ce2",
+          "#fd85b0", "#a78f7b", "#d8d8d8", "#374a91", "#48e268", "#ffa103", 
+          "#ff576d", "#66c1fe", "#97f1a0", "#3fc104", "#febbc0", "#8494ad"]);
 var radius = d3.scale.sqrt().range([0, 6]);
 
 var svg = d3.select("body")
@@ -48,7 +49,7 @@ var force = d3.layout.force()
     .gravity(0.15)
     .alpha(1);
 
-// NG things get regex replaced with actual JSON by the python script, do not remove
+// NG things get regex replaced with actual JSON by the python script
 var metro_lines = NG-METRO-LINES;
 var graph = {
     "nodes": NG-NODES ,
@@ -71,9 +72,13 @@ for (var l of graph.links) {
 
 // Helper functions for general station movement, calculation and manipulation
 function isInterchange(d) { return d.lines.length > 1; }
-function linelength(p1, p2){ return Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2)); }
+function linelength(p1, p2){ 
+  return Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2)); 
+}
 function nan(v) { return v !== v; }
-function coordinates(p) { return JSON.stringify({x:Math.round(p.x, 2),y:Math.round(p.y, 2)}); }
+function coordinates(p) { 
+  return JSON.stringify({x:Math.round(p.x, 2),y:Math.round(p.y, 2)}); 
+}
 function octilinear(p1, p2) {
   if (p1.y == p2.y) {
     return true;
@@ -92,7 +97,7 @@ var drawGraph = function (graph) {
   force.nodes(graph.nodes)
     .links(graph.links)
     .on("tick", function() {
-        // Every tick, change the energy the map has to move relative to how "good"
+        // Every tick, change the energy map's energy relative to how "good"
         // its layout is. Bad graph => high energy to reposition, & vice versa.
         energy = Math.log(octilinearity())/10 + Math.log(lineStraightness())/10;
         force.alpha(energy);
@@ -108,7 +113,7 @@ var drawGraph = function (graph) {
       return color(d.line); 
     })
     .style("stroke-width", function(d) {
-      return 7; // Math.min(10, Math.floor(18/multiEdges[[d.source, d.target]])); 
+      return 7;
     })
     .attr("class", function (d) {
       return "link count" + d.count;
@@ -128,7 +133,8 @@ var drawGraph = function (graph) {
         });
         d3.select(this).select("circle").transition().duration(250)
         .style("fill", "black")
-        // __.data__.data is not a d3 thing (the last .data element is ours and poorly named)
+        // __.data__.data is not a d3 thing 
+        // (the last .data element is ours and poorly named)
         showArticle(this.__data__.data);
       })
     .call(force.drag);
@@ -151,8 +157,8 @@ var drawGraph = function (graph) {
   // Animate.. lots
   function tick() {
 
+    // Function from http://webiks.com/d3-js-force-layout-straight-parallel-links
     function multiTranslate(targetDistance, point0, point1) {
-    // This function is taken from http://webiks.com/d3-js-force-layout-straight-parallel-links/
       var x1_x0 = point1.x - point0.x,
           y1_y0 = point1.y - point0.y,
           x2_x0, y2_y0;
@@ -172,26 +178,35 @@ var drawGraph = function (graph) {
       var x1 = d.source.x, y1 = d.source.y,
           x2 = d.target.x, y2 = d.target.y,
           dr = 0;
-          var lw = 7; //Math.min(7, Math.floor(18/multiEdges[[d.source, d.target]]));
-          var offset = multiTranslate(d.count==1?0:(Math.floor(d.count/2))*(d.count%2?-lw:lw), d.source, d.target);
+          var lw = 7;
+          var offset = multiTranslate(
+            d.count==1?0:(Math.floor(d.count/2))*(d.count%2?-lw:lw), 
+            d.source, d.target
+          );
           x1 += offset.dx;
           x2 += offset.dx;
           y1 += offset.dy;
           y2 += offset.dy;
-      return "M" + x1 + "," + y1 + "A" + dr + "," + dr + " 0 0,1 " + x2 + "," + y2; });
+      return "M"+ x1 +","+ y1 +"A"+ dr +","+ dr +" 0 0,1" + x2 +","+ y2; 
+    });
 
-    // Change the position of the nodes as they move & don't let them go off canvas
-    node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
-        node
-        .attr("cx", function(d) { return d.x = Math.max(10, Math.min(width-10, d.x)); }) 
-        .attr("cy", function(d) { return d.y = Math.max(10, Math.min(height-10, d.y)); });
+    // Change nodes' positions as they move, don't let them go off canvas
+    node.attr("transform", function (d) { 
+      return "translate(" + d.x + "," + d.y + ")"; 
+    });
+    node.attr("cx", function(d) { 
+        return d.x = Math.max(10, Math.min(width-10, d.x)); 
+    }) 
+    .attr("cy", function(d) { 
+      return d.y = Math.max(10, Math.min(height-10, d.y)); 
+    });
 
   // Draw the key & bind the click events
    var key = svg.selectAll(".key")
     .data(color.domain())
     .enter().append("g")
     .attr("class", "key")
-    .attr("transform", function(d, i) { return "translate(0," + i * 25 + ")"; });
+    .attr("transform", function(d, i) {return "translate(0," + i * 25 + ")";});
   key.append("rect")
     .attr("x", 20)
     .attr("y", 20)
@@ -224,18 +239,23 @@ function isolateLine(d) {
         return o.line == d? 1 : 0.1;
     }).duration(700);
   } else { // Reset everything
-    node.transition().duration(700).style("fill-opacity", 1).style("stroke-opacity", 1);
-    link.transition().duration(700).style("opacity", 1);
+    node.transition().duration(700)
+      .style("fill-opacity", 1)
+      .style("stroke-opacity", 1);
+    link.transition().duration(700)
+      .style("opacity", 1);
   }
   force.start();
-  force.tick(); // All the nodes are fixed so without calling tick(), start() won't work
+  force.tick(); // All the nodes are fixed so manually tick()
   force.stop();
   iso_toggle = 1-iso_toggle;
 }
 
-// Let the nodes move around a bit and then forceably pause them
-// To-do: polling until octilinearity/LS are suitably low, then doing force.alpha(0) breaks things
-// but until then we have to have a hard time limit which performs badly sometimes
+// Let the nodes move around a bit and then forceably pause them.
+
+// To-do: polling until octilinearity/LS are suitably low, then doing 
+// force.alpha(0) breaks ALL THE THINGS. but until then we have to have a hard
+// time limit which performs badly sometimes.
 function move(time) {
   for (var n=0; n<graph.nodes.length; n++) {
     graph.nodes[n].fixed = false;
@@ -250,23 +270,24 @@ function move(time) {
   }, time);
 };
 
-// Still not sure whether it's correct to use .x or .px here, like, at all.
+// Still not sure whether it's correct to use .x or .px here.
 function getMetrics(graph, spacing) {
   var metrics = { x_min: width, x_max: 0,
                   y_min: height, y_max: 0,
                   x_avg: 0, y_avg: 0,
                   v_scale: 0, h_scale: 0 };
 
-  metrics.x_min = Math.min.apply(null, graph.nodes.map(function(d) {return d.px;}));
-  metrics.y_min = Math.min.apply(null, graph.nodes.map(function(d) {return d.py;}));
-  metrics.x_max = Math.max.apply(null, graph.nodes.map(function(d) {return d.px;}));
-  metrics.y_max = Math.max.apply(null, graph.nodes.map(function(d) {return d.py;}));
+  metrics.x_min = Math.min.apply(null,graph.nodes.map(function(d){return d.px;}));
+  metrics.y_min = Math.min.apply(null,graph.nodes.map(function(d){return d.py;}));
+  metrics.x_max = Math.max.apply(null,graph.nodes.map(function(d){return d.px;}));
+  metrics.y_max = Math.max.apply(null,graph.nodes.map(function(d){return d.py;}));
 
   metrics.x_avg = (metrics.x_min+metrics.x_max)/2.0;
   metrics.y_avg = (metrics.y_min+metrics.y_max)/2.0;
 
   metrics.v_scale = Math.abs(metrics.y_max - metrics.y_min)/(height-2*spacing);
-  metrics.h_scale = Math.abs(metrics.x_max - metrics.x_min)/(height-2*spacing); // Deliberate
+  // Deliberately same denominator for v/h scales
+  metrics.h_scale = Math.abs(metrics.x_max - metrics.x_min)/(height-2*spacing); 
   metrics.x_move = (metrics.x_min*metrics.v_scale)/2.0;
   metrics.y_move = (metrics.y_min*metrics.h_scale)/2.0;
 
@@ -284,7 +305,7 @@ function exportPositions() {
 function importPositions(positions) {
   for (var n=0; n<graph.nodes.length; n++) {
     graph.nodes[n].x = positions[n].x; graph.nodes[n].px = positions[n].x;
-    graph.nodes[n].y = positions[n].y + 10; graph.nodes[n].py = positions[n].y + 10;
+    graph.nodes[n].y = positions[n].y+10; graph.nodes[n].py = positions[n].y+10;
   }
   force.start();
   force.tick();
@@ -319,7 +340,7 @@ function spaceAlongLine(l, start, stop, dir) {
     graph.nodes[n].py = graph.nodes[n].y;
   }
   var line = metro_lines[l];
-  let real_begin = start==0? graph.nodes[line[0][0]]: graph.nodes[line[start-1][1]];
+  let real_begin = start==0?graph.nodes[line[0][0]]:graph.nodes[line[start-1][1]];
   let real_end = graph.nodes[line[stop-1][1]];
   oct = octilineariseLine(l, real_begin, real_end, dir);
   let begin = oct.b;
@@ -327,9 +348,13 @@ function spaceAlongLine(l, start, stop, dir) {
   
   let delta = dist2d(begin, end);
   delta.x = Math.ceil(delta.x/(stop-start+1));
-  delta.x = (Math.abs(3*delta.x) < spacing)? delta.x*2: (Math.abs(delta.x)>spacing)? delta.x/1.5: delta.x;
+  delta.x = (Math.abs(3*delta.x) < spacing) ? 
+    delta.x*2: (Math.abs(delta.x)>spacing) ? 
+      delta.x/1.5 : delta.x;
   delta.y = Math.ceil(delta.y/(stop-start));
-  delta.y = (Math.abs(3*delta.y) < spacing)? delta.y*2: (Math.abs(delta.y)>spacing)? delta.y/1.5: delta.y;
+  delta.y = (Math.abs(3*delta.y) < spacing) ? 
+    delta.y*2: (Math.abs(delta.y)>spacing) ? 
+      delta.y/1.5 : delta.y;
 
   for (var s=start; s<=stop; s++) {
     let station = s==0? graph.nodes[line[0][0]]: graph.nodes[line[s-1][1]];
@@ -341,7 +366,7 @@ function spaceAlongLine(l, start, stop, dir) {
 }
 
 // Snap nodes to the grid so that hopefully most of them are drawn octilinearly
-// in a discrete point space then do some line straightening and hope for the best
+// in a discrete point space then do some line straightening and hope
 function snap(){
   force.stop();
   var metrics = getMetrics(graph, spacing);
@@ -360,9 +385,13 @@ function snap(){
 
   metrics = getMetrics(graph, spacing);
 
-  // We want to place stations in order of descending weight to keep the busy map sections clean
-  var st = Object.keys(graph.nodes).sort(function(a,b){return graph.nodes[b].weight-graph.nodes[a].weight})
-  // Try and place nodes if they can be snapped, otherwise nodes can bump each other off if they are closer
+  // We want to place stations in order of descending weight to keep busy 
+  // sections of the map as clean as possible
+  var st = Object.keys(graph.nodes).sort(function(a,b){
+    return graph.nodes[b].weight-graph.nodes[a].weight
+  });
+  // Try and place nodes if they can be snapped, otherwise nodes can bump 
+  // each other off if they are closer to the intersection
   for (var n of st) {
     let node = graph.nodes[n];
     node.x = (node.x) * (1.0/metrics.h_scale) - metrics.x_move;
@@ -376,7 +405,7 @@ function snap(){
       node.placed = true;
       node.x, node.px = c.x, c.x;
       node.y, node.py = c.y, c.y;  
-    } else if (taken[coordinates(c)] && dist2d(node, c) < dist2d(taken[coordinates(c)], c)) {
+    } else if (dist2d(node, c) < dist2d(taken[coordinates(c)], c)) {
       let old = taken[coordinates(c)];
       old.placed = false;
       taken[coordinates(c)] = node;
@@ -400,7 +429,7 @@ function snap(){
       let c=graph.nodes[line[s][1]];
       let candidate = {x:(a.px+c.px)/2.0, y:(a.py+c.py)/2.0};
 
-      if (octilinear(a, c) && b.weight <= 2 && !taken[coordinates(candidate)])  {
+      if (octilinear(a, c) && b.weight <= 2 && !taken[coordinates(candidate)]){
         taken[coordinates(b)] = false;
         taken[coordinates(candidate)] = b;
         b.x, b.px = candidate.x, candidate.x;
@@ -473,8 +502,7 @@ function snap(){
   }
 
   var metrics = getMetrics(graph, spacing);
-
-  // We've moved around a lot so the map probably need rescaling & recentering
+  // We've moved around a lot so the map probably needs rescaling & recentering
   for (var n=0; n<graph.nodes.length; n++) {
     let node = graph.nodes[n];
     node.x = (node.px) * (1.0/metrics.h_scale);
@@ -537,39 +565,27 @@ var lineStraightness = function(){
 }
 
 move(2000);
-setTimeout(function(){
-  snap(); 
-}, 2500);
+setTimeout(function(){snap();}, 2500);
 
+// Function from http://stackoverflow.com/a/3177838
 function timeSince(date) {
     var seconds = Math.floor((new Date() - date) / 1000);
     var interval = Math.floor(seconds / 31536000);
-
-    if (interval > 1) {
-        return interval + " years";
-    }
+    if (interval > 1) { return interval + " years";}
     interval = Math.floor(seconds / 2592000);
-    if (interval > 1) {
-        return interval + " months";
-    }
+    if (interval > 1) { return interval + " months"; }
     interval = Math.floor(seconds / 86400);
-    if (interval > 1) {
-        return interval + " days";
-    }
+    if (interval > 1) { return interval + " days"; }
     interval = Math.floor(seconds / 3600);
-    if (interval > 1) {
-        return interval + " hours";
-    }
+    if (interval > 1) { return interval + " hours";}
     interval = Math.floor(seconds / 60);
-    if (interval > 1) {
-        return interval + " minutes";
-    }
+    if (interval > 1) {return interval + " minutes";}
     return Math.floor(seconds) + " seconds";
 }
 
 function showArticle(data) {
-  $('#article-container').get(0).innerHTML = "<h1>"+data.title+"</h1>"+"<h2>"+timeSince(data.date)+" ago</h2>"+ data.html;
-    //`<h1>${data.title}</h1><h2>${data.date}</h2><img src='${data.img}'/>`
+  $('#article-container').get(0).innerHTML = 
+  "<h1>"+data.title+"</h1>"+"<h2>"+timeSince(data.date)+" ago</h2>"+ data.html;
 }
 
 $('#graphPane').click(function() {

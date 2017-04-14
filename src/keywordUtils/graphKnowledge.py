@@ -18,7 +18,8 @@ class NewsGraphResult:
 		for response in candidates: 
 			desc = response['result'].get('description', "")
 			if 'detailedDescription' in response['result']:
-				desc = response['result']['detailedDescription'][u'articleBody'].encode('utf-8')
+				desc = response['result']['detailedDescription']
+				desc = desc[u'articleBody'].encode('utf-8')
 			self.candidates.append((
 				response['result'].get('name', query),
 				response['result']['@type'],
@@ -28,7 +29,10 @@ class NewsGraphResult:
 		if len(candidates) < 2:
 			self.certainty = 0
 		else:
-			self.certainty = candidates[0]['resultScore']/candidates[1]['resultScore']
+			first = candidates[0]['resultScore']
+			second = candidates[1]['resultScore']
+			self.certainty = first/second
+				
 	
 	def nth(self, n):
 		if self.candidates and len(self.candidates) > n-1:
@@ -40,12 +44,15 @@ class NewsGraphResult:
 		return self.nth(1)
 
 	def isPerson(self):
-		return "Person" in self.candidates[0][NewsGraphResult.TYPES] if self.candidates else None
+		if self.candidates:
+			return "Person" in self.candidates[0][NewsGraphResult.TYPES]
+		return None
 
 
 class NewsGraphKnowledge:
 	LOG = False
-	IGNORE = [u"AP", u"Caption", u"Getty Images Image", u"Getty Images", u"Getty", u"Photograph", u"Photo", u"Facebook Twitter Pinterest"]
+	IGNORE = [u"AP", u"Caption", u"Getty Images Image", u"Getty Images", 
+			u"Getty", u"Photograph", u"Photo", u"Facebook Twitter Pinterest"]
 	API_KEY = 'keywordUtils/.api_key'
 
 	def __init__(self):
@@ -67,6 +74,9 @@ class NewsGraphKnowledge:
 		else:
 			return None
 
+	def popular(popular_entities, result):
+		return result.top()[NewsGraphResult.NAME] in popular_entities
+
 	def aliasEntities(self, entities, certainty=3):
 		uncertain = []
 		mapping = {}
@@ -74,7 +84,11 @@ class NewsGraphKnowledge:
 
 		strength = {e: entities.count(e) for e in entities}
 
-		popular_entities = list(set([e for e in entities if entities.count(e) > 2 and len(e) and e not in NewsGraphKnowledge.IGNORE]))
+		popular_entities = list(set(
+			[e for e in entities 
+			if entities.count(e) > 2 and len(e) 
+			and e not in NewsGraphKnowledge.IGNORE]
+		))
 
 		out = set()
 		for e1, e2 in combinations(popular_entities, 2):
@@ -105,7 +119,7 @@ class NewsGraphKnowledge:
 			if result==None or result.top()==None:
 				continue
 
-			if result.certainty > certainty or result.top()[NewsGraphResult.NAME] in popular_entities:
+			if result.certainty > certainty or popular(popular_entities, result):
 				if NewsGraphKnowledge.LOG:
 					n = result.top()[NewsGraphResult.NAME]
 					if isinstance(n, unicode):
@@ -132,6 +146,9 @@ class NewsGraphKnowledge:
 				else:
 					mapping[queryText] = queryText
 
-		aliases = dict((entity, alias) for entity, alias in mapping.iteritems() if entity!=alias)
+		aliases = dict(
+			(entity, alias) for entity, alias in mapping.iteritems() 
+			if entity!=alias
+		)
 		freqs = Counter([aliases.get(e, e) for e in entities])
 		return aliases, freqs
