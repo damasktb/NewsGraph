@@ -20,7 +20,7 @@ doc/.texpadtmp/*
 *api_key
 io_ignore
 doc/data*
-evaluation*
+../evaluation*
 data-science-is-hard*
 *.gdraw
 *.pages
