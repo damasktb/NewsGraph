@@ -11,14 +11,12 @@ goose-extractor == 1.0.25
 # webUtils/html.py: 3,4
 lxml == 3.7.3
 
-# newsgraph.py: 4,14
+# newsUtils/newsfeeds.py: 3,10
+# newsgraph.py: 3
 newspaper == 0.0.9.8
 
 # keywordUtils/corpusUtilities.py: 1
 nltk == 3.2.2
-
-# newsgraph.py: 6
-planarity == 0.4.1
 
 # keywordUtils/corpusUtilities.py: 11
 pyteaser == 2.0
@@ -26,7 +24,7 @@ pyteaser == 2.0
 # keywordUtils/corpusUtilities.py: 8
 stop-words == 2015.2.23.1
 
-# newsgraph.py: 16
+# newsUtils/newsfeeds.py: 12
 tqdm == 4.11.2
 
 # keywordUtils/corpusUtilities.py: 10

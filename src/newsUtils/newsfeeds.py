@@ -188,7 +188,7 @@ class NewsCollection:
     """
     Return the top n entities in this article by descending tf-idf.
     Default n = all.
-    Boost the score of any terms in {include} by {boost, default=100}
+    Boost the score of any terms in {include} by {boost, default=10}
     """
     vector = {}
     article = self.article(article_id)
@@ -221,7 +221,7 @@ class NewsCollection:
           ret[entity] = update
     return ret
 
-  def top_corpus_keywords(self, top_n=25, include=[], exclude=[], boost=100):
+  def top_corpus_keywords(self, top_n=25, include=[], exclude=[], boost=10):
     """
     Return a dictionary of the top {entity:[(score,article),...]} in this 
     corpus, with words in {include} boosted and words in {exclude} ignored.
