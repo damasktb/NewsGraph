@@ -86,7 +86,7 @@ function octilinear(p1, p2) {
   } else if (p1.x == p2.x) {
     return true;
   } else {
-    return Math.abs((p2.x-p1.x)/(p2.y-p1.y)) < 0.1;
+    return Math.abs((p2.x-p1.x)/(p2.y-p1.y)) < 1;
   }
 }
 function gradient(a, b){ return (b.py-a.py)/(b.px-a.px); }
@@ -98,9 +98,8 @@ var drawGraph = function (graph) {
   force.nodes(graph.nodes)
     .links(graph.links)
     .on("tick", function() {
-        // Every tick, change the energy map's energy according to 
-        // how "good" its layout is. Bad graph => high energy to 
-        // reposition in future tick()s, & vice versa.
+        // Update the energy map's energy according to the aesthetic
+        // criteria. Poor aesthetics => More energy to reposition.
         energy = Math.log(octilinearity())/10 + 
                  Math.log(lineStraightness())/10;
         force.alpha(energy);
@@ -275,7 +274,6 @@ function move(time) {
   }, time);
 };
 
-// Still not sure whether it's correct to use .x or .px here.
 function getMetrics(graph, spacing) {
   var metrics = { x_min: width, x_max: 0,
                   y_min: height, y_max: 0,
@@ -283,13 +281,13 @@ function getMetrics(graph, spacing) {
                   v_scale: 0, h_scale: 0 };
 
   metrics.x_min = Math.min.apply(
-    null,graph.nodes.map(function(d){return d.px;}));
+    null,graph.nodes.map(function(d){return d.x;}));
   metrics.y_min = Math.min.apply(
-    null,graph.nodes.map(function(d){return d.py;}));
+    null,graph.nodes.map(function(d){return d.y;}));
   metrics.x_max = Math.max.apply(
-    null,graph.nodes.map(function(d){return d.px;}));
+    null,graph.nodes.map(function(d){return d.x;}));
   metrics.y_max = Math.max.apply(
-    null,graph.nodes.map(function(d){return d.py;}));
+    null,graph.nodes.map(function(d){return d.y;}));
 
   metrics.x_avg = (metrics.x_min+metrics.x_max)/2.0;
   metrics.y_avg = (metrics.y_min+metrics.y_max)/2.0;
@@ -414,25 +412,30 @@ function snap(){
   // bump each other off if they are closer to the intersection
   for (var n of st) {
     let node = graph.nodes[n];
-    node.x = (node.x) * (1.0/metrics.h_scale) - metrics.x_move;
-    node.y = (node.y) * (1.0/metrics.v_scale) - metrics.y_move;
+    node.x = (node.x-metrics.x_move) * (1.0/metrics.h_scale);
+    node.y = (node.y-metrics.y_move) * (1.0/metrics.v_scale);
 
-    c = { x: Math.ceil((node.x+metrics.x_avg)/spacing) * spacing,
-          y: Math.ceil((node.y+metrics.y_avg)/spacing) * spacing};
+    c = { x: Math.ceil((node.x)/spacing) * spacing,
+          y: Math.ceil((node.y)/spacing) * spacing};
 
     if (!taken[coordinates(c)]){
       taken[coordinates(c)] = node;
       node.placed = true;
-      node.x, node.px = c.x, c.x;
-      node.y, node.py = c.y, c.y;  
+      node.px = c.x;// node.px = c.x;
+      node.py = c.y;// node.py = c.y;
     } else if (dist2d(node, c) < dist2d(taken[coordinates(c)], c)) {
       let old = taken[coordinates(c)];
       old.placed = false;
       taken[coordinates(c)] = node;
       node.placed = true;
-      node.x, node.px = c.x, c.x;
-      node.y, node.py = c.y, c.y;
+      node.px = c.x;// node.px = c.x;
+      node.py = c.y;// node.py = c.y;
     }
+  }
+
+  for (var n=0; n<graph.nodes.length; n++) {
+    graph.nodes[n].px = graph.nodes[n].x;
+    graph.nodes[n].py = graph.nodes[n].y;
   }
 
   // If we have: (a)  x  (c) [ac is octilinear, b has no other links]
@@ -453,8 +456,8 @@ function snap(){
         b.weight <= 2 && !taken[coordinates(candidate)]){
         taken[coordinates(b)] = false;
         taken[coordinates(candidate)] = b;
-        b.x, b.px = candidate.x, candidate.x;
-        b.y, b.py = candidate.y, candidate.y;
+        b.x = candidate.x; b.px = candidate.x;
+        b.y = candidate.y; b.py = candidate.y;
         b.placed = true;
       }
     }
@@ -522,14 +525,54 @@ function snap(){
     }
   }
 
+  var to_space = {};
+  // Forwards
+  for (var l in metro_lines) {
+    line = metro_lines[l];
+    var s = 0;
+    var start_from = graph.nodes[line[s][0]];
+    if (start_from.weight==1) {
+      var acc = graph.nodes[line[s][1]];
+      while (acc.weight<=2 && s<line.length) {
+        acc = graph.nodes[line[s][1]];
+        ++s;
+      }
+      var end = s;
+      if (end != 0) {
+        to_space[l] = [[0, end, 1]];
+      }
+    }
+
+    //Backwards
+    s = line.length-1;
+    start_from = graph.nodes[line[s][1]];
+    if (start_from.weight==1) {
+      var acc = graph.nodes[line[s][0]];
+      while (acc.weight<=2 && s>0) {
+        --s;
+        acc = graph.nodes[line[s][0]];
+      }
+      var start = acc.weight<=2? s-1: s;
+      if (start != line.length-1) {
+        to_space[l] = to_space[l] || [];
+        to_space[l].push([start, line.length, -1]);
+      }
+    }
+  }
+  for (line in to_space) {
+    for (group of to_space[line]) {
+      spaceAlongLine(line, group[0], group[1], group[2]);
+    }
+  }
+
   var metrics = getMetrics(graph, spacing);
   // We've moved the stations around a lot so the map probably needs 
   // rescaling & recentering.
   // To-do, this suffers from the x/px problem, and NaNs sometimes.
   for (var n=0; n<graph.nodes.length; n++) {
     let node = graph.nodes[n];
-    node.x = (node.px) * (1.0/metrics.h_scale);
-    node.y = (node.py) * (1.0/metrics.v_scale);
+    node.x = (node.x-metrics.x_move) * (1.0/metrics.h_scale);
+    node.y = (node.y-metrics.y_move) * (1.0/metrics.v_scale);
     node.px = node.x;
     node.py = node.y;
   }
@@ -548,14 +591,17 @@ function snap(){
   console.debug("lineStraightness:", lineStraightness());
 }
 
-// This fails if a link has the same source and target co-ordinates
 var octilinearity = function(){
   var total = 0;
   for (var n=0; n<graph.links.length; n++) {
       let s = graph.links[n].source;
       let t = graph.links[n].target;
-      let theta = 4*Math.atan(Math.abs((s.py-t.py)/(s.px-t.px)));
-      total += Math.abs(Math.sin(theta));
+      if (s.py-t.py==0 || s.px-t.px==0) {
+        continue; // implicit total += 0
+      } else {
+        let theta = 4*Math.atan(Math.abs((s.py-t.py)/(s.px-t.px)));
+        total += Math.abs(Math.sin(theta));
+      }
     }
   return total;
 }
@@ -572,10 +618,10 @@ var lineStraightness = function(){
       let v1 = {x:a.px - b.px, y:a.py - b.py};
       let v2 = {x:c.px - b.px, y:c.py - b.py};
 
-      var v1mag = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
-      var v2mag =  Math.sqrt(v2.x * v2.x + v2.y * v2.y);
-      var v1norm = {x:v1.x / v1mag, y:v1.y / v1mag};
-      var v2norm = {x:v2.x / v2mag, y:v2.y / v2mag};
+      var v1mag = Math.sqrt(v1.x*v1.x + v1.y*v1.y);
+      var v2mag =  Math.sqrt(v2.x*v2.x + v2.y*v2.y);
+      var v1norm = {x:v1.x/v1mag, y:v1.y/v1mag};
+      var v2norm = {x:v2.x/v2mag, y:v2.y/v2mag};
       
       var res = (v1norm.x * v2norm.x + v1norm.y * v2norm.y);
       // Make sure we don't NaN on e.g. acos(1.0000000000002)

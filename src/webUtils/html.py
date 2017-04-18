@@ -7,7 +7,7 @@ from datetime import datetime
 from xml.sax.saxutils import escape
 
 class Libraries:
-  MATERIALIZE = "https://cdnjs.cloudflare.com/ajax/libs/", \
+  MATERIALIZE = "https://cdnjs.cloudflare.com/ajax/libs/"+ \
   "materialize/0.98.0/css/materialize.min.css"
   MATERIAL_ICONS = \
   "https://fonts.googleapis.com/icon?family=Material+Icons"

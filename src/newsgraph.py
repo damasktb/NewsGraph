@@ -39,7 +39,7 @@ ignore = []
 
 cln = None
 if read_cache:
-  rd = CacheReader(read_cache_name)
+  rd = CacheReader('io_ignore/guardian-us.ng') #read_cache_name
   cln = rd.read()
 else:
   urls = []
