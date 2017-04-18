@@ -124,7 +124,7 @@ A complete set of results for the following tests is available in Appendix \ref{
 
 Our first hypothesis predicted that users' estimates for the number of articles represented on a map would be lower than their estimates of the same number of articles shown in the form of a list. A paired-samples $t$-test was conducted to compare estimates for the \textit{map} and \textit{list} conditions. Data was screened for violation of the following assumptions before the test was performed:
 \vspace{-0.2cm}
-\begin{itemize}[label={},itemsep=0.05em]
+\begin{itemize}[label={},itemsep=0.05em,leftmargin=0cm]
 	\item \textbf{Continuous Measurement}: Both estimates were measured on a continuous scale.
 	\item \textbf{Independence}: Participants' estimates were independent of each other.
 	\item \textbf{Outliers}: There were no outliers in either of the estimates.
@@ -146,7 +146,7 @@ The results of the $t$-test suggest there was no significant difference in estim
 
 Our second hypothesis predicted that users would identify more topics in their index after using the map than after using the list. A second paired-samples $t$-test was conducted to compare the number of topics produced during the \textit{map} and \textit{list} conditions.
 
-As in the previous test, there was no missing data, and data was screened for violation of measurement level, independence, outliers and normality (\textit{map topics}: W=0.958, df=16, $p$=0.633,  \textit{list topics}: W=0.917, df=16, $p$=0.152) as before. Figure \ref{fig:index} verifies that there was no significant difference in index topics between corpora A and B.
+As in the previous test, there was no missing data, and data was screened for violation of measurement level, independence, outliers and normality (\textit{map topics}: W=0.958, df=16, $p$=0.633,  \textit{list topics}: W=0.917, df=16, $p$=0.152) as before. Figure \ref{fig:index} verifies that there was no significant difference in total index topics between corpora A and B.
 
 \begin{figure}[htbp!]
 	\centering
@@ -163,11 +163,11 @@ Since these results supported our hypothesis, we conducted a second round of tes
 \centering
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[height=.49\linewidth]{img/evaluation/primary.pdf}
+  \includegraphics[height=.47\linewidth]{img/evaluation/primary.pdf}
   \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[height=.49\linewidth]{img/evaluation/depth}
+  \includegraphics[height=.47\linewidth]{img/evaluation/depth.pdf}
 \end{minipage}
 	\caption{Comparison of \textit{Map} and \textit{List} topic breadth and depth between the two corpora}
   \label{fig:depthbreadth}
@@ -213,16 +213,30 @@ Due to the the strong positive correlations between pleasure and dominance obser
 \end{tabular}
 \end{table}
 
-When pleasure and dominance are both high, it is not immediately obvious which emotional response is more desirable between exuberance and relaxation. However, taking each participant's exuberance as (P+A+D) and their relaxation as (P$-$A+D) and correlating these composite variables with the results of the index task, a strong link emerges between exuberance and total topics produced in the \textit{map} condition ($r$=0.753, $p$=0.001). No such correlation exists with relaxation in the \textit{map} condition, or with either of these two variables in the \textit{list} condition.
+When pleasure and dominance are both high, it is not immediately obvious which emotional response is the desirable outcome between exuberance and relaxation. Taking each participant's exuberance as (P+A+D) and their relaxation as (P$-$A+D) and correlating these composite variables with the results of the index task, a strong link emerges between exuberance and total topics produced in the \textit{map} condition ($r$=0.753, $p$=0.001), as shown in Figure \ref{fig:exuberance}. No such correlation exists with relaxation in the \textit{map} condition, or with either of these two variables in the \textit{list} condition.
 
-From the above results, it is apparent that the strength of the metro maps at at affective interaction level when both pleasure and dominance are held constant, is that participants are more excited to use them, rather than more relaxed in doing so.
+\begin{figure}[h]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{img/evaluation/listexuberance.pdf}
+  \end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{img/evaluation/mapexuberance.pdf}
+\end{minipage}
+	\caption{Comparison of correlations between index topics and exuberance}
+  \label{fig:exuberance}
+\end{figure}
+
+From the above correlations and the earlier results which support Hypothesis \ref{hyp:index}, it is apparent that the strength of the metro maps in terms of the dimensions of affect is that participants are more excited to use them, rather than more relaxed in doing so.
 
 
 \subsection{Participant Feedback}
 
-Participants' feedback on the metro maps was mixed, but with the majority of comments being positive. One participant, despite identifying more topics (both primary and total) using a metro map, reported lower happiness and feeling less in control with the map, stating ``The list was easier. I could link the topics myself in a way that felt more natural. Using the map I didn't always agree with the categorisation."
+Participants' feedback on the metro maps was mixed, but with the majority of comments being positive. One participant, despite identifying more topics (both primary and total) using a metro map, reported lower happiness and feeling less in control with the map, stating ``The list was easier. I could link the topics myself in a way that felt more natural. Using the map I didn't always agree with the categorisation." This response suggests that there was a clash between the model of the map and the participants' mental model of the underlying news, possibly exacerbated by the participant's above average news consumption.  We anticipate that if this is the case, then use of the \textit{include} and \textit{ignore} functionality by users are more confident with current events news could help align the structure of the metro maps generated with their existing mental models. 
 
-In contrast to this, a different participant (whose scores were similar to the participant above during both conditions) said ``It was easier to find stuff I cared about [using the map] with nothing in the way.'' This comment was in reference to the fact that if users wished to, they could choose to follow the stories along a single metro line and ignore everything else on the map, whereas with the list there was no filtering mechanism.
+In contrast to the first response, a different participant (whose scores were similar to the participant above during both conditions) said ``It was easier to find stuff I cared about [using the map] with nothing in the way.'' This comment was in reference to the fact that if users wished to, they could choose to follow the stories along a single metro line and ignore everything else on the map, whereas with the list there was no filtering mechanism.
 
 During the index task for the list condition, another participant asked whether topics could be repeated, ``Because this one relates to both of those [parent topics]''. He then remarked, ``This really does suit being on a graph, doesn't it.'' This was a direct reflection of the demographic of our participants; 15 out of the 16 were Computer Science students, who are required to study elementary graph theory as part of their course.
 
