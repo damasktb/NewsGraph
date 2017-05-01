@@ -8,10 +8,9 @@ This chapter presents the results of applying our method to a selection of RSS f
 \section{UK Politics (BBC News) \label{sec:politics}}
 
 The main topic threads for March 16\textsuperscript{th} 2017 in British politics were Scottish First Minister Nicola Sturgeon's call for a second independence referendum, the government's U-turn on National Insurance increases for the self-employed in the Spring Budget, and The Queen granting Article 50 royal assent, therefore enabling Brexit negotiations to begin.
-
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=.7\textwidth]{img/results/bbc-politics-frontpage.png}
+	\includegraphics[width=.75\textwidth]{img/results/bbc-politics-frontpage.png}
 	\caption{The front page BBC Politics article; drawn as (a) in Figure \ref{fig:bbc-pol}.}
 	\label{fig:bbc-pol-home}
 \end{figure}
@@ -19,10 +18,9 @@ The main topic threads for March 16\textsuperscript{th} 2017 in British politics
 To determine whether the map captured day's important political issues, we turn back to the native representation of the news. The BBC selected a piece on the proposed Scottish referendum as the front page article for their Politics page (Figure \ref{fig:bbc-pol-home}); a position which is generally indicative of importance.
 
 In contrast, RSS feeds have no notion of relative content importance, so the system has no way of knowing this article should be included. Nevertheless however, when the article is parsed, its keyword vector contains \texttt{\{`Scotland': 1.09861\}} as the top entity. This term-frequency was strengthened by the transformation of every instance of the denominal adjective \textit{Scottish} into the noun form, \textit{Scotland}. The concentration of articles which focus heavily on Scotland (its coverage score of 182.644 was the third highest of the corpus) means it is selected as a metro line, resulting in the article being added to the map as we had hoped (see Figure \ref{fig:bbc-pol}).
-
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=\textwidth]{img/results/bbc-politics.pdf}
+	\includegraphics[width=.9\textwidth]{img/results/bbc-politics.pdf}
 	\caption{A metro map covering the BBC UK Politics RSS feed (March 16\textsuperscript{th} 2017)}
 	\label{fig:bbc-pol}
 \end{figure}
@@ -33,17 +31,15 @@ Despite being entirely subsumed by the \textit{Labour Party} line, \textit{Jerem
 
 \section{Business (The Telegraph) \label{sec:business}}
 
-The system also performs well for international business news, where entities are typically the names of companies and organisations as opposed to people. NLTK Struggles with place names which have containment issues, for example, `City of London' is split into `City' and `London', and `Bank of England' into `Bank' and `England'. `London' and `England' are then penalised by tf-idf for being frequent among much of the corpus, so neither are selected as metro lines. In spite of this, the map is still largely usable and exhibits good coverage.
-
+The system also performs well for international business news, where entities are typically the names of companies and organisations as opposed to people. NLTK Struggles with place names which have containment issues, for example, `City of London' is split into \textit{City} and \textit{London}, and `Bank of England' into \textit{Bank} and \textit{England}. \textit{London} and \textit{England} are then penalised by tf-idf for being common, but  \textit{Bank} and \textit{City} are both selected as metro lines. In spite of this contrived error, the map is still largely usable and exhibits good coverage.
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=.83\textwidth]{img/results/telegraph-business-tfidf.pdf}
+	\includegraphics[width=.9\textwidth]{img/results/telegraph-business-tfidf.pdf}
 	\caption{A metro map covering The Telegraph's Business RSS feed (March 17\textsuperscript{th} 2017)}
 	\label{fig:telegraph-business}
 \end{figure}
 
 From an aesthetic perspective, a common pitfall of our approach is visible on the \textit{Bank} line (Figure \ref{fig:telegraph-business}). During repeated passes along each octilinear line, stations are moved to the midpoint of their immediately adjacent neighbours, which results in noticeably variable edge lengths. A fix for this would be to iterate between pairs of stations which represent the endpoints of a run of stations all with weight two and distribute the accumulated stations at uniform intervals between the two points (Figure \ref{fig:equal-spacing}).
-
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=.5\textwidth]{img/results/equal-spacing.pdf}
@@ -52,10 +48,9 @@ From an aesthetic perspective, a common pitfall of our approach is visible on th
 \end{figure}
 
 A second pitfall is the inability of the algorithm to smooth the \textit{European Union} line in Figure \ref{fig:telegraph-business-poor} between two points which are not octilinear to each other. The shape of the \textit{China} line here is also frequently observed, because the initial force-directed algorithm causes lines to form circular arrangements, which are then snapped to co-ordinates which form squares.
-
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=\textwidth]{img/results/telegraph-business-poor.pdf}
+	\includegraphics[width=.8\textwidth]{img/results/telegraph-business-poor.pdf}
 	\caption{A poor embedding of the map in Figure \ref{fig:telegraph-business}}
 	\label{fig:telegraph-business-poor}
 \end{figure}
@@ -66,7 +61,6 @@ A second pitfall is the inability of the algorithm to smooth the \textit{Europea
 Sports journalism was popular among the participants of the Associated Press [\citeyear{anewmodelfornews}] study, in part because of the clean cut categorisation of teams within sports, within countries where applicable. Story resolution could be always achieved on a match-by-match basis, or over one or more seasons of predefined length. Current events journalism, in contrast, includes stories which are complex and sprawling in nature, often continuing over a period of days, weeks or even years.
 
 Our system was designed for use with current events articles rather than sports content, but the results obtained through doing so bring to light some interesting issues which were not evident in previous examples, and therefore warrant discussion.
-
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{img/results/guardian-sport.pdf}
@@ -97,9 +91,9 @@ This chapter presented three different perspectives from which the results of th
 
 Firstly, we verified that our maps provide sufficient coverage of topics which were deemed significant by the original news source, and discussed a concrete example of two topics being selected as metro lines despite their high affinity with each other.
 
-Following on from content, we took a step back and looked at the maps purely in terms of the success of their embeddings. We provided examples of a best and worst case layout for a particular current events metro map and identified common weaknesses of the map layout algorithm, in particular the inability of the layout algorithm to smooth non-octilinear edges once stations have been marked as placed.
+Following on from content, we took a step back and evaluated the maps purely in terms of the success of their embeddings. Best and worst case layout examples were provided examples for a particular current events map, where we identified common weaknesses of the map layout algorithm, in particular the inability of the layout algorithm to smooth non-octilinear edges once stations have been marked as placed.
 
-Finally, we used the system to generated a metro map for a corpus it was not designed to be used on; international sports news. This demonstrated the need for common entities within a corpus to be identifiable without ambiguity, unlike for instance the names of international sports teams between different sporting disciplines. We did however find that the system generates useful maps for sports news corpora when restricted to individual sports, where there is less obvious name ambiguity.
+Finally, we used the system to generated a metro map for a corpus it was not designed to be used on; international sports news. This demonstrated the need for common entities within a corpus to be identifiable without ambiguity, unlike for instance the names of international sports teams between different sporting disciplines. We did however find that the system generates useful maps for sports news corpora when restricted to individual sports, where there is less obvious name ambiguity, and the corpus itself suggests a schema for expected entities.
 
 Section \ref{sec:sport} ended with a more general note on the utility of a schema during the graph formation process, where metro lines are chosen from a pool of candidate keywords. Being able to select or reject lines based on a schematisation of expected entities within a corpus was not something we had considered during the implementation of the system, as it only came to light by using the system on data it was not designed for. Nevertheless, schema-based metro line selection and pruning is a novel concept which merits further investigation in future systems.
 

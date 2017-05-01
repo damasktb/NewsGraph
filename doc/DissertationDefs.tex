@@ -1,6 +1,7 @@
 %%
 %% Package includes to provide the basic style
 %%
+\usepackage[gray]{xcolor}
 \usepackage{graphicx}   % Permits import of various graphics formats
 \graphicspath{{../img/}}
 \usepackage{hyperref}   % Provides hyperlinks to sections automatically
@@ -9,7 +10,7 @@
 \setlength{\columnsep}{1.5cm}
 
 \usepackage[ruled,linesnumbered]{algorithm2e}
-\usepackage{color}
+%\usepackage{color}
 \usepackage{listings}   % Provides styled code listings
 
 \setcounter{secnumdepth}{5}
@@ -20,79 +21,9 @@
 \usepackage{minted}
 
 \usepackage{graphicx}
-\usepackage{xcolor}
 \usepackage{dirtree}
 \newcommand\myicon[1]{{\color{#1}\rule{2ex}{2ex}}}
 \newcommand{\myfolder}[2]{\myicon{#1}\ {#2}}
-
-\definecolor{darkgray}{rgb}{.4,.4,.4}
-\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
-\definecolor{editorLightGray}{cmyk}{0.05, 0.05, 0.05, 0.1}
-\definecolor{editorGray}{cmyk}{0.6, 0.55, 0.55, 0.2}
-\definecolor{editorPurple}{cmyk}{0.5, 1, 0, 0}
-\definecolor{editorWhite}{cmyk}{0, 0, 0, 0}
-\definecolor{editorBlack}{cmyk}{1, 1, 1, 1}
-\definecolor{editorOrange}{cmyk}{0, 0.8, 1, 0}
-\definecolor{editorBlue}{cmyk}{1, 0.6, 0, 0}
-\definecolor{editorPink}{cmyk}{0, 1, 0, 0}
-
-\lstdefinelanguage{JavaScript}{
-  keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
-  morecomment=[l]{//},
-  morecomment=[s]{/*}{*/},
-  morestring=[b]',
-  morestring=[b]",
-  ndkeywords={class, export, boolean, throw, implements, import, this},
-  keywordstyle=\color{blue}\bfseries,
-  ndkeywordstyle=\color{darkgray}\bfseries,
-  identifierstyle=\color{black},
-  commentstyle=\color{purple}\ttfamily,
-  stringstyle=\color{red}\ttfamily,
-  sensitive=true,
-}
-
-\lstnewenvironment{HTML}[2]{\lstset{
-  language=html,
-  tagstyle=\color{editorBlue},
-  basicstyle={\small\ttfamily},
-  identifierstyle=\color{editorOrange},
-  keywordstyle=\color{editorPink},
-  commentstyle=\color{editorGray},
-  stringstyle=\color{editorPurple},
-  showstringspaces=false,
-  showspaces=false,
-  numbers=left,
-  numberstyle=\footnotesize,
-  numbersep=9pt,
-  tabsize=2,
-  breaklines=true,
-  showtabs=false,
-  captionpos=b,
-  caption={#1},
-  label={#2}
-}}{}
-
-\lstnewenvironment{Python}[2]
-  {\lstset{language=Python, breaklines, breakatwhitespace, caption={#1}, label={#2}, basicstyle=\small}}{}
-
-\lstnewenvironment{JS}[2]{\lstset{
-   language=JavaScript,
-   backgroundcolor=\color{lightgray},
-   extendedchars=true,
-   basicstyle=\footnotesize\ttfamily,
-   showstringspaces=false,
-   showspaces=false,
-   numbers=left,
-   numberstyle=\footnotesize,
-   numbersep=9pt,
-   tabsize=2,
-   breaklines=true,
-   showtabs=false,
-   captionpos=b,
-   caption={#1},
-   label={#2}
-}}{}
-
   
 \usepackage[top=4cm, bottom=3cm]{geometry} % Margins
 \usepackage{titlesec}
@@ -137,7 +68,7 @@
 \usepackage{calc}
 \setlength{\parskip}{7pt}
 \setlength{\parindent}{0pt}
-\addtolength{\hoffset}{0.5cm}
+\addtolength{\hoffset}{0.7cm}
 \addtolength{\textwidth}{0.6cm}
 %\titleformat{\chapter}[display]{\vspace{-1cm}\normalfont\bfseries}{}{0pt}{\huge}
 %%

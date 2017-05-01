@@ -1,6 +1,6 @@
 During the requirements gathering process, four distinct components of the system were identified which form a pipeline of execution; \textit{Article Retrieval}, \textit{Keyword Extraction}, \textit{Graph Building} and \textit{Map Drawing}. Crucially, all key areas of functionality within components are decoupled by design, allowing both for flexible extensibility and for alternative implementations to be tested directly against each other without requiring changes to the other modules.
 
-This chapter decomposes each of the four components to provide a detailed overview of their design and implementation, including a discussion of significant challenges and successes which arose during development.
+This chapter decomposes each of the four components in order, and provides a detailed overview of their design and implementation, including a discussion of significant challenges and successes which arose during development.
 
 \section{Code Reuse}
 The system was developed in Python 2.7 and JavaScript 1.7 using various open-source libraries and APIs. The most notable are detailed below and discussed in context in the following sections.
@@ -15,7 +15,7 @@ The system was developed in Python 2.7 and JavaScript 1.7 using various open-sou
 
 \section{Article Retrieval}
 
-The first stage of article retrieval is the parsing of RSS feeds, in order for article URLs and metadata to be extracted. This component of the system is substantially smaller than the subsequent three, as it is simply a preprocessing task.
+The first stage of article retrieval is the parsing of RSS feeds, in order for article URLs and metadata to be extracted. This component of the system is substantially smaller than the remaining three, as it is simply a preprocessing task.
 
 The Python library FeedParser was used for parsing, as at the time of writing it provided the best support for RSS 0.9x, 1.0 and 2.0. The parsing process extracts a link, channel name, and the parsed publish date from every article in the feed, but it will also attempt to extract the author name if the \texttt{author} attribute is found.
 
@@ -25,16 +25,18 @@ Once the feed data has been extracted, it is used to construct an instance of \t
 \section{Keyword Extraction} \label{sec:keys}
 
 The keyword extraction stage begins with the process of tokenising the body text of every article. Tokenisation here has three substages, all of which were implemented using NLTK (The Natural Language Toolkit for Python), and which are as follows (see Figure \ref{fig:tokenisation}):
+
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{img/implementation/Tokenisation.pdf}
 	\caption{Stepping through the tokenisation process}
 	\label{fig:tokenisation}
 \end{figure}
+
 \begin{enumerate}[itemsep=0.3em]
 	\item\textbf{Sentence segmentation:} Split the text into a list of sentences and remove sentence punctuation. This process is important, to prevent phrases being mistakenly identified across clause boundaries. It is also a non-trivial problem due to the ambiguity of the full-stop in English language texts \citep{TokenisationAndSentenceSegmentation}.
 	\item\textbf{Tokenisation:} Split each sentence into a list of individual words and remove both whitespace and any remaining clause punctuation.
-	\item\textbf{Part-of-Speech (POS) tagging:} Categorise each token according to its lexical class, e.g. adjective. This more of an extension to the tokenisation process than strictly a part of it, but it is still necessary for subsequent processing.
+	\item\textbf{Part-of-Speech (POS) tagging:} Categorise each token according to its lexical class, e.g. adjective (\textit{JJ} in NLTK). This is more of an extension to the tokenisation process than strictly a part of it, but it is still necessary for subsequent processing.
 \end{enumerate}
 
 Once the raw article bodies and titles have been tokenised and tagged, the next subproblem is identifying words and phrases of importance within articles. These keywords will form our set of candidate metro lines in the next stage of the pipeline.
@@ -45,7 +47,7 @@ The second half of the keyword extraction process is exclusively concerned with 
 
 Keyword extraction from named entities has been empirically shown to outperform other methods for extraction such as using only noun phrases \citep{EventTracking}. Additionally, restricting the candidates to entities alone reduces the search space by an order of magnitude when using frequency-based methods for keyword extraction, and bypasses the need for other natural language processing tasks such as stop-word removal and lemmatisation.
 
-After tokens have been POS tagged, named-entity chunking can be performed, again using NLTK. This process groups tokens into contiguous and non-overlapping \textit{chunks}, where each chunk is a named entity; typically a proper noun or some other noun phrase. It is possible for chunks to contain other chunks (consider the chunk `Bank of England', which contains the chunk `England'), but this is typically undesirable for entity recognition -- where we desire specificity -- so after chunking the tokens, we flatten the chunk structure so chunks cannot be any further decomposed.
+After tokens have been POS tagged, named-entity chunking can be performed, again using NLTK. This process groups tokens into contiguous and non-overlapping \textit{chunks}, where each chunk is a named entity; typically a proper noun or some other noun phrase. It is possible for chunks to contain other chunks (consider the chunk `Bank of England', which contains the chunk `England'), but this is typically undesirable for entity recognition, where we desire specificity. Consequentially, after chunking the tokens, we flatten the chunk structure so chunks cannot be any further decomposed.
 
 The result of this process is a list of named-entity chunks, each of which will be an eventual candidate for becoming a metro line. However, the chunks require some further processing before we can determine whether or not they are significant keywords within the source text.
 
@@ -57,7 +59,7 @@ During this stage of disambiguation, we only consider entities which are mention
 To begin the process of substring matching, let $P$ denote the set of entities with strictly more than one occurrence in the source article; $S$:
 \begin{align*}
 P &= \{e\;|\;\text{occurences}(e, S) > 1\}
-\intertext{$\forall (e_1, e_2) \in \{P\times{P}\;|\;$length$(e_1)\;<\;$length$(e_2)\}, $ if $e_1 $ is a substring of $e_2$, we call $e_1$ an \textit{alias} of $e_2$. Let $A$ be the set of alias pairs in $S$;} 
+\intertext{$\forall (e_1, e_2) \in \{P\times{P}\}$ if $e_1 $ is a substring of $e_2$, we call $e_1$ an \textit{alias} of $e_2$. Due to the substring restriction, aliasing is not commutative. Let $A$ be the set of alias pairs $(e_1, e_2)$ in $S$;} 
 A &= \{(a, e) \;|\;a \text{ is an alias of } e\}
 \intertext{We require the first term of every pair in $A$ to be unique, but there is no such constraint for the second term ($e$); this allows multiple aliases to map to the same entity. For example,} 
  & \{(\text{`Zuckerberg'}, \text{`Mark Zuckerberg'}), (\text{`Zuck'}, \text{`Mark Zuckerberg'})\} 
@@ -91,7 +93,7 @@ We have a reasonable degree of confidence that for every alias-entity pair $(a, 
 
 \subsubsection{Entity Disambiguation with Knowledge Graph} \label{sec:gkg}
 
-The process described above is a simplistic approach which only addresses the matching of partial to full name mentions. In comparison, \textit{entity disambiguation} refers to the process of determining the identity of entities in a body of text. Performing this process on the sentence `The UK has voted to leave the EU,' should identify `UK' as `The United Kingdom' and `EU' as `The European Union'. As advanced methods for entity disambiguation are both complex and computationally expensive, we did not implement a formal method for this. 
+The process described in the previous section is a simplistic approach which only addresses the matching of partial name mentions to full mentions. In comparison, \textit{entity disambiguation} refers to the process of determining the identity of entities in a body of text. Performing this process on the sentence `The UK has voted to leave the EU,' should identify `UK' as `The United Kingdom' and `EU' as `The European Union'. As advanced methods for entity disambiguation are both complex and computationally expensive, we did not implement a formal method for this. 
 
 Instead, the list of recognised entities are queried against Google's publicly accessible Knowledge Graph API, which returns a list of potential results as Schema.org\footnote{http://schema.org is an online hierarchy of types managed by W3C (The World Wide Web Consortium)} types. Knowledge Graph is the service which replaced Freebase in 2015, and currently contains over 70 billion facts \citep{knowledgegraph}.
 
@@ -188,7 +190,9 @@ During implementation, it was found to be useful to automatically append the nam
 
 While implementing the \textit{ignore} functionality the differing results of using tf-idf and tf-pdf on the same corpus became obvious. Because tf-idf penalises words which appear with low but constant frequency across a number of documents, keywords we intuitively would wish to ignore such as `United Kingdom' are not scored as highly as they would be with tf-pdf. 
 
-This is in line with the findings of \citeauthor{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}; tf-pdf is more useful for detecting low-frequency keywords which are consistent across many documents. However, this behaviour is exactly the opposite of what we desire from the  metro lines produced by the system; those low-frequency keywords are most likely already known or could be easily inferred by a user reading the map. Therefore, we recommend tf-idf be given preference over tf-pdf in any implementations of metro map systems for news, where the names of more specific themes or topics are being sought.
+This is in line with the findings of \citeauthor{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm}; tf-pdf is more useful for detecting low-frequency keywords which are consistent across many documents. However, this behaviour is exactly the opposite of what we desire from the  metro lines produced by the system; those low-frequency keywords are most likely already known or could be easily inferred by a user reading the map. 
+
+We therefore recommend tf-idf be given preference over tf-pdf in any implementations of metro map systems for news, where the names of more specific themes or topics are being sought. The exception to this is when using a corpus constructed from RSS feeds which share very few topic themes. If this is the case, tf-idf will struggle to extract any topics common enough to form metro lines from, resulting in an overly sparse map. The higher-level topics which are less severely penalised by tf-pdf will provide the most cohesive overview in these instances.
 
 \clearpage
 
@@ -200,12 +204,12 @@ The key challenge of the graph building process is generalising the characterist
 
 \subsection{Extending the Definition of Coverage to Paths}\label{sec:linecoverage}
 
-Our starting point in this section is a corpus of articles and their associated keyword vectors, which form a metro map by \citeauthor{GeneratingInformationMaps}'s definition, but one with too many edges and metro lines to be readable in practice, as Figure \ref{fig:dense} demonstrates. Therefore, in order to selectively prune the number of paths to some fixed upper bound, a metric is required to calculate the relative importance of paths within a corpus.
+Our starting point in this section is a corpus of articles and their associated keyword vectors, which form a metro map by \citeauthor{GeneratingInformationMaps}'s definition, but one with too many edges and metro lines to be readable in practice, as Figure \ref{fig:dense} illustrates. Therefore, in order to selectively prune the number of paths to some fixed upper bound, a metric is required to calculate the relative importance of paths within a corpus.
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=\textwidth]{img/implementation/datascienceishard.pdf}
-	\caption{An unpruned and unusably dense metro map produced by our system}
+	\caption{An unpruned and unusably dense metro map generated by the system}
 	\label{fig:dense}
 \end{figure}
 
@@ -225,7 +229,7 @@ In order to compare candidate metro lines, we build on this definition of covera
 
 Here, the extent to which a path $\mathcal{P}$ covers a document $d$ within a corpus $\mathcal{D}$ is proportional to its tf-idf coverage of that document and inversely proportional to the number of other candidate paths which \textit{also} cover that document. The coverage of the entire corpus by $\mathcal{P}$ is then given the sum of its coverage of the articles along it multiplied by the length of the path, with high coverage being desirable.
 
-It is important to note that although with the final multiplication we show preference to longer metro lines, the objective of the system is not simply to maximise the number of articles which are included on the generated maps. This could easily be achieved by choosing the most nonspecific universal keywords as metro lines, but the resultant lines would be vague and unhelpful to a reader. It is in the nature of summarisation that not all information can be preserved, and in doing this kind of graph selection, the information lost is those articles which don't form links to the significant topics within the corpus.
+It is important to note that although with the final multiplication we show preference to longer metro lines, the objective of the system is not simply to maximise the number of articles which are included on the generated maps. This could easily be achieved by choosing the most nonspecific universal keywords as metro lines, but the resultant lines would be vague and unhelpful to a reader. It is in the nature of summarisation that not all information can be preserved, and in doing this kind of graph selection, the information lost is those articles which don't form links to any significant topics within the corpus.
 
 \subsection{Penalising Affinity} \label{sec:affinity}
 
@@ -270,9 +274,9 @@ Given a large enough background corpus, it would be possible to link the day's s
 
 
 \subsection{Serialisation}
-The intermediate stage of the pipeline between graph building and map drawing is purely an issue of implementation, with few design choices to be made. Starting with the Python representation of the metro map, we group articles by metro line to be serialised, along with their metadata and summaries, to JSON. This JSON is then copied into a preexisting templated JavaScript file which is responsible for representing and drawing the graph using D3.js. The contents of the JavaScript file are then embedded as a script in an HTML file, which contains the markup for the page. 
+The intermediate stage of the pipeline between graph building and map drawing is purely an issue of implementation, with few design choices to be made. Starting with the Python representation of the metro map, articles are grouped by metro line to be serialised, along with their metadata and summaries, to JSON. This JSON is then copied into a preexisting templated JavaScript file which is responsible for representing and drawing the graph using D3.js. The contents of the JavaScript file are then embedded as a script in an HTML file, which contains the markup for the page. 
 
-The main advantage to this process is that it results in a single file, meaning the resultant visualisations are as portable, shareable and platform independent as the news they were derived from. A secondary advantage is that the JSON accepted by D3 is standard and could easily be fed into a different JavaScript graphing library in the case of a more suitable alternative being written, with no change to the core Python software. The core software itself could also be hosted as a web app which serves the map HTML files, removing the need for client-side processing or installation.
+The main advantage to this process is that it results in a single file, meaning the resultant visualisations are as portable, shareable and platform independent as the news they were derived from. A secondary advantage is that the JSON accepted by D3 is standard and could easily be passed a different JavaScript graphing library in the case of a more suitable alternative being written, with no change to the core Python software. The core software itself could also be hosted as a web app which serves the map HTML files, removing the need for any client-side processing or installation.
 
 \clearpage
 \section{Map Drawing} \label{sec:drawing}
@@ -295,8 +299,8 @@ A metro map $\mathcal{M}$ is a pair $(G, \Pi)$, where $G=(V, E)$ is a directed g
 	\label{fig:mapdefinitions}
 \end{figure}
 \begin{description}[leftmargin=7em,style=nextline]
-	\item [Station] A single article $v \in V$, represented by a node in the graph. If $v$ has more than two incident edges, i.e an article which spans more than one topic in the graph, it is called an \textit{interchange}.
-	\item [Metro Line] A contiguous named path $p \in \Pi$ which is incident to two or more nodes, represented by a line of single colour. Metro lines are composed of \textit{links}.
+	\item [Station] A single article $v \in V$, represented by a node in the graph. If $v$ has more than two incident edges, i.e. it represents article which spans more than one topic in the graph, it is called an \textit{interchange}.
+	\item [Metro Line] An unbroken named path $p \in \Pi$ which is incident to two or more nodes, represented by a line of single colour. Metro lines are composed of \textit{links}.
 	\item [Link] A direct edge $e \in E$ between two nodes, which does not pass through any other node. In contrast to \citeauthor{GeneratingInformationMaps}'s definition, here, links must belong to \textit{exactly one} metro line. The case of two lines running side-by-side through the same two nodes is represented by two distinct links. This difference is due only to an implementation detail of the graphing library chosen.
 	\item [Terminus] A node with only one incident edge. This is not the definition of a terminus in the sense of the underlying metaphor, since by our definition, a station which is the terminus for two lines (see Figure \ref{fig:mapdefinitions}.f) is no longer categorised as a terminus at all. Instead, the definition requires that the position of a terminus only determine the position of a single link in the graph.
 \end{description}
@@ -311,15 +315,15 @@ We therefore devote a significant amount of thought to optimising the visual qua
 
 The set of rules and criteria defined by \cite{AutomaticMetroMapLayoutThesis} form a complex multicriteria optimisation function. Starting with an initial layout, nodes are embedded on a square grid of finite size, and iteratively moved to maximise the node movement criteria, as long as movement does not violate one of the node movement rules.
 
-It should be noted that the function also applies to the positioning of labels and the maximum of a set of label movement criteria alongside the node movement criteria, but as visualisations are unlabelled, these will not be described.
+It should be noted that the function also applies to the positioning of labels and the maximum of a set of label movement criteria alongside the node movement criteria, but as our stations are unlabelled, these will not be described.
 
 As previously discussed, there are six node movement criteria, which -- using the metro map-specific terms defined above -- are as follows:
 \begin{enumerate}
 	\item\textbf{Angular Resolution}: Maximise the angle of incident links on the same metro line at each station. As \cite{WhichAesthetic} found satisfying this criteria had no statistical effect on task performance, this will not be a priority\footnote{However, as angular resolution comes as a natural consequence of maximising line straightness, it is not disregarded completely during implementation.}.
 	
-	\item\textbf{Edge Length}: Keep all links approximately the same length. This is a criterion which can be implemented by setting a soft constraint using the graphing library, but it will not be considered beyond this constraint.
+	\item\textbf{Edge Length}: Keep all links approximately the same length. This is a criterion which can be implemented via a soft constraint using the graphing library, but it will not be considered beyond this.
 	
-	\item\textbf{Balanced Edge Length}: Keep links incident to a given station approximately the same length. While it would be possible to implement this as another soft constraint, there is no evidence that it would significantly improve usability, so this will not be considered.
+	\item\textbf{Balanced Edge Length}: Keep links incident to a given station approximately the same length. While it would be possible to implement this as an additional constraint, there is no evidence that it would significantly improve usability, so this will not be considered.
 	
 	\item\textbf{Edge Crossings}: Minimise the number of link crossings. \citeauthor{WhichAesthetic} found this to be the most significant factor in determining task performance, therefore it will be considered.
 	
@@ -334,9 +338,11 @@ Based on the justifications given above, we consider minimising edge crossings t
 
 A major difference between the maps generated using this system and maps representing real transit networks is the lack of ``real'' starting positions we have for stations. While the freedom to move points around without having to preserve their relative positioning removes one layout constraint, finding a set of starting positions for the map layout which define a planar embedding with minimal line crossings is non-trivial. 
 
-As \citeauthor{AutomaticMetroMapLayoutThesis} notes, ``This [difficulty] is due to our method being based on optimising an existing layout: if the initial embedding is not adequate, then our method may struggle to produce an acceptable optimisation.''\cite[p.210]{AutomaticMetroMapLayoutThesis}. One solution he suggests is to generate positions using a force-directed algorithm; a class of algorithms which simulate the forces of real physical motion to position nodes in a graph, with minimal edge crossings and approximately uniform edge lengths \citep{springembedders}. The downside to using a force-directed approach is that initial positioning and therefore the final map layout becomes nondeterministic. 
+As \citeauthor{AutomaticMetroMapLayoutThesis} notes, ``This [difficulty] is due to our method being based on optimising an existing layout: if the initial embedding is not adequate, then our method may struggle to produce an acceptable optimisation.''\cite[p.210]{AutomaticMetroMapLayoutThesis}. 
 
-D3.js includes an optimised implementation of \possessivecite{forcedirected} force-directed layout algorithm, and provides several parameters which can be used to alter the forces applied to some or all of the nodes in the graph. The two forces we will adjust to optimise the force-direction for metro maps are as follows:
+One solution \citeauthor{AutomaticMetroMapLayoutThesis} suggests is to generate positions using a force-directed algorithm; a class of algorithms which simulate the forces of real physical motion to position nodes in a graph, with minimal edge crossings and approximately uniform edge lengths \citep{springembedders}. The drawback to using a force-directed approach is that initial positioning and therefore the final map layout becomes nondeterministic. 
+
+D3 includes an optimised implementation of \possessivecite{forcedirected} force-directed layout algorithm, and provides several parameters which can be used to alter the forces applied to some or all of the nodes in the graph. The two forces we will adjust to optimise the force-direction for metro maps are as follows:
 \begin{itemize}
 \item\texttt{force.charge([charge])}\footnote{\url{https://github.com/d3/d3-3.x-api-reference/blob/master/Force-Layout.md\#charge}}\par
 	\textit{Charge} specifies the force of attraction between nodes, with negative values causing nodes to repel each other. In order to minimise crossings, this should be a large negative value, particularly for nodes which of higher degrees, which will be surrounded by more edges. We therefore set charge to -300 for termini, and -500 for all other stations. 
@@ -347,19 +353,21 @@ D3.js includes an optimised implementation of \possessivecite{forcedirected} for
 
 Unfortunately, the implementation of \texttt{d3.layout.force} lacks any further mechanism for detecting or reducing line crossings due to the computational expense of the best known algorithms (this subproblem is also NP-Hard). Even if line crossings could be detected, it is likely that the topology of certain graphs generated would make it impossible to find a planar embedding with no crossings.
 
-The parameter \texttt{force.alpha} is re-evaluated every time the simulation is advanced by a single step, which happens approximately 60 times per second. Since our aim is to generate an initial layout with minimal line crossings which will result in the best possible map, the simulation can constantly vary \texttt{force.alpha} based on the quality of the map as its stations are repositioned. Therefore, if the stations settle into a map layout with desirably high octilinearity and good line straightness, the energy of the graph will be reduced such that it is impossible for the embedding to change. Likewise, if the stations start repelling each other in a way that worsens line straightness and octilinearity, the system will have its energy increased and will be more likely to move out of the undesirable state.
+The parameter \texttt{force.alpha} is re-evaluated every time the simulation is advanced by a single step, which happens approximately 60 times per second. Since our aim is to generate an initial layout with minimal line crossings which will result in the best possible map, the simulation can constantly vary \texttt{force.alpha} based on the quality of the map as its stations are repositioned. 
+
+This means that if the stations settle into a map layout with desirably low octilinearity and line straightness, the energy of the graph will be reduced such that it is impossible for the embedding to change. Likewise, if the stations start repelling each other in a way that worsens line straightness and octilinearity, the system will have its kinetic energy increased and will be more likely to move out of the undesirable state.\\
 
 \begin{listing}[htbp!]
-\caption{Recalculating \texttt{force.alpha} from \possessivecite{AutomaticMetroMapLayoutThesis} criteria}
+\caption{Recalculating \texttt{force.alpha} from \possessivecite{AutomaticMetroMapLayoutThesis} criteria: \texttt{newsgraph.js}}
 \label{list:forcealpha}
-\inputminted[fontsize=\scriptsize,linenos,numbersep=5pt,firstline=98, lastline=108]{js}{../src/webUtils/newsgraph.js}
+\inputminted[fontsize=\footnotesize,linenos,numbersep=5pt,firstline=98, lastline=108]{js}{../src/webUtils/newsgraph.js}
 \end{listing}
 
-The measure of quality that we use to adjust \texttt{force.alpha} is a  combination of the two remaining chosen aesthetic criteria; octilinearity and line straightness, as shown in Listing \ref{list:forcealpha}. The means by which these two properties are calculated are described in the following sections.
+The measure of quality we use to update the kinetic energy of the stations is a combination of the two remaining chosen aesthetic criteria; octilinearity and line straightness, as shown in Listing \ref{list:forcealpha}. Strict definitions for these criteria and the means by which they are calculated are provided in the following two sections. Separate from the map octilinearity criterion but using the same principle is Section \ref{sec:termini}, which describes the repositioning logic for the outer sections of metro maps.
 
 \subsubsection{Octilinearity}
 
-Octilinearity (Equation \ref{eqn:octilinearity} \citep{AutomaticMetroMapLayoutThesis}) penalises lines which are not drawn at multiples of 45$^{\circ}$ angles; the further the gradient of a link in the graph is from a multiple of 45$^{\circ}$, the higher its octilinearity. Lower values are desirable, with zero indicating a graph is entirely octilinear. 
+The octilinearity criterion (Equation \ref{eqn:octilinearity} \citep{AutomaticMetroMapLayoutThesis}) penalises lines which are not drawn at multiples of 45$^{\circ}$ angles; the further the gradient of a link in the graph is from a multiple of 45$^{\circ}$, the higher its octilinearity. Lower values are desirable, with zero indicating a graph is entirely octilinear. 
 
 \begin{equation}
 	\text{octilinearity}(G) = \sum_{u, v\in E}\bigg|sin\;4\,\bigg(tan^{-1}\frac{|u.y - v.y|}{|u.x - v.x|}\bigg)\bigg|
@@ -439,50 +447,109 @@ The line straightness of the graph in Figure \ref{fig:linestraightness} (left) i
 }
 \end{algorithm}
 
-Empirically, we found the best results came from weighting octilinearity and line straightness equally when using them to set \texttt{force.alpha}, but this could be refined through further investigation. We take the sum of the natural log of both values, to ensure that small improvements to already low values for either criterion are rewarded.
+Empirically, the best results came from weighting octilinearity and line straightness equally when using them to set \texttt{force.alpha}, but this could be refined through further investigation. 
+
+The actual value assigned to \texttt{force.alpha} is the sum of the natural log of both values, to ensure that small improvements to already low values for either criterion are rewarded. This sum is also divided by a constant, due to the extreme responsiveness of the force-directed algorithm to large values of \texttt{force.alpha}.
 
 \subsection{Heuristic Refinement}
 
-Once all stations have been assigned their starting positions, they can be incrementally moved to adjacent intersections to improve the quality of the map. The first step is to discretise the search space for station positions, by \textit{snapping} stations to intersections on a large grid. We found the optimal size for this grid to be in the order of $\frac{n}{4}\times\frac{n}{4}$ for a map containing $n$ stations.
+Once all stations have been assigned their starting positions, they are incrementally moved to adjacent intersections, according to a set of conditions for improving the quality of the map. The first step is to discretise the search space for station positions, by \textit{snapping} stations to intersections on a large grid. We found the optimal size for this grid to be in the order of $\frac{n}{4}\times\frac{n}{4}$ for a map containing $n$ stations.
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=\textwidth]{img/implementation/snap.pdf}
+	\includegraphics[width=.7\textwidth]{img/implementation/snap.pdf}
 	\caption{An example set of initial moves demonstrating the \textit{snap-to-grid} process}
 	\label{fig:snap}
 \end{figure}
 
-Figure \ref{fig:snap} shows the \textit{snap-to-grid} process applied to a small example. We snap stations in order of descending weight (number of incident edges), as typically the more edges a node is connected to, the more difficult it is to place. In the example, this means station $c$ (with weight three) is moved first. There is contention for the second move, as both stations $a$ and $b$ have weight two, so we make an arbitrary decision as to which we move first, and the two moves are shown as one step. The final station to move is station $d$, after which we can mark all stations as successfully placed. 
+Figure \ref{fig:snap} shows the \textit{snap-to-grid} process applied to a small example. Stations are `snapped' in order of descending weight (number of incident edges), as typically the more edges a node is connected to, the more difficult it is to place. In the example, this means station $c$ (with weight three) is moved first. There is contention for the second move, as both stations $a$ and $b$ have weight two, so we make an arbitrary decision as to which we move first, and the two moves are shown as one step. The final station to move is station $d$, after which we can mark all stations as successfully placed.
 
-Stations whose nearest intersections are already occupied are left unplaced. This implementation contrasts slightly with \citeauthor{AutomaticMetroMapLayoutThesis}'s approach, where stations are snapped \textit{in order} of Euclidian distance to their nearest intersection, and snapped to the next-nearest if the closest intersection is already occupied. This implementation performs poorly for maps with several highly connected nodes, which is a common attribute of metro maps of news, due to the publishing review articles which often span many of the lines on the map.
+Stations whose nearest intersections are already occupied are left unplaced. This implementation contrasts slightly with \citeauthor{AutomaticMetroMapLayoutThesis}'s approach, where stations are snapped \textit{in order} of Euclidian distance to their nearest intersection, and snapped to the next-nearest if the closest intersection is already occupied. This is because \citeauthor{AutomaticMetroMapLayoutThesis}'s implementation performs poorly for maps with several highly connected nodes, which is a common attribute of metro maps of news, due to the publishing of review articles which often span many of the lines on the map.
 
-To determine the final station positions, our approach diverges from \citeauthor{AutomaticMetroMapLayoutThesis}'s into a heuristic method which has been refined for metro maps comprising between 10 and 50 stations. It is vital that lines with high affinity have been removed before this stage, or the following process will result in a map where nodes with high weights are occluded.
+To assign the final station positions, our approach now diverges from \citeauthor{AutomaticMetroMapLayoutThesis}'s into a heuristic method which has been refined for metro maps comprising between 10 and 50 stations. It is vital that lines with high affinity have been removed before this stage, or the following process will result in a map where nodes with high weights are occluded.
 
-Although by definition the \textit{snap-to-grid} gives a map near-perfect octilinearity, it can significantly worsen line-straightness, as shown in Figure \ref{fig:aoct}. It would be preferable to have the circled station repositioned as the transformation shows, even though this sacrifices the uniform edge length of the map. We therefore make several passes over each metro line, moving stations to the midpoint of the line between the previous and next neighbouring stations if that line is octilinear.
+Although by definition the \textit{snap-to-grid} gives a map near-perfect octilinearity, it can significantly worsen line-straightness and several of the other aesthetic criteria, as shown in Figure \ref{fig:aoct}. It would be preferable to have the circled station repositioned as the transformation shows, even though this sacrifices the uniform edge length of the map. It is therefore necessary to make several passes over each metro line, moving stations to the midpoint of the line between the previous and next neighbouring stations if that line is octilinear.
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=.8\textwidth]{img/implementation/averagingoctilinear.pdf}
+	\includegraphics[width=.7\textwidth]{img/implementation/averagingoctilinear.pdf}
 	\caption{An octilinear move which compromises the edge-length criterion}
 	\label{fig:aoct}
 \end{figure}
 
-In addition, a final pass checks for stations which are still unplaced at this point and performs the same midpoint movement regardless of whether the line between the next and previous points is octilinear. This is simply to try and ensure the unplaced point obscures and crosses as few other links as possible in what is most likely a densely packed area of the map. An example of this process is shown in Figure \ref{fig:nonoct}.
+In addition, a final pass checks for stations which are still unplaced at this point and performs the same midpoint movement regardless of whether the line between the next and previous points is octilinear. This is an attempt to ensure the unplaced point obscures and crosses as few other links as possible, in what is most likely a densely packed area of the map. An example of this process is shown in Figure \ref{fig:nonoct}.
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=.8\textwidth]{img/implementation/averagingnonoctilinear.pdf}
+	\includegraphics[width=.7\textwidth]{img/implementation/averagingnonoctilinear.pdf}
 	\caption{A non-octilinear move of an unplaced station}
 	\label{fig:nonoct}
 \end{figure}
 
-After the final pass, octilinearity and line-straightness are recomputed, and the number of points left unplaced (i.e. drawn directly on top of another point) are counted. If any of the numbers are high, the process can be restarted and the randomness of the initial force-direction will result in a different initial embedding. The exact value of `high' is a dependent on the number of articles on the map, as perfect octilinearity and line-straightness is typically only possible for small or sparse metro maps, and the more stations a map contains, the more likely it is that an article will be left unplaced.
+\subsubsection{Octilinearising Terminus Branches} \label{sec:termini}
+
+The three-step process for station movement described above focuses on repositioning the more connected portions of the metro maps generated by the system, which are typically found in the centres of the maps. This process does not help shape \textit{terminus branches}, that is, portions of metro lines which lead to or from its terminating stations and which have no intersections with other metro lines (see the blue metro line in Figure \ref{fig:leaves1}). 
+
+The nature of D3's force-directed algorithm and our lower \texttt{force.charge} rating for terminus stations causes straight lines to curve under the force, resulting in terminus branches being snapped to grid intersections which approximate the curve, as shown in figure \ref{fig:leaves1}, rather than as straight lines.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.4\textwidth]{img/implementation/leaves1.pdf}
+	\caption{A terminus branch containing an unnecessary bend}
+	\label{fig:leaves1}
+\end{figure}
+
+Terminus branches are often easy to reposition, because there is less contention for space outside the centre portion of the map. They are also not hard to identify; stations which fall between termini and any intersections can be accumulated as part of a branch, and this accumulation continues until an intersection with a different metro line is reached. 
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.4\textwidth]{img/implementation/leaves2.pdf}
+	\caption{The candidate move for the branch in Figure \ref{fig:leaves1}}
+	\label{fig:leaves2}
+\end{figure}
+
+The repositioning process is illustrated in Figure \ref{fig:leaves2}. The gradient $\alpha$ of line $\overrightarrow{ab}$ is 22.5$^{\circ}$, which, rounded to the nearest octilinear angle is 45$^{\circ}$. The new location for the terminus station $b$ is a line of length $|\overrightarrow{ab}|$, at an angle of 45$^{\circ}$, represented in the figure by the dotted line $\overrightarrow{ab'}$.
+
+The JavaScript implementation of this function shown in Listing \ref{list:octilinearise} works bidirectionally, on branches which both lead \textit{to} a terminus or originate \textit{from} a terminus, according to the chronology of the line. This function performs the exact process shown in Figure \ref{fig:leaves2}, by finding the nearest octilinear angle to the line between the stations \texttt{begin} and \texttt{end}, and returning an object containing the new co-ordinates of the stations. From the co-ordinates of the two branch endpoints, the positions of all the stations between can be interpolated in a separate function.\\
+
+\begin{listing}[htbp!]
+\caption{The \texttt{octilineariseLine} function for terminus branches: \texttt{newsgraph.js}}
+\label{list:octilinearise}
+\inputminted[fontsize=\footnotesize,linenos,numbersep=5pt,firstline=328, lastline=349]{js}{../src/webUtils/newsgraph.js}
+\end{listing}
+ 
+Position $b'$ is therefore chosen as a candidate move for station $b$ in Figure \ref{fig:leaves2}. The stations on the branch between the two points are spaced evenly along the line $\overrightarrow{ab'}$, the result of which is shown in Figure \ref{fig:leaves3}.  In the case of an orphaned metro line with no intersections, the result of this process is that the entire metro line will be drawn at an octilinear angle, with its stations evenly spaced between its two termini.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=.5\textwidth]{img/implementation/leaves3.pdf}
+	\caption{The result of octilinearising the terminus branch in Figure \ref{fig:leaves1}}
+	\label{fig:leaves3}
+\end{figure}
+
+As a final step in the \textit{map drawing} stage, octilinearity and line-straightness are recomputed for the repositioned map, and the number of points left unplaced (i.e. drawn directly on top of another point) are counted. If any of these the numbers are high, the process can be restarted and the randomness of the initial force-direction will result in a different initial embedding. The exact value of `high' is a dependent on the number of articles on the map and has not been sufficiently investigated. Perfect octilinearity and line-straightness are typically only achievable for small or very sparse metro maps, as the more stations a map contains, the more likely it is that an article will be left unplaced.
 
 \section{Summary}
 
-We have given a detailed description of the system's pipeline, covering transformation of news data from XML elements in an RSS feed to raw text, to parsed keywords, to recognised entities, to nodes in a directed graph, to stations on a formatted metro map.
+We have given a detailed description of the system's pipeline, covering transformation of news data from XML elements to stations on an interactive metro map. We consider the following processes to be novel or significant successes of development:
 
-Several unexpected difficulties arose during implementation, in particularly the tradeoffs involved with entity disambiguation in the context of what makes a ``useful'' metro line, and the process of deciding which lines to select between two or more with high affinity. 
+\begin{enumerate}
+	\item Entity disambiguation through substring matching, denominal adjective stemming, and Google Knowledge Graph result ratios (Section \ref{sec:keys}).
+	\item Formalisation of the metrics \textit{Path coverage} and \textit{Line affinity} (Sections \ref{sec:linecoverage} and \ref{sec:affinity}).
+	\item The first application of \possessivecite{AutomaticMetroMapLayoutThesis} aesthetic criteria to metro maps representing news corpora (Section \ref{sec:drawing}).
+	\item A heuristic function to improve the layout of terminus branches within small ($n<50$) metro maps, by octilinear repositioning of termini (Section \ref{sec:drawing}). 
+\end{enumerate}
 
-However, the most significant challenge of implementation was undoubtedly the process of drawing and refining usable metro maps. The conflict between edge crossings, line-straightness and octilinearity was always at play, and the final algorithm still falls into both local and global minima as it is unable to detect the edge crossings. This section of the pipeline would benefit greatly from further work, as it is a significant area of active research in its own right. As the expected datasets for the map are typically small (under 50 stations), a non-polynomial time algorithm for refining station positions would be feasible in terms of running time, and would doubtless improve the quality of the maps generated.
+Several unexpected difficulties arose during the implementation of the system, in particular the tradeoffs involved with the certainty of entity disambiguation, quantifying the logic for determining what makes a ``useful'' metro line, and deciding which metro lines to select between two or more with shared high affinity. 
 
-The results obtained by using the system to generate metro maps for various news corpora are presented in the next chapter. We take forward the successes of entity disambiguation and denominal adjective stemming, the concepts of line coverage and affinity, and the difficulties of generating initial station embeddings as points of discussion.
+The most significant challenge of implementation was undoubtedly the process of drawing and refining usable metro maps. The conflict between edge crossings, line-straightness and octilinearity was always at play, and the final algorithm still falls into both local and global minima as it is unable to detect the edge crossings. This section of the pipeline would benefit greatly from further work, as it is a significant area of active research in its own right. 
+
+As the expected datasets for the map are typically small (with fewer than 50 stations), a non-polynomial time algorithm for refining station positions would be feasible in terms of running time, and would doubtless improve the quality of the maps generated.
+
+The results of the process documented in this chapter are illustrated in Figure \ref{fig:final}. This example is available to interact with as \texttt{example-metro-map.html} in the \texttt{src} directory of this project.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=\textwidth]{img/implementation/final-map.pdf}
+	\caption{A metro map generated using the system}
+	\label{fig:final}
+\end{figure}
+
+Further results obtained by using the system to generate metro maps for various news corpora are presented in the next chapter.
 

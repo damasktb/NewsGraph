@@ -7,18 +7,18 @@ The day the result of the 2016 United Kingdom EU Membership Referendum was annou
 
 Some months after Leonhardt's article was published, Journalism Professor Jay Rosen voiced his agreement with its premise in a blog post on the failure of journalism during the financial crisis; ``there are certain very important stories -- and the mortgage crisis is a good example -- where until I grasp the whole I am unable to make sense of any part.''\citep{NationalExplainer}
 
-Studies have found that the general public use news media to make important life decisions, for entertainment and discussion, as a requirement of their jobs, and out of perceived civic obligation \citep{InformationCartography,UnderstandingTheParticipatoryNewsConsumer}. As a result of the ongoing shift towards online multimedia journalism, there has been an explosion of globally accessible knowledge which is expanding at an unprecedented rate as the internet grows. 
+Recent studies have found that the general public use news media for many purposes; to make important life decisions, for entertainment, as a requirement of their jobs, and out of perceived civic obligation \citep{InformationCartography,UnderstandingTheParticipatoryNewsConsumer}. As a result of the ongoing shift towards online multimedia journalism, there has been an explosion of globally accessible knowledge which is expanding at an unprecedented rate as the internet grows. 
 
 Although ubiquitous news media has resulted in more immediate and diverse coverage of current events, the volume of content available online has made the process of understanding it both daunting and off-putting to young adults \citep{anewmodelfornews}. Additionally, while news aggregators and RSS readers make it faster for users to access the news they care about, they do not aid comprehension. In spite of these facts, little attention has been given to addressing the problem that understanding news articles individually is inherently reliant on understanding news articles as a collection. 
 
 Existing information infrastructure has been criticised both for not supporting the cross-correlation between collections of related news articles \citep{GalaxyOfNews}, and for attempting fit complex narratives into reductive and misleading visualisations \citep{InformationCartography}. Research into how humans' spatio-cognitive abilities can be applied to more abstract visual metaphors \citep{FromMetaphorToMethod} suggests the strength of visual metaphors lies in their familiarity. We therefore build on the work of \cite{GeneratingInformationMaps} to integrate the Metro Map metaphor into the news aggregation process.
 
 \section*{Key Aims and Contributions}
-The primary aim of this project is the development of a tool which generates interactive metro maps of news from RSS feeds, with individual articles transformed into stations and common themes transformed into \textit{metro lines}. Our goal is to reduce the information overload experienced by news consumers by providing contextual links between articles and topics.
+The primary aim of this project is the development of a tool which generates interactive metro maps of news from RSS feeds, with individual articles transformed into \textit{stations} and common themes transformed into \textit{metro lines}. Our goal is to reduce the information overload experienced by news consumers by providing contextual links between articles and topics.
 
 The resultant system is a news feed aggregator with graphically structured output, and to the best of our knowledge is first of its kind. Contributions of this dissertation include:\vspace{-0.3cm}
 \begin{itemize}[itemsep=0.1em]
-	\item Implementation of efficient keyword extraction using tf-idf \citep{tfidf} on a reduced keyword space of named entities (Section \ref{sec:keys}).
+	\item Implementation of efficient keyword extraction using tf-idf \citep{tfidf} and tf-pdf \citep{TopicExtractionfromnewsArchiveUsingTFPDFAlgorithm} on a keyword space of named entities (Section \ref{sec:keys}).
 	\item A novel and lightweight method for performing entity disambiguation within current events articles using Google's Knowledge Graph API (Section \ref{sec:gkg}).
 	\item Formalisation of the metrics \textit{Line Coverage} and \textit{Affinity} as criteria for evaluating and ranking candidate metro lines (Sections \ref{sec:linecoverage} and \ref{sec:affinity}).
 	\item Recommendations for how D3.js parameters can be manually tuned to generate initial force-directed station positions for planar embeddings of metro maps (Section \ref{sec:fdp}).
@@ -35,6 +35,6 @@ The structure of this dissertation is as follows: \vspace{-0.1cm}
 	\item [Chapter \ref{c:implementation}] discusses the algorithms and techniques chosen to transform the data from feed to visualisation, describes how they were implemented in the system and explains the trade-offs which were encountered.
 	\item [Chapter \ref{c:results}] provides a set of example results generated by the system from different RSS feeds and analyses them from the perspectives of content, layout, and context.
 	\item [Chapter \ref{c:evaluation}] describes the process by which we evaluated the system in a two-part user study and discusses the results and implications of our experiments.
-	\item [Chapter \ref{c:conclusions}] summarises both the contributions and limitations of this work, and provides a discussion on future research directions.
+	\item [Chapter \ref{c:conclusions}] discusses both the contributions and limitations of this work, and provides a discussion on future research directions.
 \end{description}
 
