@@ -325,22 +325,24 @@ function importPositions(positions) {
   force.stop();
 }
 
-function octilineariseLine(li, begin, end, dir) {
-  let l = metro_lines[li];
+function octilineariseLine(metro_line, begin, end, dir) {
+  let l = metro_lines[metro_line];
   let line = {x: end.px-begin.px, y: end.py-begin.py};
-  let theta = Math.atan(line.y/line.x);
-  let nearest = Math.ceil(theta/(Math.PI/4)) * (Math.PI/4);
-  if (dir == 1) { // line coming inwards, move 'begin'
-    if (Math.round(Math.abs(nearest),2)==2||nan(Math.tan(nearest))) {
+
+  let alpha = Math.atan(line.y/line.x);
+  let nearest = Math.ceil(alpha/(Math.PI/4)) * (Math.PI/4);
+
+  if (dir == 1) { // line coming inwards; move 'begin' station
+    if (Math.round(Math.abs(nearest),2)==2 || nan(Math.tan(nearest))) {
       begin.py += linelength(begin, end);
     } else {
-      begin.py += line.x * (Math.tan(nearest) - Math.tan(theta));
+      begin.py += line.x * (Math.tan(nearest)-Math.tan(alpha));
     }
-  } else { // line going outwards, move 'end'
-    if (Math.round(Math.abs(nearest),2)==2||nan(Math.tan(nearest))) {
+  } else { // line going outwards; move 'end' station
+    if (Math.round(Math.abs(nearest),2)==2 || nan(Math.tan(nearest))) {
       end.py += linelength(begin, end);
     } else {
-      end.py += line.x * (Math.tan(nearest) - Math.tan(theta));
+      end.py += line.x * (Math.tan(nearest)-Math.tan(alpha));
     }
   }
   return {b:begin, e:end};
@@ -606,7 +608,7 @@ var octilinearity = function(){
   return total;
 }
 
-// This fails if basically any points are drawn on top of each other
+// This fails if any points are drawn on top of each other
 var lineStraightness = function(){
   var total = 0;
   for (var line in metro_lines) {
